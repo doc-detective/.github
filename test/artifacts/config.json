@@ -1,0 +1,21 @@
+{
+  "runOn": [
+    {
+      "platforms": ["windows", "linux", "mac"],
+      "browsers": [
+        {
+          "name": "chrome",
+          "headless": true
+        },
+        {
+          "name": "firefox",
+          "headless": true
+        }
+      ]
+    }
+  ],
+  "logLevel": "debug",
+  "telemetry": {
+    "send": false
+  }
+}
