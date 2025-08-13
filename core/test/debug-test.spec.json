@@ -1,0 +1,26 @@
+{
+  "tests": [
+    {
+      "testId": "debug-test",
+      "description": "Simple test to verify debug mode functionality",
+      "steps": [
+        {
+          "stepId": "step-1",
+          "description": "First step - simple wait",
+          "wait": 100
+        },
+        {
+          "stepId": "step-2", 
+          "description": "Second step with breakpoint",
+          "wait": 100,
+          "breakpoint": true
+        },
+        {
+          "stepId": "step-3",
+          "description": "Third step - another wait",
+          "wait": 100
+        }
+      ]
+    }
+  ]
+}

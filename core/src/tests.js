@@ -23,6 +23,7 @@ const uuid = require("uuid");
 const { setAppiumHome } = require("./appium");
 const { resolveExpression } = require("./expressions");
 const { getEnvironment, getAvailableApps } = require("./config");
+const { DebugManager } = require("./debug/DebugManager");
 
 exports.runSpecs = runSpecs;
 // exports.appiumStart = appiumStart;
@@ -241,6 +242,10 @@ async function runSpecs({ resolvedTests }) {
   const availableApps = runnerDetails.availableApps;
   const metaValues = { specs: {} };
   let appium;
+  
+  // Initialize debug manager
+  const debugManager = new DebugManager(config);
+  
   const report = {
     summary: {
       specs: {
@@ -493,39 +498,102 @@ async function runSpecs({ resolvedTests }) {
             context.contextId
           ].steps[step.stepId] = {};
 
-          // Run step
-          const stepResult = await runStep({
-            config: config,
-            context: context,
-            step: step,
-            driver: driver,
-            metaValues: metaValues,
-            options: {
-              openApiDefinitions: context.openApi || [],
-            },
-          });
-          log(
-            config,
-            "debug",
-            `RESULT: ${stepResult.status}, ${stepResult.description}`
-          );
+          let stepResult;
+          let stepReport;
+          let shouldRetry = false;
+          let shouldSkip = false;
+          let shouldStop = false;
 
-          stepResult.result = stepResult.status;
-          stepResult.resultDescription = stepResult.description;
-          delete stepResult.status;
-          delete stepResult.description;
+          // Debug: Check for breakpoint before step execution
+          if (debugManager.shouldPause(step, false)) {
+            const debugAction = await debugManager.handleDebugPause(
+              step, 
+              context, 
+              metaValues, 
+              false
+            );
+            if (debugAction === 'stop') {
+              shouldStop = true;
+            }
+          }
 
-          // Add step result to report
-          const stepReport = {
-            ...stepResult,
-            ...step,
-          };
-          contextReport.steps.push(stepReport);
-          report.summary.steps[stepReport.result.toLowerCase()]++;
+          if (!shouldStop) {
+            do {
+              shouldRetry = false;
+              
+              // Run step
+              stepResult = await runStep({
+                config: config,
+                context: context,
+                step: step,
+                driver: driver,
+                metaValues: metaValues,
+                options: {
+                  openApiDefinitions: context.openApi || [],
+                },
+              });
+              log(
+                config,
+                "debug",
+                `RESULT: ${stepResult.status}, ${stepResult.description}`
+              );
 
-          // If this step failed, set flag to skip remaining steps
-          if (stepReport.result === "FAIL") {
+              stepResult.result = stepResult.status;
+              stepResult.resultDescription = stepResult.description;
+              delete stepResult.status;
+              delete stepResult.description;
+
+              // Debug: Handle failures in debug mode
+              if (stepResult.result === "FAIL" && debugManager.isDebugMode) {
+                const debugAction = await debugManager.handleDebugPause(
+                  step,
+                  context,
+                  metaValues,
+                  true,
+                  stepResult.resultDescription
+                );
+
+                switch (debugAction) {
+                  case 'retry':
+                    shouldRetry = true;
+                    log(config, "debug", "Retrying step due to user request");
+                    break;
+                  case 'skip':
+                    shouldSkip = true;
+                    stepResult.result = "SKIPPED";
+                    stepResult.resultDescription = "Skipped by user in debug mode";
+                    log(config, "debug", "Skipping step due to user request");
+                    break;
+                  case 'stop':
+                    shouldStop = true;
+                    log(config, "debug", "Stopping test execution due to user request");
+                    break;
+                  case 'continue':
+                    // Continue with the failure
+                    break;
+                }
+              }
+            } while (shouldRetry && !shouldStop);
+
+            // Add step result to report
+            stepReport = {
+              ...stepResult,
+              ...step,
+            };
+            contextReport.steps.push(stepReport);
+            report.summary.steps[stepReport.result.toLowerCase()]++;
+
+            // If this step failed, set flag to skip remaining steps (unless we're skipping)
+            if (stepReport.result === "FAIL" && !shouldSkip) {
+              stepExecutionFailed = true;
+            }
+          }
+
+          // If user chose to stop, break out of step loop
+          if (shouldStop) {
+            log(config, "debug", "Test execution stopped by user in debug mode");
             stepExecutionFailed = true;
+            break;
           }
         }
 
