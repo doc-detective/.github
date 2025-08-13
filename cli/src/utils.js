@@ -44,6 +44,14 @@ function setArgs(args) {
       description: "Allow execution of potentially unsafe tests",
       type: "boolean",
     })
+    .option("debug", {
+      description: "Enable breakpoint debugging mode",
+      type: "boolean",
+    })
+    .option("stepThrough", {
+      description: "Enable step-through debugging mode (pauses at every step)",
+      type: "boolean",
+    })
     .help()
     .alias("help", "h").argv;
 
@@ -118,6 +126,12 @@ async function setConfig({ configPath, args }) {
   }
   if (typeof args.allowUnsafe === "boolean") {
     config.allowUnsafeSteps = args.allowUnsafe;
+  }
+  if (typeof args.debug === "boolean" && args.debug) {
+    config.debug = true;
+  }
+  if (typeof args.stepThrough === "boolean" && args.stepThrough) {
+    config.debug = "stepThrough";
   }
   // Resolve paths
   config = await resolvePaths({

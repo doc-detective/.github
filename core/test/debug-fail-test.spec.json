@@ -1,0 +1,25 @@
+{
+  "tests": [
+    {
+      "testId": "debug-fail-test",
+      "description": "Test to verify debug mode failure handling",
+      "steps": [
+        {
+          "stepId": "step-1",
+          "description": "First step - simple wait",
+          "wait": 100
+        },
+        {
+          "stepId": "step-2", 
+          "description": "Second step - should fail",
+          "checkLink": "https://this-domain-does-not-exist-12345.com"
+        },
+        {
+          "stepId": "step-3",
+          "description": "Third step - after failure",
+          "wait": 100
+        }
+      ]
+    }
+  ]
+}
