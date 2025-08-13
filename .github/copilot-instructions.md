@@ -1,14 +1,51 @@
-# Development Guidelines for Agents
+# Doc Detective Development Guide
 
 ## What is Doc Detective?
 
-Doc Detective is a tool to automate documentation testing. It can validate the accuracy and completeness of documentation by comparing it against the actual behavior of the associated project/product. It's designed to help developers ensure that their documentation is always up-to-date and reflective of the current state of the codebase.
+Doc Detective is a documentation testing framework that enables treating documentation as testable assertions. It automatically detects tests embedded in documentation (markdown, JSON specs) and executes them against live applications via browser automation, API calls, and shell commands. The goal is to ensure documentation stays accurate as products evolve.
 
-Doc Detective lets developers treat docs as literal assertions of product behavior (Docs as Tests), and detects tests from the markup syntax of the content source files, then executes the tests. This means that the docs are *literally* their own tests, and Doc Detective is their test runner.
+## Architecture Overview
 
-## Core Philosophy
+This is a **git subtree monorepo** managing 8 independent packages:
 
-All work should be done in small, incremental changes that maintain a working state throughout development.
+- **`core/`** - Test execution engine (`doc-detective-core` npm package)
+- **`common/`** - Shared schemas and utilities (`doc-detective-common`)
+- **`resolver/`** - Test detection and parsing (`doc-detective-resolver`)
+- **`cli/`** - Standalone CLI tool (`doc-detective` npm package)
+- **`vscode/`** - VS Code extension
+- **`github-action/`** - GitHub Action wrapper
+- **`container/`** - Docker images
+- **`docs/`** - Documentation website (Docusaurus)
+
+### Key Data Flow
+
+1. **Resolver** detects tests from markdown/JSON files → parses into normalized test specs
+2. **Core** executes test specs → runs browser automation, API calls, shell commands  
+3. **Results** are returned as structured JSON for integration with CI/testing infrastructure
+
+## Git Subtree Workflow
+
+**CRITICAL**: This repo uses git subtrees, not submodules. Each subdirectory maps to an independent GitHub repository.
+
+### Essential Commands
+
+```bash
+# Pull all latest changes from upstream repos
+npm run subtree:pull:all
+
+# Push changes to upstream repos  
+npm run subtree:push:all
+
+# Work with specific packages
+npm run subtree:pull:core
+npm run subtree:push:core
+```
+
+**Development Flow:**
+1. Always run `npm run subtree:pull:all` before starting work
+2. Make changes in subdirectories (e.g., `core/`, `cli/`)
+3. Commit changes to this monorepo
+4. Run `npm run subtree:push:all` to sync changes to individual repos
 
 ## Quick Reference
 
