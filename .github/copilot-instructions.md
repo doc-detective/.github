@@ -47,6 +47,510 @@ npm run subtree:push:core
 3. Commit changes to this monorepo
 4. Run `npm run subtree:push:all` to sync changes to individual repos
 
+## Project Structure and Key Files
+
+### Core Module (`core/`)
+- **`src/index.js`** - Main entry point, exports `runTests(config)`
+- **`src/tests.js`** - Test orchestration and spec execution
+- **`src/actions/`** - Individual action implementations (checkLink, click, find, etc.)
+- **`src/utils.js`** - Logging, file operations, temp cleanup
+- **`test/`** - Integration tests using real test servers
+
+### Common Module (`common/`)
+- **`src/schemas/`** - JSON schema definitions for all data structures
+- **`src/validate.js`** - Schema validation utilities using AJV
+- **`src/files.js`** - File reading and path resolution
+- **`src/resolvePaths.js`** - Path resolution logic
+
+### Resolver Module (`resolver/`)
+- **`src/detectTests.js`** - Parse markdown and JSON for test specifications
+- **`src/resolveTests.js`** - Transform detected tests into executable specs
+
+### CLI Module (`cli/`)
+- **`index.js`** - CLI entry point and argument parsing
+- **`src/`** - CLI-specific utilities and commands
+- **`samples/`** - Example test files and configurations
+
+## Test Specifications and Actions
+
+Doc Detective executes **test specifications** containing **tests** with **steps** that perform **actions**:
+
+### Core Actions (implemented in `core/src/actions/`)
+
+- **`checkLink`** - Verify URL accessibility and response codes
+- **`click`** - Click elements via CSS selector or text content
+- **`find`** - Locate elements and optionally interact with them
+- **`goTo`** - Navigate browser to specified URLs
+- **`httpRequest`** - Make HTTP requests with validation of responses
+- **`runShell`** - Execute shell commands and capture output
+- **`runCode`** - Execute code blocks (useful for testing code examples)
+- **`screenshot`** - Capture screenshots for visual validation
+- **`type`** - Input text and special keys (`$ENTER$`, `$ESC$`, etc.)
+- **`wait`** - Pause execution for specified duration
+- **`setVariables`** - Load environment variables from files
+- **`record`/`stopRecord`** - Video recording of test execution
+
+### Test Format Examples
+
+**JSON Specification Format:**
+```json
+{
+  "id": "example-test-spec",
+  "contexts": [
+    {
+      "app": { "name": "firefox" },
+      "platforms": ["windows", "mac", "linux"]
+    }
+  ],
+  "tests": [
+    {
+      "id": "navigation-test",
+      "steps": [
+        {
+          "action": "goTo",
+          "url": "https://example.com"
+        },
+        {
+          "action": "find",
+          "selector": "input[name='search']",
+          "click": true
+        },
+        {
+          "action": "type",
+          "keys": ["search term", "$ENTER$"]
+        },
+        {
+          "action": "screenshot",
+          "path": "search-results.png"
+        }
+      ]
+    }
+  ]
+}
+```
+
+**Inline Markdown Format:**
+```markdown
+# Documentation with embedded tests
+
+<!-- test
+testId: doc-navigation
+contexts: [{"app": {"name": "firefox"}}]
+-->
+
+Navigate to the homepage:
+<!-- step goTo: "https://example.com" -->
+
+Find the search box and enter a query:
+<!-- step find: input[name='search'] -->
+<!-- step type: ["search term", "$ENTER$"] -->
+
+The results should appear:
+<!-- step screenshot: search-results.png -->
+```
+
+## Schema-Driven Development
+
+All data structures are defined via JSON schemas in `common/src/schemas/`:
+
+### Key Schemas
+- **`config.json`** - Configuration schema for Doc Detective runs
+- **`test.json`** - Test specification schema
+- **`step.json`** - Individual step/action schema
+- **Action schemas** - Individual schemas for each action type (e.g., `checkLink.json`, `click.json`)
+
+### Schema Usage Pattern
+```javascript
+const { validate } = require('doc-detective-common');
+
+// Validate configuration
+const configResult = validate('config', userConfig);
+if (!configResult.valid) {
+  console.error('Invalid config:', configResult.errors);
+}
+
+// Validate test specification
+const testResult = validate('test', testSpec);
+```
+
+### Adding New Schemas
+1. Create schema file in `common/src/schemas/src_schemas/`
+2. Run schema build process to generate output schemas
+3. Update `common/src/schemas/index.js` to export new schema
+4. Use in validation throughout codebase
+
+## Testing Approach
+
+### Integration Testing Philosophy
+- **Test through public APIs** - Don't test internal implementation details
+- **Use real test servers** - Express servers in `test/server/` directories
+- **Browser automation** - WebDriverIO for real browser interactions
+- **Real file operations** - Create and clean up actual test files
+
+### Test Structure Pattern
+```javascript
+const { runTests } = require('../src');
+const { createServer } = require('./server');
+const assert = require('assert').strict;
+
+describe('Doc Detective Core Tests', function() {
+  this.timeout(0); // Indefinite timeout for browser tests
+  
+  let server;
+  
+  before(async () => {
+    server = createServer({ port: 8092 });
+    await server.start();
+  });
+  
+  after(async () => {
+    await server.stop();
+  });
+  
+  it('should execute test specifications successfully', async () => {
+    const config = {
+      runTests: { input: './test/artifacts' },
+      logLevel: 'silent'
+    };
+    
+    const result = await runTests(config);
+    assert.equal(result.summary.specs.fail, 0);
+  });
+});
+```
+
+### Test Server Pattern (used in `core/test/server/` and `resolver/test/server/`)
+```javascript
+const express = require('express');
+
+function createServer(options = {}) {
+  const app = express();
+  const port = options.port || 3000;
+  
+  app.use(express.static(options.staticDir || './public'));
+  app.use(express.json());
+  
+  // Custom routes for testing
+  app.get('/api/test', (req, res) => {
+    res.json({ status: 'ok', timestamp: Date.now() });
+  });
+  
+  return {
+    start: () => new Promise(resolve => {
+      const server = app.listen(port, resolve);
+      return server;
+    }),
+    stop: () => server?.close()
+  };
+}
+```
+
+## Browser Automation and WebDriver
+
+Doc Detective uses WebDriverIO for browser automation with multiple driver support:
+
+### Supported Browsers
+- **Firefox** (via GeckoDriver) - Default and most stable
+- **Chrome/Chromium** (via ChromeDriver)
+- **Safari** (via SafariDriver, macOS only)
+
+### WebDriver Configuration
+```javascript
+// Typical WebDriver session config
+const sessionConfig = {
+  logLevel: 'warn',
+  capabilities: {
+    browserName: 'firefox', // or 'chrome', 'safari'
+    'moz:firefoxOptions': {
+      headless: process.env.HEADLESS !== 'false',
+      args: ['--width=1920', '--height=1080']
+    }
+  }
+};
+```
+
+### Element Finding Strategies
+- **CSS Selectors** - Primary method for element location
+- **Text content** - Fallback for finding elements by visible text
+- **XPath** - For complex element traversal when needed
+
+### Screenshot and Visual Testing
+- Screenshots saved as PNG files
+- Configurable paths and directories
+- Variation handling for slight visual differences
+- Integration with CI/CD pipelines for visual regression testing
+
+## Configuration System
+
+Doc Detective uses a hierarchical configuration system:
+
+### Configuration Precedence (highest to lowest)
+1. Command-line arguments
+2. Environment variables  
+3. Config file (`.doc-detective.json`)
+4. Default values
+
+### Key Configuration Sections
+```json
+{
+  "runTests": {
+    "input": "./docs",
+    "output": "./test-results",
+    "recursive": true,
+    "setup": "./setup.spec.json",
+    "cleanup": "./cleanup.spec.json"
+  },
+  "contexts": [
+    {
+      "app": { "name": "firefox", "options": { "headless": true } },
+      "platforms": ["linux", "mac", "windows"]
+    }
+  ],
+  "logLevel": "info",
+  "telemetry": false
+}
+```
+
+### Environment Variable Support
+- Load from `.env` files using `setVariables` action
+- Variable substitution in test specifications
+- Support for different environments (dev, staging, prod)
+
+## File Detection and Processing
+
+The resolver module handles file detection and parsing:
+
+### File Type Support
+- **Markdown files** (`.md`, `.markdown`) - Detect inline test comments
+- **JSON files** (`.json`) - Direct test specification format
+- **YAML files** (`.yaml`, `.yml`) - Alternative specification format
+
+### Detection Patterns
+```javascript
+// Markdown inline test detection
+<!-- test -->           // Start test block
+<!-- step action: params --> // Individual step
+<!-- /test -->          // End test block (optional)
+
+// JSON/YAML specification
+{
+  "tests": [
+    {
+      "steps": [
+        { "action": "goTo", "url": "..." }
+      ]
+    }
+  ]
+}
+```
+
+### Path Resolution
+- Recursive directory scanning
+- Glob pattern support
+- Exclusion patterns (e.g., `node_modules/`, `.git/`)
+- Relative path resolution from config file location
+
+## CI/CD Integration
+
+### GitHub Actions Integration
+The `github-action/` module provides:
+- **Automated test execution** in CI pipelines
+- **Pull request creation** when files change (screenshots, etc.)
+- **Issue creation** on test failures
+- **Artifact handling** for screenshots and videos
+
+### Key Action Inputs
+```yaml
+- uses: doc-detective/github-action@main
+  with:
+    config: .doc-detective.json
+    exit_on_fail: true
+    create_pr_on_change: true
+    pr_title: "Doc Detective Updates"
+    create_issue_on_fail: true
+```
+
+### Docker Container Support
+The `container/` module provides:
+- Pre-configured environments with browsers
+- Consistent execution across different CI systems
+- Multi-platform support (Linux x64, ARM64)
+
+## Error Handling and Debugging
+
+### Logging Levels
+- **`silent`** - No output
+- **`error`** - Errors only
+- **`warn`** - Warnings and errors
+- **`info`** - General information (default)
+- **`debug`** - Detailed execution information
+
+### Common Debugging Techniques
+```bash
+# Run with debug logging
+npx doc-detective --logLevel debug
+
+# Test specific file
+npx doc-detective --input specific-test.json
+
+# Run without headless browser for visual debugging
+HEADLESS=false npx doc-detective
+```
+
+### Error Result Structure
+```json
+{
+  "summary": {
+    "specs": { "pass": 0, "fail": 1, "skipped": 0 },
+    "tests": { "pass": 0, "fail": 1, "skipped": 0 },
+    "steps": { "pass": 2, "fail": 1, "skipped": 1 }
+  },
+  "specs": [
+    {
+      "status": "fail",
+      "error": {
+        "message": "Element not found: .missing-selector",
+        "stack": "..."
+      }
+    }
+  ]
+}
+```
+
+## Performance Considerations
+
+### Browser Resource Management
+- **Session reuse** - Single browser session per context when possible
+- **Cleanup handling** - Automatic cleanup of browser processes
+- **Memory management** - Proper disposal of WebDriver sessions
+
+### Parallel Execution
+- **Context isolation** - Different contexts can run in parallel
+- **Test sequencing** - Steps within tests run sequentially
+- **Resource limiting** - Configure concurrent browser sessions
+
+### File I/O Optimization
+- **Batch file operations** - Process multiple files efficiently
+- **Temporary file cleanup** - Automatic cleanup of generated files
+- **Path caching** - Cache resolved paths during execution
+
+## Development Workflows
+
+### Local Development
+```bash
+# Setup for development
+git clone https://github.com/doc-detective/.github.git
+cd .github
+npm run subtree:pull:all
+
+# Work on specific module
+cd core/
+npm install
+npm test
+
+# Test changes
+npm run dev  # If available in module
+```
+
+### Adding New Actions
+1. **Create action file** in `core/src/actions/new-action.js`
+2. **Define JSON schema** in `common/src/schemas/src_schemas/newAction.json`
+3. **Update action registry** in `core/src/actions/index.js`
+4. **Add tests** in `core/test/` with real examples
+5. **Update documentation** in `docs/`
+
+### Module Dependencies
+```
+cli -> core -> resolver -> common
+     -> common
+
+vscode -> core -> resolver -> common
+       -> common
+
+github-action -> cli (as dependency)
+
+container -> cli (as base image)
+```
+
+### Version Management
+- Each module maintains independent versioning
+- Subtree pushes sync changes to individual repositories
+- NPM packages published independently
+- Dependency updates managed per module
+
+## VS Code Extension Development
+
+The `vscode/` module provides:
+
+### Key Features
+- **Test detection** in markdown and JSON files
+- **Syntax highlighting** for Doc Detective test comments
+- **Command palette** integration for running tests
+- **Results visualization** in VS Code interface
+
+### Extension Architecture
+```
+vscode/
+├── src/
+│   ├── extension.ts        # Main extension entry point
+│   ├── commands/          # VS Code command implementations
+│   ├── providers/         # Language providers for syntax highlighting
+│   └── utils/            # Utility functions
+├── media/                 # Icons and static assets
+└── package.json          # Extension manifest
+```
+
+### Development Setup
+```bash
+cd vscode/
+npm install
+code .  # Open in VS Code
+# Press F5 to launch extension development host
+```
+
+## Telemetry and Analytics
+
+Doc Detective includes optional telemetry:
+
+### Telemetry Data
+- **Usage patterns** - Which actions are most commonly used
+- **Error frequencies** - Common failure patterns
+- **Performance metrics** - Execution times and resource usage
+
+### Privacy Controls
+- **Opt-out available** - Set `telemetry: false` in config
+- **No sensitive data** - Only aggregate usage patterns collected
+- **Transparent collection** - All telemetry code is open source
+
+## Contributing Guidelines
+
+### Code Style
+- **JavaScript ES6+** - Modern JavaScript features
+- **Consistent formatting** - Use existing patterns in each module
+- **Clear naming** - Functions and variables should be self-documenting
+- **Error handling** - Proper error propagation and user-friendly messages
+
+### Testing Requirements
+- **Integration tests** for new actions
+- **Schema validation** for new data structures
+- **Real browser testing** for UI interactions
+- **Cross-platform testing** when possible
+
+### Documentation Updates
+- **Schema documentation** - Update when adding new schemas
+- **Action documentation** - Document new actions with examples
+- **API documentation** - Update for public API changes
+- **Sample files** - Provide working examples
+
+### Pull Request Process
+1. **Fork and branch** from main repository
+2. **Make changes** in appropriate module directories
+3. **Test thoroughly** - All existing tests must pass
+4. **Update documentation** - Include relevant doc updates
+5. **Submit PR** to the main `.github` repository
+6. **Maintainer sync** - Changes get synced to individual repos
+
+
 ## Quick Reference
 
 **Key Principles:**
