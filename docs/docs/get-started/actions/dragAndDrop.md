@@ -47,14 +47,23 @@ The `dragAndDrop` action supports two syntax patterns:
 
 ## Properties
 
-- **`source`** (required): The element to drag. Can be a string (element text or CSS/XPath selector) or an object with `elementText` and/or `selector` properties.
-- **`target`** (required): The target location to drop the element. Can be a string (element text or CSS/XPath selector) or an object with `elementText` and/or `selector` properties.
+- **`source`** (required): The element to drag. Can be a string (element text, CSS/XPath selector, or regex pattern) or an object with `elementText` and/or `selector` properties.
+- **`target`** (required): The target location to drop the element. Can be a string (element text, CSS/XPath selector, or regex pattern) or an object with `elementText` and/or `selector` properties.
 - **`duration`** (optional): Duration of the drag operation in milliseconds. Default is 1000ms.
 
 When using the detailed object syntax for `source` or `target`:
-- **`elementText`** (optional): Display text of the element. If combined with `selector`, the element must match both.
+- **`elementText`** (optional): Display text of the element or regex pattern. If combined with `selector`, the element must match both.
 - **`selector`** (optional): CSS or XPath selector of the element. If combined with `elementText`, the element must match both.
 - **`timeout`** (optional): Max duration in milliseconds to wait for the element to exist. Default is 5000ms.
+
+### Regex Pattern Matching
+
+The `dragAndDrop` action supports regex pattern matching for both simple string syntax and detailed object syntax:
+
+- **Simple syntax**: Use regex patterns enclosed in forward slashes, e.g., `"/Widget.*/"`
+- **Object syntax**: Use regex patterns in the `elementText` property, e.g., `"elementText": "/Button [0-9]+/"`
+
+Regex patterns allow for flexible element matching when text content varies or contains dynamic values.
 
 At least one of `elementText` or `selector` is required for each element object.
 
@@ -196,10 +205,76 @@ Here are a few ways you might use the `dragAndDrop` action:
 }
 ```
 
+### Drag using regex pattern matching (simple syntax)
+
+```json
+{
+  "tests": [
+    {
+      "steps": [
+        {
+          "description": "Drag any widget item to the canvas using regex",
+          "dragAndDrop": {
+            "source": "/Widget Item.*/",
+            "target": "#canvas"
+          }
+        }
+      ]
+    }
+  ]
+}
+```
+
+### Drag using regex pattern matching (detailed syntax)
+
+```json
+{
+  "tests": [
+    {
+      "steps": [
+        {
+          "description": "Drag specific numbered widget using regex",
+          "dragAndDrop": {
+            "source": {
+              "selector": ".draggable",
+              "elementText": "/Widget.*[0-9]+/"
+            },
+            "target": {
+              "selector": ".drop-zone"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
+```
+
+### Drag to target found by regex
+
+```json
+{
+  "tests": [
+    {
+      "steps": [
+        {
+          "description": "Drag to any available drop zone using regex",
+          "dragAndDrop": {
+            "source": "Table",
+            "target": "/Drop Zone.*/"
+          }
+        }
+      ]
+    }
+  ]
+}
+```
+
 ## Behavior
 
-- Uses the same element finding logic as the [`find`](find) action
+- Uses the same element finding logic as the [`find`](find) action, including full regex pattern matching support
 - Supports both text-based and selector-based element identification
+- Regex patterns should be enclosed in forward slashes (e.g., `/pattern/`) for both simple syntax and elementText properties
 - When both `elementText` and `selector` are specified, elements must match both criteria
 - When multiple elements match criteria, operates on the first matched element
 - Duration controls the speed of the drag operation (higher values = slower drags)
