@@ -7,6 +7,7 @@ exports.resolveDetectedTests = resolveDetectedTests;
 // Doc Detective actions that require a driver.
 const driverActions = [
   "click",
+  "dragAndDrop",
   "find",
   "goTo",
   "loadCookie",
