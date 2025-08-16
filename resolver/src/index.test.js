@@ -223,7 +223,7 @@ describe("Input/output detect comparisons", async function () {
     };
     const results = await detectAndResolveTests({ config });
     fs.unlinkSync(tempYamlFile); // Clean up temp file
-    expect(results).to.have.keys(["config", "specs"]);
+    expect(results).to.contain.keys(["config", "specs", "resolvedTestsId"]);
     expect(results.specs).to.be.an("array").that.is.not.empty;
     expect(results.specs[0]).to.have.property("specId").that.is.a("string");
     expect(results.specs[0]).to.have.property("tests").that.is.an("array").that

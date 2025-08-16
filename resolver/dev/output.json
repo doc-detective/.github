@@ -1,27 +1,427 @@
-[
-  {
-    "specId": "cleanup",
-    "tests": [
+{
+  "resolvedTestsId": "c95824a0-029d-40c0-a013-7f3bfff81b72",
+  "config": {
+    "input": [
+      "./dev/dev.spec.json"
+    ],
+    "logLevel": "debug",
+    "runOn": [
       {
-        "steps": [
+        "platforms": [
+          "linux",
+          "mac",
+          "windows"
+        ],
+        "browsers": [
           {
-            "loadVariables": "/home/hawkeyexl/Workspaces/resolver/dev/env"
+            "name": "chrome"
           },
           {
-            "runShell": {
-              "command": "echo",
-              "args": [
-                "cleanup"
-              ],
-              "maxVariation": 0
-            },
-            "variables": {}
+            "name": "firefox"
           }
-        ],
-        "unsafe": false,
-        "detectSteps": true,
-        "testId": "f1255082-34d3-45e9-a77a-f0ef3c57f366"
+        ]
       }
-    ]
-  }
-]
+    ],
+    "output": ".",
+    "recursive": true,
+    "relativePathBase": "file",
+    "detectSteps": true,
+    "fileTypes": [
+      {
+        "name": "markdown",
+        "extensions": [
+          "md",
+          "markdown",
+          "mdx"
+        ],
+        "inlineStatements": {
+          "testStart": [
+            "{\\/\\*\\s*test\\s+?([\\s\\S]*?)\\s*\\*\\/}",
+            "<!--\\s*test\\s*([\\s\\S]*?)\\s*-->",
+            "\\[comment\\]:\\s+#\\s+\\(test\\s*(.*?)\\s*\\)",
+            "\\[comment\\]:\\s+#\\s+\\(test start\\s*(.*?)\\s*\\)"
+          ],
+          "testEnd": [
+            "{\\/\\*\\s*test end\\s*\\*\\/}",
+            "<!--\\s*test end\\s*([\\s\\S]*?)\\s*-->",
+            "\\[comment\\]:\\s+#\\s+\\(test end\\)"
+          ],
+          "ignoreStart": [
+            "{\\/\\*\\s*test ignore start\\s*\\*\\/}",
+            "<!--\\s*test ignore start\\s*-->"
+          ],
+          "ignoreEnd": [
+            "{\\/\\*\\s*test ignore end\\s*\\*\\/}",
+            "<!--\\s*test ignore end\\s*-->"
+          ],
+          "step": [
+            "{\\/\\*\\s*step\\s+?([\\s\\S]*?)\\s*\\*\\/}",
+            "<!--\\s*step\\s*([\\s\\S]*?)\\s*-->",
+            "\\[comment\\]:\\s+#\\s+\\(step\\s*(.*?)\\s*\\)"
+          ]
+        },
+        "markup": [
+          {
+            "name": "checkHyperlink",
+            "regex": [
+              "(?<!\\!)\\[[^\\]]+\\]\\(\\s*(https?:\\/\\/[^\\s)]+)(?:\\s+\"[^\"]*\")?\\s*\\)"
+            ],
+            "actions": [
+              "checkLink"
+            ]
+          },
+          {
+            "name": "clickOnscreenText",
+            "regex": [
+              "\\b(?:[Cc]lick|[Tt]ap|[Ll]eft-click|[Cc]hoose|[Ss]elect|[Cc]heck)\\b\\s+\\*\\*((?:(?!\\*\\*).)+)\\*\\*"
+            ],
+            "actions": [
+              "click"
+            ]
+          },
+          {
+            "name": "findOnscreenText",
+            "regex": [
+              "\\*\\*((?:(?!\\*\\*).)+)\\*\\*"
+            ],
+            "actions": [
+              "find"
+            ]
+          },
+          {
+            "name": "goToUrl",
+            "regex": [
+              "\\b(?:[Gg]o\\s+to|[Oo]pen|[Nn]avigate\\s+to|[Vv]isit|[Aa]ccess|[Pp]roceed\\s+to|[Ll]aunch)\\b\\s+\\[[^\\]]+\\]\\(\\s*(https?:\\/\\/[^\\s)]+)(?:\\s+\"[^\"]*\")?\\s*\\)"
+            ],
+            "actions": [
+              "goTo"
+            ]
+          },
+          {
+            "name": "screenshotImage",
+            "regex": [
+              "!\\[[^\\]]*\\]\\(\\s*([^\\s)]+)(?:\\s+\"[^\"]*\")?\\s*\\)\\s*\\{(?=[^}]*\\.screenshot)[^}]*\\}"
+            ],
+            "actions": [
+              "screenshot"
+            ]
+          },
+          {
+            "name": "typeText",
+            "regex": [
+              "\\b(?:press|enter|type)\\b\\s+\"([^\"]+)\""
+            ],
+            "actions": [
+              "type"
+            ]
+          },
+          {
+            "name": "httpRequestFormat",
+            "regex": [
+              "```(?:http)?\\r?\\n([A-Z]+)\\s+([^\\s]+)(?:\\s+HTTP\\/[\\d.]+)?\\r?\\n((?:[^\\s]+:\\s+[^\\s]+\\r?\\n)*)?(?:\\s+([\\s\\S]*?)\\r?\\n+)?```"
+            ],
+            "actions": [
+              {
+                "httpRequest": {
+                  "method": "$1",
+                  "url": "$2",
+                  "request": {
+                    "headers": "$3",
+                    "body": "$4"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "name": "runCode",
+            "regex": [
+              "```(bash|python|py|javascript|js)(?![^\\r\\n]*testIgnore)[^\\r\\n]*\\r?\\n([\\s\\S]*?)\\r?\\n```"
+            ],
+            "actions": [
+              {
+                "unsafe": true,
+                "runCode": {
+                  "language": "$1",
+                  "code": "$2"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "asciidoc",
+        "extensions": [
+          "adoc",
+          "asciidoc",
+          "asc"
+        ],
+        "inlineStatements": {
+          "testStart": [
+            "\\/\\/\\s+\\(\\s*test\\s+([\\s\\S]*?)\\s*\\)"
+          ],
+          "testEnd": [
+            "\\/\\/\\s+\\(\\s*test end\\s*\\)"
+          ],
+          "ignoreStart": [
+            "\\/\\/\\s+\\(\\s*test ignore start\\s*\\)"
+          ],
+          "ignoreEnd": [
+            "\\/\\/\\s+\\(\\s*test ignore end\\s*\\)"
+          ],
+          "step": [
+            "\\/\\/\\s+\\(\\s*step\\s+([\\s\\S]*?)\\s*\\)"
+          ]
+        },
+        "markup": []
+      },
+      {
+        "name": "html",
+        "extensions": [
+          "html",
+          "htm"
+        ],
+        "inlineStatements": {
+          "testStart": [
+            "<!--\\s*test\\s+?([\\s\\S]*?)\\s*-->"
+          ],
+          "testEnd": [
+            "<!--\\s*test end\\s*([\\s\\S]*?)\\s*-->"
+          ],
+          "ignoreStart": [
+            "<!--\\s*test ignore start\\s*-->"
+          ],
+          "ignoreEnd": [
+            "<!--\\s*test ignore end\\s*-->"
+          ],
+          "step": [
+            "<!--\\s*step\\s+?([\\s\\S]*?)\\s*-->"
+          ]
+        },
+        "markup": []
+      }
+    ],
+    "telemetry": {
+      "send": true
+    },
+    "concurrentRunners": 1,
+    "debug": false,
+    "configId": "94c1771f-5083-4641-b1c3-3459fbfd400e",
+    "environment": {
+      "arch": "x64",
+      "platform": "linux",
+      "workingDirectory": "/home/hawkeyexl/Workspaces/resolver"
+    }
+  },
+  "specs": [
+    {
+      "tests": [
+        {
+          "testId": "2c583297-47f9-4659-a681-36b33e843618",
+          "runOn": [
+            {
+              "platforms": [
+                "linux",
+                "mac",
+                "windows"
+              ],
+              "browsers": [
+                {
+                  "name": "chrome"
+                },
+                {
+                  "name": "firefox"
+                }
+              ]
+            }
+          ],
+          "openApi": [],
+          "contexts": [
+            {
+              "platform": "linux",
+              "browser": {
+                "name": "chrome"
+              },
+              "unsafe": false,
+              "openApi": [],
+              "steps": [
+                {
+                  "goTo": "https://duckduckgo.com"
+                },
+                {
+                  "saveCookie": {
+                    "name": "FOOBAR",
+                    "path": "/home/hawkeyexl/Workspaces/resolver/dev/auth-cookie.txt",
+                    "overwrite": true
+                  }
+                },
+                {
+                  "loadCookie": {
+                    "name": "FOOBAR",
+                    "path": "/home/hawkeyexl/Workspaces/resolver/dev/auth-cookie.txt"
+                  }
+                }
+              ],
+              "contextId": "41da32c4-1d9a-4fbc-aaa7-046be3e8127d"
+            },
+            {
+              "platform": "linux",
+              "browser": {
+                "name": "firefox"
+              },
+              "unsafe": false,
+              "openApi": [],
+              "steps": [
+                {
+                  "goTo": "https://duckduckgo.com"
+                },
+                {
+                  "saveCookie": {
+                    "name": "FOOBAR",
+                    "path": "/home/hawkeyexl/Workspaces/resolver/dev/auth-cookie.txt",
+                    "overwrite": true
+                  }
+                },
+                {
+                  "loadCookie": {
+                    "name": "FOOBAR",
+                    "path": "/home/hawkeyexl/Workspaces/resolver/dev/auth-cookie.txt"
+                  }
+                }
+              ],
+              "contextId": "0dc6a5dd-0814-4f14-88f3-a26ad9e54bca"
+            },
+            {
+              "platform": "mac",
+              "browser": {
+                "name": "chrome"
+              },
+              "unsafe": false,
+              "openApi": [],
+              "steps": [
+                {
+                  "goTo": "https://duckduckgo.com"
+                },
+                {
+                  "saveCookie": {
+                    "name": "FOOBAR",
+                    "path": "/home/hawkeyexl/Workspaces/resolver/dev/auth-cookie.txt",
+                    "overwrite": true
+                  }
+                },
+                {
+                  "loadCookie": {
+                    "name": "FOOBAR",
+                    "path": "/home/hawkeyexl/Workspaces/resolver/dev/auth-cookie.txt"
+                  }
+                }
+              ],
+              "contextId": "bc99d08a-f1d3-40b7-b758-af7a71ef9875"
+            },
+            {
+              "platform": "mac",
+              "browser": {
+                "name": "firefox"
+              },
+              "unsafe": false,
+              "openApi": [],
+              "steps": [
+                {
+                  "goTo": "https://duckduckgo.com"
+                },
+                {
+                  "saveCookie": {
+                    "name": "FOOBAR",
+                    "path": "/home/hawkeyexl/Workspaces/resolver/dev/auth-cookie.txt",
+                    "overwrite": true
+                  }
+                },
+                {
+                  "loadCookie": {
+                    "name": "FOOBAR",
+                    "path": "/home/hawkeyexl/Workspaces/resolver/dev/auth-cookie.txt"
+                  }
+                }
+              ],
+              "contextId": "1a40556e-306c-48ed-9518-ba496e595b7a"
+            },
+            {
+              "platform": "windows",
+              "browser": {
+                "name": "chrome"
+              },
+              "unsafe": false,
+              "openApi": [],
+              "steps": [
+                {
+                  "goTo": "https://duckduckgo.com"
+                },
+                {
+                  "saveCookie": {
+                    "name": "FOOBAR",
+                    "path": "/home/hawkeyexl/Workspaces/resolver/dev/auth-cookie.txt",
+                    "overwrite": true
+                  }
+                },
+                {
+                  "loadCookie": {
+                    "name": "FOOBAR",
+                    "path": "/home/hawkeyexl/Workspaces/resolver/dev/auth-cookie.txt"
+                  }
+                }
+              ],
+              "contextId": "3c4fb68f-1dad-4d36-b80b-88fd0449f624"
+            },
+            {
+              "platform": "windows",
+              "browser": {
+                "name": "firefox"
+              },
+              "unsafe": false,
+              "openApi": [],
+              "steps": [
+                {
+                  "goTo": "https://duckduckgo.com"
+                },
+                {
+                  "saveCookie": {
+                    "name": "FOOBAR",
+                    "path": "/home/hawkeyexl/Workspaces/resolver/dev/auth-cookie.txt",
+                    "overwrite": true
+                  }
+                },
+                {
+                  "loadCookie": {
+                    "name": "FOOBAR",
+                    "path": "/home/hawkeyexl/Workspaces/resolver/dev/auth-cookie.txt"
+                  }
+                }
+              ],
+              "contextId": "d54be137-343d-4c56-bf6d-43ea9c1248d0"
+            }
+          ]
+        }
+      ],
+      "specId": "c8b701d3-f5a7-4ef2-86d3-7d38aaf7dc6e",
+      "runOn": [
+        {
+          "platforms": [
+            "linux",
+            "mac",
+            "windows"
+          ],
+          "browsers": [
+            {
+              "name": "chrome"
+            },
+            {
+              "name": "firefox"
+            }
+          ]
+        }
+      ],
+      "openApi": []
+    }
+  ]
+}

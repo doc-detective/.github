@@ -12,10 +12,16 @@ main();
  */
 async function main() {
   const json = {
-    input: "./dev/cleanup.spec.json",
+    input: "./dev/dev.spec.json",
     logLevel: "debug",
+    runOn: [
+      {
+        platforms: ["linux", "mac", "windows"],
+        browsers: ["chrome", "firefox"],
+      },
+    ],
   };
-  result = await detectTests({ config: json });
+  result = await detectAndResolveTests({ config: json });
   console.log(JSON.stringify(result, null, 2));
   // Output the result to a file
   const outputPath = path.join(__dirname, "output.json");

@@ -7,9 +7,12 @@ exports.resolveDetectedTests = resolveDetectedTests;
 // Doc Detective actions that require a driver.
 const driverActions = [
   "click",
+  "dragAndDrop",
   "find",
   "goTo",
+  "loadCookie",
   "record",
+  "saveCookie",
   "screenshot",
   "stopRecord",
   "type",
@@ -143,6 +146,7 @@ async function resolveDetectedTests({ config, detectedTests }) {
   log(config, "debug", `RESOLVING DETECTED TEST SPECS:\n${JSON.stringify(detectedTests, null, 2)}`);
   // Set initial shorthand values
   const resolvedTests = {
+    resolvedTestsId: uuid.v4(),
     config: config,
     specs: [],
   };
