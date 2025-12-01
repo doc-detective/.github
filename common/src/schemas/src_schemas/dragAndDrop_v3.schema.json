@@ -1,36 +1,44 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "click",
-  "description": "Click or tap an element.",
-  "anyOf": [
-    {
-      "$ref": "#/components/schemas/string"
+  "title": "dragAndDrop",
+  "description": "Drag and drop an element from source to target.",
+  "type": "object",
+  "required": ["source", "target"],
+  "properties": {
+    "source": {
+      "$ref": "#/components/schemas/elementSpecification",
+      "description": "The element to drag."
     },
-    {
-      "$ref": "#/components/schemas/object"
+    "target": {
+      "$ref": "#/components/schemas/elementSpecification",
+      "description": "The target location to drop the element."
     },
-    {
-      "type": "boolean"
+    "duration": {
+      "type": "integer",
+      "description": "Duration of the drag operation in milliseconds.",
+      "default": 1000,
+      "minimum": 0
     }
-  ],
+  },
   "components": {
     "schemas": {
-      "string": {
-        "title": "Click element (simple)",
-        "type": "string",
-        "description": "Identifier for the element to click. Can be a selector, element text, ARIA name, ID, or test ID."
-      },
-      "button": {
-        "description": "Kind of click to perform.",
-        "type": "string",
-        "enum": [
-          "left",
-          "right",
-          "middle"
+      "elementSpecification": {
+        "anyOf": [
+          {
+            "$ref": "#/components/schemas/string"
+          },
+          {
+            "$ref": "#/components/schemas/object"
+          }
         ]
       },
+      "string": {
+        "title": "Element (simple)",
+        "type": "string",
+        "description": "Display text, selector, or regex pattern (enclosed in forward slashes) of the element."
+      },
       "object": {
-        "title": "Click element (detailed)",
+        "title": "Element (detailed)",
         "type": "object",
         "anyOf": [
           {
@@ -70,24 +78,21 @@
           }
         ],
         "properties": {
-          "button": {
-            "$ref": "#/components/schemas/button"
-          },
           "elementText": {
             "type": "string",
-            "description": "Display text of the element to click. If combined with other element finding fields, the element must match all specified criteria."
+            "description": "Display text or regex pattern (enclosed in forward slashes) of the element. If combined with `selector`, the element must match both the text and the selector."
           },
           "selector": {
             "type": "string",
-            "description": "Selector of the element to click. If combined with other element finding fields, the element must match all specified criteria."
+            "description": "Selector of the element. If combined with `elementText`, the element must match both the text and the selector."
           },
           "elementId": {
             "type": "string",
-            "description": "ID attribute of the element to click. Supports exact match or regex pattern using /pattern/ syntax."
+            "description": "ID attribute of the element to find. Supports exact match or regex pattern using /pattern/ syntax."
           },
           "elementTestId": {
             "type": "string",
-            "description": "data-testid attribute of the element to click. Supports exact match or regex pattern using /pattern/ syntax."
+            "description": "data-testid attribute of the element to find. Supports exact match or regex pattern using /pattern/ syntax."
           },
           "elementClass": {
             "anyOf": [
@@ -123,22 +128,58 @@
           "elementAria": {
             "type": "string",
             "description": "Computed accessible name of the element per ARIA specification. Supports exact match or regex pattern using /pattern/ syntax."
+          },
+          "timeout": {
+            "type": "integer",
+            "description": "Max duration in milliseconds to wait for the element to exist.",
+            "default": 5000
           }
         }
       }
     }
   },
   "examples": [
-    true,
-    "right",
     {
-      "button": "left",
-      "elementText": "Element text"
+      "source": "Table",
+      "target": "#canvas"
     },
     {
-      "selector": "#elementToScreenshot",
-      "elementText": "Element text",
-      "button": "middle"
+      "source": ".draggable-block",
+      "target": ".drop-zone",
+      "duration": 2000
+    },
+    {
+      "source": {
+        "selector": ".widget",
+        "elementText": "Data Table"
+      },
+      "target": {
+        "selector": "#design-canvas"
+      },
+      "duration": 500
+    },
+    {
+      "source": {
+        "selector": ".draggable",
+        "timeout": 10000
+      },
+      "target": {
+        "elementText": "Drop Zone",
+        "timeout": 5000
+      }
+    },
+    {
+      "source": "/Widget Item.*/",
+      "target": "#canvas"
+    },
+    {
+      "source": {
+        "selector": ".draggable",
+        "elementText": "/Button [0-9]+/"
+      },
+      "target": {
+        "elementText": "/Drop Zone.*/"
+      }
     }
   ]
 }
