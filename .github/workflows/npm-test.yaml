@@ -22,7 +22,7 @@ on:
 
 jobs:
   test:
-    timeout-minutes: 15
+    timeout-minutes: 20
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -31,7 +31,6 @@ jobs:
           - windows-latest
           - macos-latest
         node:
-          - 18
           - 20
           - 22
           - 24
@@ -45,7 +44,7 @@ jobs:
           cache: 'npm'
           cache-dependency-path: package-lock.json
       
-      - run: npm ci      
+      - run: npm install   
       - run: npm test
 
   publish-npm:
@@ -62,7 +61,7 @@ jobs:
           cache-dependency-path: package-lock.json
           registry-url: https://registry.npmjs.org/
 
-      - run: npm ci
+      - run: npm install
       - run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{secrets.npm_token}}

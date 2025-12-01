@@ -30,7 +30,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '20'
           cache: 'npm'
           cache-dependency-path: package-lock.json
           registry-url: 'https://registry.npmjs.org/'
@@ -90,7 +90,7 @@ jobs:
 
       - name: Install dependencies
         if: steps.check_changes.outputs.skip_release == 'false'
-        run: npm ci
+        run: npm install
 
       - name: Run tests
         if: steps.check_changes.outputs.skip_release == 'false'
