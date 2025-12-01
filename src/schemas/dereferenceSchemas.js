@@ -30,8 +30,10 @@ async function dereferenceSchemas() {
     "click_v3.schema.json",
     "config_v3.schema.json",
     "context_v3.schema.json",
+    "dragAndDrop_v3.schema.json",
     "find_v3.schema.json",
     "goTo_v3.schema.json",
+    "loadCookie_v3.schema.json",
     "loadVariables_v3.schema.json",
     "httpRequest_v3.schema.json",
     "openApi_v3.schema.json",
@@ -40,6 +42,7 @@ async function dereferenceSchemas() {
     "report_v3.schema.json",
     "runCode_v3.schema.json",
     "runShell_v3.schema.json",
+    "saveCookie_v3.schema.json",
     "screenshot_v3.schema.json",
     "spec_v3.schema.json",
     "step_v3.schema.json",
@@ -164,6 +167,7 @@ async function dereferenceSchemas() {
 
 // Prepend app-root path to referenced relative paths
 function updateRefPaths(schema) {
+  if (schema === null || typeof schema !== "object") return schema;
   for (let [key, value] of Object.entries(schema)) {
     if (typeof value === "object") {
       updateRefPaths(value);
@@ -188,6 +192,7 @@ function updateRefPaths(schema) {
  * @returns {object} The schema object with all `$id` properties deleted.
  */
 function deleteDollarIds(schema) {
+  if (schema === null || typeof schema !== "object") return schema;
   for (let [key, value] of Object.entries(schema)) {
     if (typeof value === "object") {
       deleteDollarIds(value);
