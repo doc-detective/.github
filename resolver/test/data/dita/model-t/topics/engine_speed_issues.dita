@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE troubleshooting PUBLIC "-//OASIS//DTD DITA Troubleshooting//EN" "troubleshooting.dtd">
+<troubleshooting id="engine_speed_issues">
+    <title>Engine Speed Control Problems</title>
+
+    <shortdesc>Resolve issues with engine running too fast or choking when the throttle is fully
+        retarded.</shortdesc> 
+
+    <troublebody>
+        <condition>
+            <p>The engine either: <ul>
+                    <li>Runs too fast when throttle is fully retarded</li>
+                    <li>Chokes and stops when throttle is fully retarded</li>
+                </ul>
+            </p>
+        </condition>
+
+        <troubleSolution>
+            <cause>
+                <p>Incorrect carburetor throttle lever adjustment.</p>
+            </cause>
+
+            <remedy>
+                <steps>
+                    <step>
+                        <cmd>For engine running too fast: Unscrew the carburetor throttle lever
+                            adjusting screw until the engine idles at suitable speed.</cmd>
+                    </step>
+                    <step>
+                        <cmd>For engine choking: Screw in the adjusting screw until it strikes the
+                            boss, preventing the throttle from closing too far.</cmd>
+                    </step>
+                    <step>
+                        <cmd>After achieving proper adjustment, tighten the lock-screw to secure the
+                            setting.</cmd>
+                    </step>
+                </steps>
+            </remedy>
+        </troubleSolution>
+    </troublebody>
+</troubleshooting>

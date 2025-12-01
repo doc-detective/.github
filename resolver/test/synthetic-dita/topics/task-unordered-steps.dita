@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<task id="task-unordered-steps" xml:lang="en-us">
+  <title>Initial Configuration Tasks</title>
+  
+  <taskbody>
+    <context>
+      <p>These configuration steps can be performed in any order.</p>
+    </context>
+    
+    <steps-unordered>
+      <step>
+        <cmd>Set your <uicontrol>Display Name</uicontrol> in the profile settings.</cmd>
+      </step>
+      
+      <step>
+        <cmd>Upload a profile picture by clicking <uicontrol>Choose File</uicontrol>.</cmd>
+      </step>
+      
+      <step>
+        <cmd>Configure notification preferences in <menucascade><uicontrol>Settings</uicontrol><uicontrol>Notifications</uicontrol></menucascade>.</cmd>
+      </step>
+    </steps-unordered>
+  </taskbody>
+</task>

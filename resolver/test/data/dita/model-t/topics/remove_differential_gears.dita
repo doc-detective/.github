@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<task id="remove_differential_gears">
+    <title>Removing the Differential Gears</title> 
+    <shortdesc>This task describes how to remove the differential gears from the inner ends of the
+        rear axle shafts where they are secured by split retaining rings.</shortdesc>
+    <taskbody>
+        <context>
+            <p>The differential gears are keyed to the inner ends of the rear axle shafts and
+                secured by split retaining rings that fit into grooves in the shafts. These gears
+                interact with the differential pinions during turns to allow independent axle shaft
+                rotation, while moving as one unit during straight-line driving.</p>
+        </context>
+        <steps>
+            <step>
+                <cmd>Push the differential gears inward on the shaft</cmd>
+                <info>Force the gears away from their secured end position on the shaft</info>
+            </step>
+            <step>
+                <cmd>Remove the split retaining rings</cmd>
+                <info>Using a screwdriver or chisel, carefully drive out both halves of the
+                    retaining ring from the shaft grooves</info>
+            </step>
+            <step>
+                <cmd>Remove the differential gears</cmd>
+                <info>Force the gears off the ends of the axle shafts</info>
+            </step>
+        </steps>
+        <result>
+            <p>The differential gears will be separated from the axle shafts.</p>
+        </result>
+    </taskbody>
+</task>

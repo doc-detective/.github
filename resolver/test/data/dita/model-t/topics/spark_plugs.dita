@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<concept id="spark_plugs">
+    <title>Understanding Spark Plugs</title>
+ 
+    <shortdesc>Spark plugs are essential engine components that ignite the gasoline charge in
+        cylinders through a high-voltage current, with one plug positioned at the top of each
+        cylinder.</shortdesc>
+
+    <conbody>
+        <section>
+            <title>Location and Access</title>
+            <p>Each spark plug is located at the top of its respective cylinder. They can be easily
+                removed using the spark plug wrench provided with the vehicle, after disconnecting
+                the wire connection.</p>
+        </section>
+
+        <section>
+            <title>Operation</title>
+            <p>The spark plug operation follows this process:</p>
+            <ul>
+                <li>High voltage current flows from the secondary coils in the coil box</li>
+                <li>Current reaches the contact points in each spark plug</li>
+                <li>Current jumps a 1/32" gap, creating a spark</li>
+                <li>This spark ignites the gasoline charge in the cylinders</li>
+            </ul>
+        </section>
+
+        <section>
+            <title>Maintenance Guidelines</title>
+            <p>For optimal performance, follow these maintenance guidelines:</p>
+            <ul>
+                <li>Keep spark plugs clean and free from carbon deposits</li>
+                <li>Replace malfunctioning spark plugs rather than attempting repairs</li>
+                <li>Use factory-recommended spark plug models</li>
+                <li>Maintain perfect contact in all wire connections to: <ul>
+                        <li>Spark plugs</li>
+                        <li>Coil box</li>
+                        <li>Commutator</li>
+                    </ul>
+                </li>
+            </ul>
+        </section>
+
+        <section>
+            <title>Important Note</title>
+            <p>The manufacturer-installed spark plugs are specifically designed for optimal
+                performance in <ph keyref="company_name"/> engines, regardless of contrary
+                recommendations from service providers.</p>
+        </section>
+    </conbody>
+</concept>

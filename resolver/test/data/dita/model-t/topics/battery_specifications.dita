@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE reference PUBLIC "-//OASIS//DTD DITA Reference//EN" "reference.dtd">
+<reference id="battery_specifications">
+    <title>Battery Specifications</title>
+    <shortdesc>The <ph keyref="company_name"/> Starting System requires a specific battery
+        configuration.</shortdesc>
+    <refbody>
+        <section>
+            <title>Battery Requirements</title>
+            <table frame="all">
+                <title>Battery Requirements</title>
+                <tgroup cols="2">
+                    <colspec colnum="1" colwidth="0.5*"/>
+                    <colspec colnum="2" colwidth="0.5*"/>
+                    <thead>
+                        <row>
+                            <entry>Specification</entry>
+                            <entry>Value</entry>
+                        </row>
+                    </thead>
+                    <tbody>
+                        <row>
+                            <entry>Voltage</entry>
+                            <entry>6 volts</entry>
+                        </row>
+                        <row>
+                            <entry>Number of cells</entry>
+                            <entry>3 cells</entry>
+                        </row>
+                    </tbody>
+                </tgroup>
+            </table>
+        </section>
+    </refbody>
+</reference>

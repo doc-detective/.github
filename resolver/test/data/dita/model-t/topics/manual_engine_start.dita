@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<task id="manual_engine_start">
+    <title>Starting the Engine Manually</title>
+    <shortdesc>Procedure for starting an engine using the hand crank on early
+        automobiles.</shortdesc>
+    <taskbody>
+        <prereq>
+            <p>Ensure the vehicle is in a safe, well-ventilated area with the parking brake
+                engaged.</p>
+            <p>Be aware of potential backfire risks and avoid cranking downward against
+                compression.</p>
+        </prereq>
+        <steps>
+            <step>
+                <cmd>Locate the starting crank at the front of the car</cmd>
+            </step>
+            <step>
+                <cmd>Grip the starting crank handle firmly</cmd>
+                <stepxmp>Push the handle toward the car until you feel the crank ratchet
+                    engage</stepxmp>
+            </step>
+            <step>
+                <cmd>Lift the crank upward with a quick, decisive swing</cmd>
+            </step>
+            <step>
+                <cmd>Prime the <abbreviated-form keyref="glossary_carburetor"/> if the engine is
+                    cold</cmd>
+                <substeps>
+                    <substep>
+                        <cmd>Pull the small wire at the lower left corner of the radiator</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Give the engine two or three quarter turns with the starting
+                            handle</cmd>
+                    </substep>
+                </substeps>
+            </step>
+        </steps>
+        <result>
+            <p>The engine should now be running. Allow it to warm up before driving.</p>
+        </result>
+    </taskbody>
+</task>

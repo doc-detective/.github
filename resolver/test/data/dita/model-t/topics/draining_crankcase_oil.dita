@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<task id="draining_crankcase_oil">
+    <title>Draining Oil from the Crank Case</title> 
+
+    <shortdesc>Learn when and how to properly drain and replace oil in your vehicle's crank case for
+        optimal engine maintenance.</shortdesc>
+
+    <taskbody>
+        <prereq>
+            <p>Ensure you have the following materials:</p>
+            <ul>
+                <li>Fresh lubricating oil (1 gallon)</li>
+                <li>Kerosene oil (1 gallon)</li>
+            </ul>
+        </prereq>
+
+        <context>
+            <p>Regular oil changes are essential for maintaining your vehicle's engine. For new
+                cars, perform the first oil change after 350 miles, then every 750 miles
+                thereafter.</p>
+        </context>
+
+        <steps>
+            <step>
+                <cmd>Remove the plug beneath the flywheel casing to drain the old oil.</cmd>
+            </step>
+            <step>
+                <cmd>Replace the plug after draining.</cmd>
+            </step>
+            <step>
+                <cmd>Pour one gallon of kerosene oil through the breather pipe.</cmd>
+            </step>
+            <step>
+                <cmd>Turn the engine over 15-20 times to allow the kerosene to cleanse the
+                    engine.</cmd>
+                <info>The splashing kerosene will help clean the engine components.</info>
+            </step>
+            <step>
+                <cmd>Remove the crank case plug and drain the kerosene oil completely.</cmd>
+                <info>Ensure all kerosene is removed from the crank case depressions.</info>
+            </step>
+            <step>
+                <cmd>Pour approximately one quart of lubricating oil into the motor.</cmd>
+            </step>
+            <step>
+                <cmd>Turn the engine over several times.</cmd>
+            </step>
+            <step>
+                <cmd>Remove the crank case plug and drain the flushing oil.</cmd>
+            </step>
+            <step>
+                <cmd>Replace the plug.</cmd>
+            </step>
+            <step>
+                <cmd>Refill the crank case with fresh oil.</cmd>
+            </step>
+        </steps>
+
+        <result>
+            <p>The engine now has clean oil and is ready for operation.</p>
+        </result>
+    </taskbody>
+</task>

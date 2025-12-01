@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE reference PUBLIC "-//OASIS//DTD DITA Reference//EN" "reference.dtd">
+<reference id="starter_location">
+    <title>Starter Location</title>
+    <shortdesc>The starting motor mounts to the transmission cover on the engine's left side and
+        engages with the flywheel during operation.</shortdesc>
+    <refbody>
+        <section>
+            <p>The starting motor is located and operates as follows:</p> 
+            <ul>
+                <li>Mounted on the left-hand side of the engine</li>
+                <li>Bolted to the transmission cover</li>
+                <li>Features a Bendix drive shaft pinion that engages with the flywheel teeth during
+                    operation</li>
+            </ul>
+        </section>
+    </refbody>
+</reference>

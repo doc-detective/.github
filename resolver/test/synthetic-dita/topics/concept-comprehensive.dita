@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<concept id="concept-comprehensive" xml:lang="en-us">
+  <title>Understanding Doc Detective Test Architecture</title>
+  
+  <shortdesc>This concept topic provides comprehensive coverage of Doc Detective's architecture, testing patterns, and best practices with links, media, and code examples.</shortdesc>
+  
+  <conbody>
+    <section>
+      <title>Core Testing Concepts</title>
+      
+      <p>Doc Detective enables <term>documentation-driven testing</term>, where technical documentation serves as the source of truth for test generation. This approach ensures documentation accuracy while automating quality assurance.</p>
+      
+      <!-- Demonstrates definition list -->
+      <dl>
+        <dlentry>
+          <dt>Test Suite</dt>
+          <dd>A collection of related tests that validate a specific feature or workflow. Test suites are organized hierarchically and can include setup and teardown operations.</dd>
+        </dlentry>
+        
+        <dlentry>
+          <dt>Test Action</dt>
+          <dd>An individual operation performed during test execution, such as <apiname>click</apiname>, <apiname>typeKeys</apiname>, or <apiname>httpRequest</apiname>. Actions are the building blocks of tests.</dd>
+        </dlentry>
+        
+        <dlentry>
+          <dt>Selector</dt>
+          <dd>A mechanism for identifying UI elements in the application under test. Doc Detective supports CSS selectors, ARIA labels, and text-based matching for accessibility-focused testing.</dd>
+        </dlentry>
+        
+        <dlentry>
+          <dt>Assertion</dt>
+          <dd>A validation step that confirms expected behavior or state. Assertions use the <apiname>find</apiname> action to verify that specific content, elements, or conditions exist.</dd>
+        </dlentry>
+        
+        <dlentry>
+          <dt>Context Variables</dt>
+          <dd>Named values stored during test execution that can be referenced in subsequent steps. Variables enable data-driven testing and test parameterization.</dd>
+        </dlentry>
+      </dl>
+    </section>
+    
+    <section>
+      <title>Testing Architecture</title>
+      
+      <p>The Doc Detective architecture consists of three primary layers:</p>
+      
+      <ol>
+        <li><b>Source Layer</b>: Documentation files (DITA, Markdown, etc.) containing embedded test instructions</li>
+        <li><b>Extraction Layer</b>: Parser and resolver components that convert documentation to test specifications</li>
+        <li><b>Execution Layer</b>: Test runner that executes tests against target applications</li>
+      </ol>
+      
+      <fig>
+        <title>Doc Detective Architecture Diagram</title>
+        <image href="../images/architecture-diagram.png" placement="break">
+          <alt>Flowchart showing documentation flowing through parser and resolver to test execution</alt>
+        </image>
+      </fig>
+    </section>
+    
+    <section>
+      <title>Test Action Types</title>
+      
+      <p>Doc Detective supports multiple categories of test actions:</p>
+      
+      <!-- Definition list for API descriptions -->
+      <dl>
+        <dlentry>
+          <dt>Navigation Actions</dt>
+          <dd>
+            <ul>
+              <li><apiname>goTo</apiname>: Navigate to a URL</li>
+              <li><apiname>find</apiname>: Locate and validate page elements</li>
+              <li><apiname>checkLink</apiname>: Verify link validity</li>
+            </ul>
+          </dd>
+        </dlentry>
+        
+        <dlentry>
+          <dt>Interaction Actions</dt>
+          <dd>
+            <ul>
+              <li><apiname>click</apiname>: Click UI elements</li>
+              <li><apiname>typeKeys</apiname>: Input text or keyboard commands</li>
+              <li><apiname>wait</apiname>: Pause execution for specified duration</li>
+            </ul>
+          </dd>
+        </dlentry>
+        
+        <dlentry>
+          <dt>API Actions</dt>
+          <dd>
+            <ul>
+              <li><apiname>httpRequest</apiname>: Execute HTTP requests for API testing</li>
+              <li><apiname>setVariables</apiname>: Store values for later use</li>
+              <li><apiname>runShell</apiname>: Execute command-line operations</li>
+            </ul>
+          </dd>
+        </dlentry>
+        
+        <dlentry>
+          <dt>Utility Actions</dt>
+          <dd>
+            <ul>
+              <li><apiname>saveScreenshot</apiname>: Capture visual state</li>
+              <li><apiname>startRecording</apiname> / <apiname>stopRecording</apiname>: Video capture</li>
+            </ul>
+          </dd>
+        </dlentry>
+      </dl>
+    </section>
+    
+    <section>
+      <title>Integration Points</title>
+      
+      <p>Doc Detective integrates with multiple documentation and testing ecosystems:</p>
+      
+      <ul>
+        <li><b>Documentation Formats</b>: DITA, Markdown, AsciiDoc, reStructuredText</li>
+        <li><b>CI/CD Platforms</b>: GitHub Actions, GitLab CI, Jenkins, CircleCI</li>
+        <li><b>Browser Automation</b>: Puppeteer, Playwright for cross-browser testing</li>
+        <li><b>API Testing</b>: Native HTTP client with JSON/XML support</li>
+      </ul>
+      
+      <p>For more information on CI/CD integration, see the <xref href="https://doc-detective.com/docs/integrations/github-actions" format="html" scope="external">GitHub Actions documentation</xref>.</p>
+    </section>
+    
+    <section>
+      <title>Code Examples</title>
+      
+      <!-- Demonstrates example with code validation -->
+      <example>
+        <title>Basic Test Specification (JSON)</title>
+        <codeblock outputclass="json">{
+  "tests": [
+    {
+      "id": "user-login",
+      "description": "Verify user can log in successfully",
+      "steps": [
+        {
+          "action": "goTo",
+          "url": "https://app.example.com/login"
+        },
+        {
+          "action": "find",
+          "selector": "h1",
+          "text": "Sign In"
+        },
+        {
+          "action": "typeKeys",
+          "keys": "user@example.com",
+          "selector": "[aria-label='Email']"
+        },
+        {
+          "action": "typeKeys",
+          "keys": "$PASSWORD",
+          "selector": "[aria-label='Password']"
+        },
+        {
+          "action": "click",
+          "selector": "button[type='submit']"
+        },
+        {
+          "action": "find",
+          "text": "Welcome back"
+        }
+      ]
+    }
+  ]
+}</codeblock>
+      </example>
+      
+      <example>
+        <title>API Test with Response Validation</title>
+        <codeblock outputclass="json">{
+  "action": "httpRequest",
+  "method": "POST",
+  "url": "https://api.example.com/users",
+  "headers": {
+    "Content-Type": "application/json",
+    "Authorization": "Bearer $API_TOKEN"
+  },
+  "body": {
+    "username": "testuser",
+    "email": "test@example.com"
+  },
+  "responseBody": {
+    "username": "testuser",
+    "status": "active"
+  },
+  "statusCodes": [201]
+}</codeblock>
+      </example>
+      
+      <example>
+        <title>Configuration File (YAML)</title>
+        <codeblock outputclass="yaml">runTests:
+  setup: ./tests/setup.spec.json
+  cleanup: ./tests/cleanup.spec.json
+  contexts:
+    - app: chrome
+      platforms:
+        - linux
+        - mac
+        - windows
+  
+detectSteps: true
+mediaDirectory: ./test-media
+downloadDirectory: ./downloads
+
+envVariables:
+  BASE_URL: https://app.example.com
+  API_ENDPOINT: https://api.example.com</codeblock>
+      </example>
+    </section>
+    
+    <section>
+      <title>Best Practices</title>
+      
+      <ol>
+        <li><b>Use Semantic Selectors</b>: Prefer ARIA labels and role attributes over CSS classes for maintainability</li>
+        <li><b>Implement Wait Strategies</b>: Use <codeph>matchCondition</codeph> to wait for dynamic content rather than fixed timeouts</li>
+        <li><b>Organize by User Journey</b>: Structure tests to mirror actual user workflows</li>
+        <li><b>Leverage Variables</b>: Use <codeph>setVariables</codeph> to avoid hardcoding values</li>
+        <li><b>Document Test Intent</b>: Include descriptive <parmname>description</parmname> fields for all tests and steps</li>
+      </ol>
+    </section>
+    
+    <section>
+      <title>Related Resources</title>
+      
+      <ul>
+        <li><xref href="https://doc-detective.com/docs" format="html" scope="external">Official Documentation</xref></li>
+        <li><xref href="https://github.com/doc-detective/doc-detective" format="html" scope="external">GitHub Repository</xref></li>
+        <li><xref href="reference-api.dita" format="dita" scope="local">API Reference</xref></li>
+        <li><xref href="reference-cli.dita" format="dita" scope="local">CLI Reference</xref></li>
+        <li><xref href="task-comprehensive.dita" format="dita" scope="local">Getting Started Tutorial</xref></li>
+      </ul>
+    </section>
+    
+    <section>
+      <title>Additional Media</title>
+      
+      <fig>
+        <title>Test Execution Flow</title>
+        <image href="../images/execution-flow.png" placement="break">
+          <alt>Sequence diagram showing test execution lifecycle</alt>
+        </image>
+      </fig>
+      
+      <p>For video tutorials, see the <xref href="https://youtube.com/@doc-detective" format="html" scope="external">Doc Detective YouTube channel</xref>.</p>
+    </section>
+  </conbody>
+  
+  <related-links>
+    <link href="https://doc-detective.com/blog" format="html" scope="external">
+      <linktext>Doc Detective Blog</linktext>
+    </link>
+    <link href="https://discord.gg/doc-detective" format="html" scope="external">
+      <linktext>Community Discord Server</linktext>
+    </link>
+    <link href="task-comprehensive.dita" format="dita" scope="local">
+      <linktext>Hands-On Task Tutorial</linktext>
+    </link>
+  </related-links>
+</concept>

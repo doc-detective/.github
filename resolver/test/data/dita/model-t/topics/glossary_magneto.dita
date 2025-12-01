@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE glossentry PUBLIC "-//OASIS//DTD DITA Glossary//EN" "glossary.dtd">
+<glossentry id="glossary_magneto">
+    <glossterm>Magneto</glossterm>
+    <glossdef>An electrical generating system integrated into the <ph keyref="company_name"/>
+        <ph keyref="product_name"/>'s flywheel (1908-1927) that produced alternating current for
+        the ignition system. This unique design used sixteen permanent magnets built into the
+        flywheel working with stationary coils to generate electrical power while the engine was
+        running, eliminating the need for a battery for ignition.</glossdef>
+    <glossBody>
+        <glossPartOfSpeech value="noun"/>
+        <glossProperty>Automotive electrical component</glossProperty>
+        <glossSurfaceForm>magneto</glossSurfaceForm>
+        <glossUsage>The term is frequently used when discussing the <ph keyref="product_name"/>'s
+            innovative electrical system and in restoration contexts, particularly noting its
+            integration with the flywheel and its role in early automotive electrical
+            generation.</glossUsage>
+        <glossAlt>
+            <glossSynonym>Ford Model T flywheel magneto</glossSynonym>
+        </glossAlt>
+    </glossBody>
+</glossentry>

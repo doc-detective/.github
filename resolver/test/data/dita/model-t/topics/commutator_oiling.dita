@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<concept id="commutator_oiling">
+    <title>Commutator Oiling Requirements</title>
+
+    <shortdesc>Regular oiling of the commutator is essential for maintaining smooth engine operation
+        and preventing wear on critical components.</shortdesc>
+
+    <conbody>
+        <section>
+            <title>Importance of Commutator Lubrication</title>
+            <p>Keeping the commutator well oiled is crucial for maintaining optimal engine
+                performance. While many drivers underestimate its importance, proper lubrication
+                directly affects the engine's smooth operation.</p>
+        </section>
+
+        <section>
+            <title>Recommended Oiling Frequency</title>
+            <p>The commutator should be oiled:</p>
+            <ul>
+                <li>Every other day, or</li>
+                <li>At least every 200 miles of operation</li>
+            </ul>
+        </section>
+
+        <section>
+            <title>Effects of Inadequate Lubrication</title>
+            <p>The commutator roller operates at high speeds, making proper lubrication critical.
+                Insufficient oiling can lead to:</p>
+            <ul>
+                <li>Excessive wear on components</li>
+                <li>Poor contact between the roller and the four contact points</li>
+                <li>Engine misfiring, particularly at higher speeds</li>
+            </ul>
+        </section>
+        <section>
+            <title>Reference Figure</title>
+            <fig>
+                <title>Oiling the <ph keyref="company_name"/>
+                    <ph keyref="product_name"/> Commutator</title>
+                <image keyref="oiling_commutator">
+                    <alt>A hand holding a small oil can showing where to oil the commutator.</alt>
+                </image>
+            </fig>
+        </section>
+    </conbody>
+</concept>

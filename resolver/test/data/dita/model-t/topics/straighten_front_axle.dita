@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<task id="straighten_front_axle">
+    <title>Straightening a Bent Front Axle</title>
+    <shortdesc>Guidelines for straightening a front axle or spindle after an accident.</shortdesc>
+    <taskbody>
+        <prereq>
+            <note type="attention">Professional repair is strongly recommended for bent axle
+                components.</note>
+        </prereq>
+        <context>
+            <p>Proper alignment of the front axle is critical for vehicle safety and tire wear.
+                Visual inspection alone is not sufficient to ensure proper straightening.</p>
+            <fig>
+                <title>The <ph keyref="company_name"/>
+                    <ph keyref="product_name"/> Spindle and Front Hub Assembly</title>
+                <image keyref="spindle_and_front_hub_assembly">
+                    <alt>Image showing all of the parts of the <ph keyref="company_name"/>
+                        <ph keyref="product_name"/> spindle and front hub assembly.</alt>
+                </image>
+            </fig>
+        </context>
+        <steps>
+            <step>
+                <cmd>Assess the damage to the axle or spindle.</cmd>
+            </step>
+            <step>
+                <cmd>If attempting repairs yourself, straighten the components cold.</cmd>
+                <info>
+                    <note type="warning">Do not apply heat to the forgings as this will compromise
+                        the steel's tempering.</note>
+                </info>
+            </step>
+            <step>
+                <cmd>Verify wheel alignment after straightening.</cmd>
+                <info>Refer to procedure #90 for wheel alignment specifications.</info>
+            </step>
+        </steps>
+        <result>
+            <p>When properly straightened, the wheels should be in perfect alignment to prevent
+                excessive tire wear.</p>
+        </result>
+        <postreq>
+            <note type="tip">For best results, return damaged components to an authorized dealer for
+                straightening using specialized jigs.</note>
+        </postreq>
+    </taskbody>
+</task>

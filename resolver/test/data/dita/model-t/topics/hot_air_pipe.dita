@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<concept id="hot_air_pipe">
+    <title>Hot Air Pipe</title> 
+    <shortdesc>The hot air pipe transfers heat from the exhaust pipe to the carburetor to aid in
+        gasoline vaporization during cold weather operation.</shortdesc>
+    <conbody>
+        <p>The hot air pipe serves as a thermal conductor between the exhaust system and carburetor.
+            By channeling hot air from around the exhaust pipe to the carburetor, it facilitates the
+            vaporization of gasoline for improved engine performance.</p>
+        <p>While this component is essential during cold weather operation, it should typically be
+            removed during hot weather conditions for optimal performance.</p>
+    </conbody>
+</concept>

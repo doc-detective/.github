@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE reference PUBLIC "-//OASIS//DTD DITA Reference//EN" "reference.dtd">
+<reference id="band_adjustment">
+    <title>Band Adjustment</title> 
+    <shortdesc>Proper adjustment procedures for slow speed, brake, and reverse bands, including
+        maintenance guidelines and replacement criteria.</shortdesc>
+    <refbody>
+        <section>
+            <title>Slow Speed Band Adjustment</title>
+            <ul>
+                <li>Locate the lock nut at the right side of transmission cover</li>
+                <li>Loosen the lock nut</li>
+                <li>Turn the adjusting screw to the right to tighten</li>
+            </ul>
+        </section>
+
+        <section>
+            <title>Brake and Reverse Band Adjustment</title>
+            <ul>
+                <li>Remove the transmission cover door</li>
+                <li>Locate the adjusting nuts on the shafts</li>
+                <li>Turn the adjusting nuts to the right to tighten</li>
+            </ul>
+        </section>
+
+        <section>
+            <title>Important Specifications</title>
+            <ul>
+                <li>Bands must not drag on drums when disengaged to prevent: <ul>
+                        <li>Unwanted brake effect</li>
+                        <li>Motor overheating </li>
+                    </ul></li>
+                <li>Foot brake should be adjusted to: <ul>
+                        <li>Enable immediate car stoppage under sudden pressure</li>
+                        <li>Allow rear wheel sliding in emergencies</li>
+                    </ul>
+                </li>
+            </ul>
+        </section>
+
+        <section>
+            <title>Maintenance Guidelines</title>
+            <ul>
+                <li>Replace band lining when bands no longer engage properly</li>
+                <li>Proper band engagement should provide smooth car movement without jerking</li>
+                <li>Replacement lining is available at <ph keyref="company_name"/> service stations
+                    at minimal cost</li>
+            </ul>
+        </section>
+    </refbody>
+</reference>

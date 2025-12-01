@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE map PUBLIC "-//OASIS//DTD DITA Map//EN" "map.dtd">
+<map>
+    <title><ph keyref="company_name"/> 
+        <ph keyref="product_name"/> Glossary</title>
+    <glossref keys="glossary_axle" print="yes" href="topics/glossary_axle.dita"/>
+    <glossref keys="glossary_bendix_drive" print="yes" href="topics/glossary_bendix_drive.dita"/>
+    <glossref keys="glossary_carburetor" print="yes" href="topics/glossary_carburetor.dita"/>
+    <glossref keys="glossary_clutch" print="yes" href="topics/glossary_clutch.dita"/>
+    <glossref keys="glossary_commutator" print="yes" href="topics/glossary_commutator.dita"/>
+    <glossref keys="glossary_crankshaft" print="yes" href="topics/glossary_crankshaft.dita"/>
+    <glossref keys="glossary_differential" print="yes" href="topics/glossary_differential.dita"/>
+    <glossref keys="glossary_magneto" print="yes" href="topics/glossary_magneto.dita"/>
+    <glossref keys="glossary_muffler" print="yes" href="topics/glossary_muffler.dita"/>
+    <glossref keys="glossary_piston" print="yes" href="topics/glossary_piston.dita"/>
+    <glossref keys="glossary_radiator" print="yes" href="topics/glossary_radiator.dita"/>
+    <glossref keys="glossary_sparkplug" print="yes" href="topics/glossary_sparkplug.dita"/>
+    <glossref keys="glossary_throttle" print="yes" href="topics/glossary_throttle.dita"/>
+    <glossref keys="glossary_transmission" print="yes" href="topics/glossary_transmission.dita"/>
+</map>

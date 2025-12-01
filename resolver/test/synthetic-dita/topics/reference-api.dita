@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE reference PUBLIC "-//OASIS//DTD DITA Reference//EN" "reference.dtd">
+<reference id="reference-api" xml:lang="en-us">
+  <title>User API Reference</title>
+  
+  <shortdesc>Complete API reference for user management operations including properties, syntax, and examples.</shortdesc>
+  
+  <refbody>
+    <!-- Demonstrates refsyn with full syntax elements -->
+    <section>
+      <title>Create User Endpoint</title>
+      
+      <refsyn>
+        <title>Syntax</title>
+        <synph>
+          <kwd>POST</kwd>
+          <sep> </sep>
+          <var>/api/users</var>
+        </synph>
+      </refsyn>
+      
+      <refsyn>
+        <title>cURL Command Syntax</title>
+        <synph>
+          <kwd>curl</kwd>
+          <sep> </sep>
+          <oper>-X</oper>
+          <sep> </sep>
+          <kwd>POST</kwd>
+          <sep> </sep>
+          <var>URL</var>
+          <sep> </sep>
+          <oper>-H</oper>
+          <sep> </sep>
+          <delim>"</delim>
+          <var>Header</var>
+          <delim>"</delim>
+          <sep> </sep>
+          <oper>-d</oper>
+          <sep> </sep>
+          <delim>'</delim>
+          <var>Data</var>
+          <delim>'</delim>
+        </synph>
+      </refsyn>
+      
+      <!-- Demonstrates properties table -->
+      <properties>
+        <prophead>
+          <proptypehd>Type</proptypehd>
+          <propvaluehd>Parameter</propvaluehd>
+          <propdeschd>Description</propdeschd>
+        </prophead>
+        
+        <property>
+          <proptype>string</proptype>
+          <propvalue>
+            <parmname>username</parmname>
+          </propvalue>
+          <propdesc>Unique username for the account. Required. Must be 3-20 characters.</propdesc>
+        </property>
+        
+        <property>
+          <proptype>string</proptype>
+          <propvalue>
+            <parmname>email</parmname>
+          </propvalue>
+          <propdesc>User's email address. Required. Must be valid email format.</propdesc>
+        </property>
+        
+        <property>
+          <proptype>string</proptype>
+          <propvalue>
+            <parmname>displayName</parmname>
+          </propvalue>
+          <propdesc>Display name for the user. Optional.</propdesc>
+        </property>
+        
+        <property>
+          <proptype>string</proptype>
+          <propvalue>
+            <parmname>role</parmname>
+          </propvalue>
+          <propdesc>User role. Required. One of: <codeph>admin</codeph>, <codeph>developer</codeph>, <codeph>tester</codeph>, <codeph>viewer</codeph>.</propdesc>
+        </property>
+        
+        <property>
+          <proptype>object</proptype>
+          <propvalue>
+            <parmname>metadata</parmname>
+          </propvalue>
+          <propdesc>Optional metadata object containing custom key-value pairs.</propdesc>
+        </property>
+      </properties>
+      
+      <?doc-detective id="api-create-user-test" ?>
+      <?doc-detective description="Test creating a user via API" ?>
+      <example>
+        <title>Example Request</title>
+        <codeblock outputclass="shell">curl -X POST https://api.example.com/users \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_API_TOKEN" \
+  -d '{
+    "username": "newuser",
+    "email": "newuser@example.com",
+    "displayName": "New User",
+    "role": "developer"
+  }'</codeblock>
+      </example>
+      
+      <example>
+        <title>Example Response (Success)</title>
+        <codeblock outputclass="json">{
+  "id": "usr_123456",
+  "username": "newuser",
+  "email": "newuser@example.com",
+  "displayName": "New User",
+  "role": "developer",
+  "status": "active",
+  "createdAt": "2025-10-08T10:30:00Z"
+}</codeblock>
+      </example>
+      
+      <example>
+        <title>Error Response</title>
+        <codeblock outputclass="json">{
+  "error": "USER_ALREADY_EXISTS",
+  "message": "A user with username 'newuser' already exists",
+  "statusCode": 409
+}</codeblock>
+      </example>
+    </section>
+    
+    <!-- Additional API sections -->
+    <section>
+      <title>Get User Endpoint</title>
+      
+      <refsyn>
+        <synph>
+          <kwd>GET</kwd>
+          <sep> </sep>
+          <var>/api/users/</var>
+          <delim>{</delim>
+          <var>userId</var>
+          <delim>}</delim>
+        </synph>
+      </refsyn>
+      
+      <properties>
+        <prophead>
+          <proptypehd>Type</proptypehd>
+          <propvaluehd>Parameter</propvaluehd>
+          <propdeschd>Description</propdeschd>
+        </prophead>
+        
+        <property>
+          <proptype>string</proptype>
+          <propvalue>
+            <parmname>userId</parmname>
+          </propvalue>
+          <propdesc>Path parameter. The unique user ID or username.</propdesc>
+        </property>
+        
+        <property>
+          <proptype>boolean</proptype>
+          <propvalue>
+            <parmname>includeMetadata</parmname>
+          </propvalue>
+          <propdesc>Query parameter. Include metadata in response. Default: <codeph>false</codeph>.</propdesc>
+        </property>
+      </properties>
+      
+      <?doc-detective timeout="5000" ?>
+      <example>
+        <title>Example Request</title>
+        <codeblock outputclass="shell">curl -X GET "https://api.example.com/users/newuser?includeMetadata=true" \
+  -H "Authorization: Bearer YOUR_API_TOKEN"</codeblock>
+      </example>
+    </section>
+    
+    <section>
+      <title>Update User Endpoint</title>
+      
+      <refsyn>
+        <synph>
+          <kwd>PATCH</kwd>
+          <sep> </sep>
+          <var>/api/users/</var>
+          <delim>{</delim>
+          <var>userId</var>
+          <delim>}</delim>
+        </synph>
+      </refsyn>
+      
+      <properties>
+        <prophead>
+          <proptypehd>Type</proptypehd>
+          <propvaluehd>Parameter</propvaluehd>
+          <propdeschd>Description</propdeschd>
+        </prophead>
+        
+        <property>
+          <proptype>string</proptype>
+          <propvalue>
+            <parmname>displayName</parmname>
+          </propvalue>
+          <propdesc>Updated display name. Optional.</propdesc>
+        </property>
+        
+        <property>
+          <proptype>string</proptype>
+          <propvalue>
+            <parmname>role</parmname>
+          </propvalue>
+          <propdesc>Updated role. Optional.</propdesc>
+        </property>
+      </properties>
+    </section>
+    
+    <section>
+      <title>Delete User Endpoint</title>
+      
+      <refsyn>
+        <synph>
+          <kwd>DELETE</kwd>
+          <sep> </sep>
+          <var>/api/users/</var>
+          <delim>{</delim>
+          <var>userId</var>
+          <delim>}</delim>
+        </synph>
+      </refsyn>
+      
+      <?doc-detective optional="true" ?>
+      <example>
+        <title>Example Request</title>
+        <codeblock outputclass="shell">curl -X DELETE "https://api.example.com/users/newuser" \
+  -H "Authorization: Bearer YOUR_API_TOKEN"</codeblock>
+      </example>
+      
+      <example>
+        <title>Success Response</title>
+        <msgblock>HTTP/1.1 204 No Content</msgblock>
+      </example>
+    </section>
+  </refbody>
+  
+  <related-links>
+    <link href="https://api.example.com/docs" format="html" scope="external">
+      <linktext>Full API Documentation</linktext>
+    </link>
+    <link href="task-comprehensive.dita" format="dita" scope="local">
+      <linktext>User Creation Task Guide</linktext>
+    </link>
+  </related-links>
+</reference>

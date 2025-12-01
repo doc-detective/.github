@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<task id="electric_starter_engine_start">
+    <title>Starting the Engine with an Electric Starter</title>
+    <shortdesc>Procedure for starting an engine using the electric starter on modern
+        automobiles.</shortdesc>
+    <taskbody>
+        <prereq>
+            <p>Ensure the vehicle is in a safe, well-ventilated area with the parking brake
+                engaged.</p>
+        </prereq>
+        <steps>
+            <step>
+                <cmd>Position spark and throttle levers</cmd>
+                <stepxmp>Set levers to the same position as for manual cranking</stepxmp>
+            </step>
+            <step>
+                <cmd>Turn on the ignition switch</cmd>
+                <info>Preferably use the magneto for ignition</info>
+            </step>
+            <step>
+                <cmd>Locate the starter push button on the floor</cmd>
+            </step>
+            <step>
+                <cmd>Prime the carburetor if the engine is cold</cmd>
+                <substeps>
+                    <substep>
+                        <cmd>Pull out the carburetor priming rod on the instrument board</cmd>
+                        <stepxmp>Hold the rod out for only a few seconds to avoid flooding the
+                            engine</stepxmp>
+                    </substep>
+                </substeps>
+            </step>
+            <step>
+                <cmd>Press the starter push button with your foot</cmd>
+                <stepxmp>This engages the <abbreviated-form keyref="glossary_bendix_drive"/> shaft
+                    with the flywheel teeth</stepxmp>
+            </step>
+        </steps>
+        <result>
+            <p>The engine should now be running. Allow it to warm up before driving.</p>
+        </result>
+    </taskbody>
+</task>

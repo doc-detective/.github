@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<task id="task-with-choices" xml:lang="en-us">
+  <title>Configuring Application Settings with Multiple Options</title>
+  
+  <taskbody>
+    <context>
+      <p>This task demonstrates the <codeph>choices</codeph> element for parameterized test generation.</p>
+    </context>
+    
+    <steps>
+      <step>
+        <cmd>Navigate to <menucascade><uicontrol>Settings</uicontrol><uicontrol>Preferences</uicontrol></menucascade></cmd>
+      </step>
+      
+      <step>
+        <cmd>Select your preferred theme:</cmd>
+        <choices>
+          <choice>Click <uicontrol>Light Theme</uicontrol> for a bright interface</choice>
+          <choice>Click <uicontrol>Dark Theme</uicontrol> for reduced eye strain</choice>
+          <choice>Click <uicontrol>Auto</uicontrol> to match system settings</choice>
+        </choices>
+      </step>
+      
+      <step>
+        <cmd>Click <uicontrol>Save</uicontrol> to apply changes.</cmd>
+        <stepresult>
+          <p>A confirmation message <msgph>Settings saved successfully</msgph> appears.</p>
+        </stepresult>
+      </step>
+    </steps>
+  </taskbody>
+</task>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<task id="headlight_focusing">
+    <title>Focusing the Headlights</title> 
+    <shortdesc>Adjust headlight focus using the rear adjustment screw for optimal beam
+        pattern.</shortdesc>
+    <taskbody>
+        <steps>
+            <step>
+                <cmd>Locate the adjusting screw</cmd>
+                <info>The adjusting screw is located at the back of the lamp assembly</info>
+            </step>
+            <step>
+                <cmd>Adjust the focus</cmd>
+                <substeps>
+                    <substep>
+                        <cmd>Turn adjusting screw clockwise to adjust focus in one direction</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Turn adjusting screw counterclockwise to adjust focus in opposite
+                            direction</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Continue adjusting until desired focus is achieved</cmd>
+                    </substep>
+                </substeps>
+            </step>
+        </steps>
+    </taskbody>
+</task>

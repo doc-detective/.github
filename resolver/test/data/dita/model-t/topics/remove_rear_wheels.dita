@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<task id="remove_rear_wheels">
+    <title>Removing Rear Wheels</title>
+    <shortdesc>Emergency procedure for rear wheel removal and important maintenance
+        guidelines.</shortdesc>
+    <taskbody>
+        <context>
+            <note type="warning">Rear wheels should only be removed when absolutely
+                necessary.</note> 
+        </context>
+        <steps>
+            <step>
+                <cmd>Remove the hub cap.</cmd>
+            </step>
+            <step>
+                <cmd>Remove the cotter pin.</cmd>
+            </step>
+            <step>
+                <cmd>Unscrew the castle nut and remove the spindle washer.</cmd>
+            </step>
+            <step>
+                <cmd>Using a wheel puller, remove the wheel from the tapered shaft.</cmd>
+                <info>The wheel is secured with a key.</info>
+            </step>
+        </steps>
+        <result>The rear wheel will now be detached from the axle shaft.</result>
+        <postreq>
+            <p>When reinstalling:</p>
+            <ul>
+                <li>Ensure the axle shaft nut is tightened completely</li>
+                <li>Verify the cotter pin is properly installed</li>
+                <li>Check hub lock nuts periodically and tighten as needed to prevent axle shaft
+                    damage</li>
+            </ul>
+        </postreq>
+    </taskbody>
+</task>

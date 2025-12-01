@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE troubleshooting PUBLIC "-//OASIS//DTD DITA Troubleshooting//EN" "troubleshooting.dtd">
+<troubleshooting id="ammeter_operation">
+    <title>Ammeter Operation and Troubleshooting</title>
+    <shortdesc>The instrument board ammeter indicates battery charging status and requires specific
+        troubleshooting steps when readings are abnormal.</shortdesc>
+    <troublebody> 
+        <condition>
+            <title>Normal Operation Parameters</title>
+            <p>The ammeter should:</p>
+            <ul>
+                <li>Register "charge" when the generator is charging the battery</li>
+                <li>Register "discharge" when lights are on and engine speed is below 10 mph</li>
+                <li>Show 10-12 reading at speeds of 15 mph or higher</li>
+            </ul>
+            <p>Abnormal Reading at Speeds Above 15 mph</p>
+            <p>Potential causes include:</p>
+            <ul>
+                <li>Loose terminal connections</li>
+                <li>Generator malfunction</li>
+                <li>Wiring short-circuit</li>
+                <li>Dirty generator commutator</li>
+            </ul>
+            <note type="caution">Do not run engine longer than necessary with terminal wire
+                disconnected during testing.</note>
+        </condition>
+        <troubleSolution>
+            <remedy>
+                <steps>
+                    <step>
+                        <cmd>Inspect ammeter terminal posts for tight connections</cmd>
+                    </step>
+                    <step>
+                        <cmd>Test generator function:</cmd>
+                        <substeps>
+                            <substep>
+                                <cmd>Disconnect wire from generator terminal</cmd>
+                            </substep>
+                            <substep>
+                                <cmd>Run engine at moderate speed</cmd>
+                            </substep>
+                            <substep>
+                                <cmd>Short-circuit terminal stud to generator housing using pliers
+                                    or screwdriver</cmd>
+                            </substep>
+                            <substep>
+                                <cmd>Check for strong spark</cmd>
+                            </substep>
+                        </substeps>
+                        <stepresult>A good live spark indicates proper generator
+                            function</stepresult>
+                    </step>
+                    <step>
+                        <cmd>Inspect wiring from generator through ammeter to battery for insulation
+                            breaks</cmd>
+                    </step>
+                    <step>
+                        <cmd>Clean generator commutator if previous steps don't resolve issue:</cmd>
+                        <substeps>
+                            <substep>
+                                <cmd>Remove dust cap from generator end</cmd>
+                            </substep>
+                            <substep>
+                                <cmd>Use slightly oiled fine-grade sandpaper</cmd>
+                            </substep>
+                            <substep>
+                                <cmd>Hold sandpaper against rotating commutator until surface is
+                                    bright and clean</cmd>
+                            </substep>
+                        </substeps>
+                    </step>
+                </steps>
+            </remedy>
+        </troubleSolution>
+    </troublebody>
+</troubleshooting>

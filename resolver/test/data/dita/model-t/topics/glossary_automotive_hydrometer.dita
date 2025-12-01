@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE glossentry PUBLIC "-//OASIS//DTD DITA Glossary//EN" "glossary.dtd">
+<glossentry id="glossary_automotive_hydrometer">
+    <glossterm>Hydrometer</glossterm>
+    <glossdef>A diagnostic instrument used in automotive maintenance to measure the specific gravity
+        of liquids, primarily used to test the state of charge in lead-acid batteries by measuring
+        the concentration of sulfuric acid in the electrolyte solution. It consists of a glass tube
+        with a weighted float and calibrated scale that indicates the density of the liquid being
+        tested.</glossdef> 
+    <glossBody>
+        <glossPartOfSpeech value="noun"/>
+        <glossSurfaceForm>hydrometer</glossSurfaceForm>
+        <glossUsage>The term is commonly used in automotive maintenance manuals, battery service
+            documentation, and technical guides. It is essential vocabulary for automotive
+            technicians and DIY mechanics performing battery maintenance.</glossUsage>
+        <glossAlt>
+            <glossSynonym>specific gravity tester</glossSynonym>
+        </glossAlt>
+    </glossBody>
+</glossentry>

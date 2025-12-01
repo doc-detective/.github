@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<task id="remove_magneto">
+    <title>Removing the Magneto</title>
+
+    <shortdesc>Remove the magneto assembly by first removing the power plant from the car, then
+        accessing the flywheel and magneto components.</shortdesc>
+
+    <taskbody>
+
+        <context>
+            <p>The magneto can only be accessed and removed after the power plant has been removed
+                from the vehicle.</p>
+        </context>
+
+        <steps>
+            <step>
+                <cmd>Remove the crank case</cmd>
+            </step>
+            <step>
+                <cmd>Remove the transmission cover</cmd>
+            </step>
+            <step>
+                <cmd>Locate the four cap screws holding the flywheel to the crank shaft</cmd>
+            </step>
+            <step>
+                <cmd>Remove all four cap screws from the flywheel</cmd>
+            </step>
+            <step>
+                <cmd>Access and remove the magnets and magneto mechanism</cmd>
+                <info>This step provides complete access to the entire magneto assembly</info>
+            </step>
+        </steps>
+
+        <result>
+            <p>The magneto assembly is now removed from the vehicle.</p>
+        </result>
+
+        <postreq>
+            <note type="important">Before disassembly, mark all parts carefully to ensure proper
+                reassembly orientation and position.</note>
+            <fig>
+                <title>Ford Magneto</title>
+                <image keyref="magneto">
+                    <alt>The flywheel with magnets revolves while magneto coils remain
+                        stationary.</alt>
+                </image>
+            </fig>
+        </postreq>
+    </taskbody>
+</task>

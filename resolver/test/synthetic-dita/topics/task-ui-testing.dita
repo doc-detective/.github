@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<task id="task-ui-testing" xml:lang="en-us">
+  <title>UI Testing Workflow</title>
+  
+  <taskbody>
+    <steps>
+      <step>
+        <cmd>Open the test application at <xref href="http://localhost:3000" format="html">http://localhost:3000</xref></cmd>
+      </step>
+      
+      <step>
+        <cmd>Click each navigation menu item to verify routing.</cmd>
+      </step>
+    </steps>
+  </taskbody>
+</task>

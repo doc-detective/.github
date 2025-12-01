@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<concept id="commutator_purpose">
+    <title>Purpose of the Commutator</title>
+ 
+    <shortdesc>The commutator, also known as a timer, controls spark plug firing timing by managing
+        the electrical circuit in the primary system through a rotating mechanism.</shortdesc>
+
+    <conbody>
+        <section>
+            <title>Functional Overview</title>
+            <p>The commutator serves two primary functions:</p>
+            <ul>
+                <li>Determines the precise moment when spark plugs must fire</li>
+                <li>Controls the make and break action in the primary circuit</li>
+            </ul>
+        </section>
+
+        <section>
+            <title>Operating Mechanism</title>
+            <p>The electrical current flows through the following path:</p>
+            <ol>
+                <li>Current flows from the grounded wire in the magneto through metal parts</li>
+                <li>Current reaches the metal roller in the commutator</li>
+                <li>As the roller revolves, it touches four commutator contact points</li>
+                <li>Each contact point connects to a coil unit via attached wires</li>
+                <li>This creates a momentary electrical circuit through the primary wire system</li>
+            </ol>
+        </section>
+
+        <section>
+            <title>Maintenance Requirement</title>
+            <p>For optimal performance, the commutator requires regular maintenance:</p>
+            <ul>
+                <li>Keep the component clean</li>
+                <li>Maintain proper lubrication at all times</li>
+            </ul>
+        </section>
+
+        <section>
+            <title>Reference Figure</title>
+            <fig>
+                <title>The <ph keyref="company_name"/> Commutator</title>
+                <image keyref="commutator">
+                    <alt>A view of the <ph keyref="company_name"/> commutator, pointing out all of
+                        its parts</alt>
+                </image>
+            </fig>
+        </section>
+    </conbody>
+</concept>

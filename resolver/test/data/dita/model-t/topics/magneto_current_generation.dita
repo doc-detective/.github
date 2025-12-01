@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<concept id="magneto_current_generation">
+    <title>Magneto Current Generation Process</title>
+ 
+    <shortdesc>The magneto generates electrical current through electromagnetic induction as the
+        flywheel magnets pass by stationary coil spools, creating a low tension alternating
+        current.</shortdesc>
+
+    <conbody>
+        <p>The magneto generates current through a series of coordinated components and actions:</p>
+
+        <ul>
+            <li>The flywheel, containing magnets, rotates at the same speed as the motor</li>
+            <li>Stationary coil spools are mounted on the fixed portion of the magneto</li>
+            <li>The passing magnets induce a low tension alternating current in the wire coils</li>
+            <li>The generated current travels through the magneto connection wire to the coil box
+                mounted on the dashboard</li>
+        </ul>
+
+        <p>This electromagnetic induction process provides the foundation for the vehicle's
+            electrical system operation.</p>
+    </conbody>
+</concept>

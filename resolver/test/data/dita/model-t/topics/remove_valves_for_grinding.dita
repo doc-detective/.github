@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<task id="remove_valves_for_grinding">
+    <title>Removing Valves for Grinding</title>
+    <shortdesc>Procedure for safely removing engine valves to prepare for valve grinding and
+        maintenance.</shortdesc>
+
+    <taskbody>
+        <prereq>
+            <p>Before beginning, ensure you have: <ul>
+                    <li>Valve lifting tool</li>
+                    <li>Appropriate hand tools</li>
+                    <li>Clean work area</li>
+                    <li>Safety equipment (gloves, eye protection)</li>
+                </ul>
+            </p>
+        </prereq>
+
+        <context>
+            <p>Valve removal is a critical step in engine maintenance, allowing for valve grinding
+                and inspection of valve components.</p>
+        </context>
+
+        <steps>
+            <step>
+                <cmd>Drain the radiator</cmd>
+                <info>Completely empty the radiator to prevent coolant spillage during engine
+                    disassembly.</info>
+            </step>
+
+            <step>
+                <cmd>Remove the cylinder head</cmd>
+                <info>Carefully detach the cylinder head to access the valve mechanism.</info>
+            </step>
+
+            <step>
+                <cmd>Remove the two valve covers on the right side of the engine</cmd>
+                <info>This provides direct access to the valve springs and valve mechanism.</info>
+            </step>
+
+            <step>
+                <cmd>Raise the valve spring using a lifting tool</cmd>
+                <info>Use the valve lifting tool to compress the valve spring.</info>
+            </step>
+
+            <step>
+                <cmd>Remove the pin under the valve seat</cmd>
+                <info>With the spring compressed, carefully pull out the small pin securing the
+                    valve.</info>
+            </step>
+
+            <step>
+                <cmd>Lift out the valve</cmd>
+                <info>Once the pin is removed, carefully lift the valve out by its head.</info>
+            </step>
+        </steps>
+
+        <result>
+            <p>The valve has been successfully removed and is ready for grinding or further
+                inspection.</p>
+        </result>
+
+        <postreq>
+            <p>After valve removal: <ul>
+                    <li>Clean the valve thoroughly</li>
+                    <li>Inspect for any damage or wear</li>
+                    <li>Prepare for grinding or replacement</li>
+                    <li>Keep all removed components organized</li>
+                </ul>
+            </p>
+        </postreq>
+    </taskbody>
+</task>

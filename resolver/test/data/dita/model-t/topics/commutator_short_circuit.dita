@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<concept id="commutator_short_circuit">
+    <title>Detecting Short Circuits in Commutator Wiring</title>
+ 
+    <shortdesc>A short circuit in commutator wiring can be detected through specific symptoms
+        including coil buzzing and engine performance issues. Understanding these indicators helps
+        prevent potential damage to the engine.</shortdesc>
+
+    <conbody>
+        <p>A short circuit can occur when the insulation of primary wires (which run from the coil
+            to commutator) becomes worn, exposing the copper wire. When this exposed wire contacts
+            the engine pan or other metal parts, current leakage occurs, resulting in a short
+            circuit.</p>
+
+        <section>
+            <title>Key Indicators of a Short Circuit</title>
+            <ul>
+                <li>Steady buzzing from one of the coil units</li>
+                <li>Sudden engine lagging during operation</li>
+                <li>Engine pounding due to premature explosion</li>
+            </ul>
+        </section>
+
+        <section>
+            <title>Safety Warning</title>
+            <p>When a short circuit is suspected, avoid cranking the engine downward against
+                compression. This action can cause a dangerous kickback due to the short circuit
+                condition.</p>
+        </section>
+    </conbody>
+</concept>

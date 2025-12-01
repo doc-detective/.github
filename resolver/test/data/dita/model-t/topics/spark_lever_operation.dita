@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<task id="spark_lever_operation">
+    <title>Operating the Spark Lever</title>
+    <shortdesc>Learn how to properly control the spark lever to optimize engine performance and fuel
+        efficiency.</shortdesc>
+
+    <taskbody>
+        <prereq>
+            <p>Familiarize yourself with the location of the spark lever before operating the
+                vehicle.</p>
+        </prereq>
+        <context>
+            <p>The spark lever is located under the steering wheel on the left-hand side and plays a
+                crucial role in engine performance and fuel economy.</p>
+        </context>
+
+        <steps>
+            <step>
+                <cmd>Advance the spark lever to the maximum point the engine can tolerate.</cmd>
+            </step>
+
+            <step>
+                <cmd>Monitor the engine for knocking sounds.</cmd>
+                <stepresult>If a dull knock occurs, it indicates the spark is advanced too far,
+                    causing premature explosion.</stepresult>
+            </step>
+
+            <step>
+                <cmd>Retard the spark lever only when the engine slows down on heavy roads or steep
+                    grades.</cmd>
+            </step>
+
+            <step>
+                <cmd>Avoid excessive spark retardation.</cmd>
+                <stepresult>Over-retarding can cause: <ul>
+                        <li>Loss of engine power</li>
+                        <li>Engine overheating</li>
+                        <li>Potential valve damage (warped, burned, or cracked)</li>
+                    </ul>
+                </stepresult>
+            </step>
+        </steps>
+
+        <result>
+            <p>By mastering spark lever control, you can achieve maximum engine speed and optimal
+                gasoline consumption.</p>
+        </result>
+    </taskbody>
+</task>

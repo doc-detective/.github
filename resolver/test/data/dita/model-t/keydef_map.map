@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE map PUBLIC "-//OASIS//DTD DITA Map//EN" "map.dtd">
+<map>
+    <title>Ford Manual Topics Key Definitions</title>
+    
+    <!-- Car Ownership -->
+    <keydef keys="ownership" href="topics/ford_car_ownership.dita"/>
+    <keydef keys="genuine_parts" href="topics/ford_genuine_parts.dita"/>
+    
+    <!-- Car Operation -->
+    <topicgroup>
+        <keydef keys="car_operation" href="topics/the_car_and_its_operation.dita"/>
+        <keydef keys="radiator_prep" href="topics/prepare_radiator.dita"/>
+        <keydef keys="gas_tank_prep" href="topics/gasoline_tank_preparation.dita"/>
+        <keydef keys="oil_maintenance" href="topics/engine_oil_maintenance.dita"/>
+        <keydef keys="spark_throttle" href="topics/spark_throttle_operation.dita"/>
+        <keydef keys="start_lever" href="topics/engine_start_lever_settings_reference.dita"/>
+        <keydef keys="startup_prep" href="topics/engine_startup_preparation.dita"/>
+        <keydef keys="engine_start" href="topics/engine_starting_overview.dita"/>
+        <keydef keys="manual_start" href="topics/manual_engine_start.dita"/>
+        <keydef keys="electric_start" href="topics/electric_starter_engine_start.dita"/>
+        <keydef keys="cold_start" href="topics/starting_engine_in_cold_weather.dita"/>
+        <keydef keys="hand_lever" href="topics/hand_lever_usage.dita"/>
+        <keydef keys="foot_pedals" href="topics/foot_pedals_operation.dita"/>
+        <keydef keys="car_start" href="topics/starting_a_car.dita"/>
+        <keydef keys="car_reverse" href="topics/reversing_a_car.dita"/>
+        <keydef keys="car_stop" href="topics/car_stopping_procedure.dita"/>
+        <keydef keys="reverse_procedure" href="topics/car_reversal_procedure.dita"/>
+        <keydef keys="spark_lever" href="topics/spark_lever_operation.dita"/>
+        <keydef keys="speed_control" href="topics/vehicle_speed_control.dita"/>
+        <keydef keys="owner_maintenance" href="topics/ford_owner_maintenance.dita"/>
+        <keydef keys="new_car_maint" href="topics/new_car_maintenance.dita"/>
+    </topicgroup>
+    
+    <!-- Engine -->
+    <topicgroup>
+        <keydef keys="engine" href="topics/the_ford_engine.dita"/>
+        <keydef keys="engine_principle" href="topics/gasoline_engine_principle.dita"/>
+        <keydef keys="piston" href="topics/piston_functions.dita"/>
+        <keydef keys="connect_rod" href="topics/remove_connecting_rod.dita"/>
+        <keydef keys="valve_arrange" href="topics/engine_valve_arrangement.dita"/>
+        <keydef keys="valve_timing" href="topics/engine_valve_timing.dita"/>
+        <keydef keys="valve_care" href="topics/engine_valve_care.dita"/>
+        <keydef keys="valve_grinding" href="topics/remove_valves_for_grinding.dita"/>
+        <keydef keys="grinding" href="topics/grinding_valves.dita"/>
+        <keydef keys="pushrod_wear" href="topics/valve_pushrod_wear.dita"/>
+        <keydef keys="knock_causes" href="topics/engine_knocking_causes.dita"/>
+        <keydef keys="knocks" href="topics/engine_knocks.dita"/>
+        <keydef keys="carbon_removal" href="topics/remove_carbon.dita"/>
+        <keydef keys="spark_plugs" href="topics/clean_spark_plugs.dita"/>
+        <keydef keys="power_plant" href="topics/remove_power_plant.dita"/>
+        <keydef keys="rod_bearings" href="topics/adjust_rod_bearings.dita"/>
+        <keydef keys="main_bearings" href="topics/adjust_main_bearings.dita"/>
+        <keydef keys="valve_springs" href="topics/test_replace_valve_springs.dita"/>
+    </topicgroup>
+    
+    <!-- Cooling System -->
+    <topicgroup>
+        <keydef keys="cooling" href="topics/ford_cooling_system.dita"/>
+        <keydef keys="engine_cool" href="topics/engine_cooling.dita"/>
+        <keydef keys="water_circ" href="topics/water_circulation.dita"/>
+        <keydef keys="overheat_causes" href="topics/overheating_causes.dita"/>
+        <keydef keys="radiator_level" href="topics/maintain_radiator_level.dita"/>
+        <keydef keys="persist_overheat" href="topics/address_persistent_overheating.dita"/>
+        <keydef keys="add_water" href="topics/add_water_overheated_radiator.dita"/>
+        <keydef keys="radiator_overheat" href="topics/radiator_overheating.dita"/>
+        <keydef keys="flush" href="topics/flush_radiator.dita"/>
+        <keydef keys="freezing" href="topics/radiator_freezing.dita"/>
+        <keydef keys="temp_repair" href="topics/temp_leak_repair.dita"/>
+        <keydef keys="perm_repair" href="topics/permanent_leak_repair.dita"/>
+    </topicgroup>
+    
+    <!-- Gasoline System -->
+    <topicgroup>
+        <keydef keys="gas_system" href="topics/the_gasoline_system.dita"/>
+        <keydef keys="carb_function" href="topics/carburetor_function.dita"/>
+        <keydef keys="dash_adjust" href="topics/carburetor_dash_adjustment.dita"/>
+        <keydef keys="fuel_mix" href="topics/fuel_mixture_types.dita"/>
+        <keydef keys="carb_adjust" href="topics/carburetor_adjustment.dita"/>
+        <keydef keys="carb_water" href="topics/water_in_carburetor.dita"/>
+        <keydef keys="carb_leak" href="topics/carburetor_leakage.dita"/>
+        <keydef keys="carb_dirt" href="topics/troubleshoot_dirt_carburetor.dita"/>
+        <keydef keys="speed_issues" href="topics/engine_speed_issues.dita"/>
+        <keydef keys="hot_air" href="topics/hot_air_pipe.dita"/>
+        <keydef keys="float" href="topics/cork_float.dita"/>
+        <keydef keys="warm_prime" href="topics/warm_start_priming.dita"/>
+    </topicgroup>
+
+    <!-- Ignition System -->
+    <topicgroup>
+        <keydef keys="ignition" href="topics/ford_ignition_system.dita"/>
+        <keydef keys="ignition_purpose" href="topics/ignition_system_purpose.dita"/>
+        <keydef keys="magneto_current" href="topics/magneto_current_generation.dita"/>
+        <keydef keys="coil_vibrator" href="topics/coil_vibrator_adjustment.dita"/>
+        <keydef keys="weak_unit" href="topics/weak_unit_detection.dita"/>
+        <keydef keys="comm_short" href="topics/commutator_short_circuit.dita"/>
+        <keydef keys="coil_start" href="topics/coil_adjustment_starting.dita"/>
+        <keydef keys="comm_purpose" href="topics/commutator_purpose.dita"/>
+        <keydef keys="spark_plug" href="topics/spark_plugs.dita"/>
+        <keydef keys="ignition_trouble" href="topics/ignition_trouble.dita"/>
+        <keydef keys="missing_cylinder" href="topics/identify_missing_cylinder.dita"/>
+        <keydef keys="beyond_coil" href="topics/beyond_coil_plug_issues.dita"/>
+        <keydef keys="comm_misfire" href="topics/commutator_misfiring.dita"/>
+        <keydef keys="remove_comm" href="topics/remove_commutator.dita"/>
+        <keydef keys="cold_comm" href="topics/cold_weather_commutator.dita"/>
+        <keydef keys="remove_magneto" href="topics/remove_magneto.dita"/>
+        <keydef keys="magneto_maint" href="topics/magneto_maintenance.dita"/>
+    </topicgroup>
+    
+    <!-- Transmission -->
+    <topicgroup>
+        <keydef keys="transmission" href="topics/the_ford_transmission.dita"/>
+        <keydef keys="trans_function" href="topics/transmission_function.dita"/>
+        <keydef keys="planetary" href="topics/planetary_transmission.dita"/>
+        <keydef keys="clutch_purpose" href="topics/clutch_purpose.dita"/>
+        <keydef keys="clutch_control" href="topics/clutch_control.dita"/>
+        <keydef keys="clutch_adjust" href="topics/clutch_adjustment.dita"/>
+        <keydef keys="band_adjust" href="topics/band_adjustment.dita"/>
+        <keydef keys="band_remove" href="topics/band_removal.dita"/>
+        <keydef keys="trans_assembly" href="topics/transmission_assembly.dita"/>
+    </topicgroup>
+    
+    <!-- Rear Axle -->
+    <topicgroup>
+        <keydef keys="rear_axle" href="topics/the_rear_axle_assembly.dita"/>
+        <keydef keys="remove_axle" href="topics/remove_rear_axle.dita"/>
+        <keydef keys="universal_joint" href="topics/disconnect_universal_joint.dita"/>
+        <keydef keys="axle_differential" href="topics/disassembling_rear_axle_and_differential.dita"/>
+        <keydef keys="drive_pinion" href="topics/remove_drive_shaft_pinion.dita"/>
+        <keydef keys="diff_gears" href="topics/remove_differential_gears.dita"/>
+        <keydef keys="axle_shaft" href="topics/remove_rear_axle_shaft.dita"/>
+    </topicgroup>
+    
+    <!-- Muffler -->
+    <topicgroup>
+        <keydef keys="muffler" href="topics/the_ford_muffler.dita"/>
+        <keydef keys="muffler_need" href="topics/muffler_necessity.dita"/>
+        <keydef keys="disconnect_muff" href="topics/disconnect_muffler.dita"/>
+    </topicgroup>
+    
+    <!-- Running Gear -->
+    <topicgroup>
+        <keydef keys="running_gear" href="topics/the_running_gear.dita"/>
+        <keydef keys="gear_maint" href="topics/running_gear_maintenance.dita"/>
+        <keydef keys="front_axle" href="topics/remove_front_axle.dita"/>
+        <keydef keys="straighten_axle" href="topics/straighten_front_axle.dita"/>
+        <keydef keys="wheel_maint" href="topics/wheel_maintenance.dita"/>
+        <keydef keys="front_wheels" href="topics/remove_front_wheels.dita"/>
+        <keydef keys="rear_wheels" href="topics/remove_rear_wheels.dita"/>
+        <keydef keys="wheel_config" href="topics/wheel_configuration.dita"/>
+        <keydef keys="roller_bearing" href="topics/roller_bearing_installation.dita"/>
+        <keydef keys="install_bearing" href="topics/install_roller_bearings.dita"/>
+        <keydef keys="bearing_lube" href="topics/bearing_lubrication.dita"/>
+        <keydef keys="spring_clip" href="topics/spring_clip_maintenance.dita"/>
+        <keydef keys="steering_maint" href="topics/steering_apparatus_maintenance.dita"/>
+        <keydef keys="steering_tight" href="topics/steering_gear_tightening.dita"/>
+    </topicgroup>
+    
+    <!-- Lubrication System -->
+    <topicgroup>
+        <keydef keys="lube_system" href="topics/the_ford_lubricating_system.dita"/>
+        <keydef keys="lubrication" href="topics/lubrication_system.dita"/>
+        <keydef keys="oil_specs" href="topics/oil_specifications.dita"/>
+        <keydef keys="drain_oil" href="topics/draining_crankcase_oil.dita"/>
+        <keydef keys="comm_oil" href="topics/commutator_oiling.dita"/>
+        <keydef keys="diff_lube" href="topics/differential_lubrication.dita"/>
+    </topicgroup>
+    
+    <!-- Tire Care -->
+    <topicgroup>
+        <keydef keys="tire_care" href="topics/care_of_the_tires.dita"/>
+        <keydef keys="tire_remove" href="topics/tire_removal.dita"/>
+        <keydef keys="casing_repair" href="topics/tire_casing_repair.dita"/>
+        <keydef keys="tube_repair" href="topics/inner_tube_repair.dita"/>
+    </topicgroup>
+    
+    <!-- Maintenance Points -->
+    <topicgroup>
+        <keydef keys="maintenance" href="topics/points_on_maintenance.dita"/>
+        <keydef keys="car_wash" href="topics/car_washing.dita"/>
+        <keydef keys="top_care" href="topics/convertible_top_care.dita"/>
+        <keydef keys="car_store" href="topics/car_storage.dita"/>
+        <keydef keys="headlight" href="topics/headlight_overview.dita"/>
+        <keydef keys="light_clean" href="topics/headlight_cleaning.dita"/>
+        <keydef keys="light_focus" href="topics/headlight_focusing.dita"/>
+    </topicgroup>
+    
+    <!-- One Ton Truck -->
+    <topicgroup>
+        <keydef keys="truck" href="topics/the_ford_model_t_one_ton_truck.dita"/>
+        <keydef keys="axle_disassembly" href="topics/axle_disassembly.dita"/>
+        <keydef keys="worm_remove" href="topics/worm_removal.dita"/>
+        <keydef keys="diff_gear_remove" href="topics/differential_gear_removal.dita"/>
+        <keydef keys="rear_axle_lube" href="topics/rear_axle_lubrication.dita"/>
+    </topicgroup>
+    
+    <!-- Starting and Lighting System -->
+    <topicgroup>
+        <keydef keys="starting_lighting" href="topics/the_ford_starting_and_lighting_system.dita"/>
+        <keydef keys="start_light" href="topics/starting_lighting_system.dita"/>
+        <keydef keys="starter_loc" href="topics/starter_location.dita"/>
+        <keydef keys="engine_fail" href="topics/engine_fails_to_start.dita"/>
+        <keydef keys="motor_fail" href="topics/starting_motor_fails.dita"/>
+        <keydef keys="accident_start" href="topics/accidental_starter_engagement.dita"/>
+        <keydef keys="generator" href="topics/generator_operation.dita"/>
+        <keydef keys="start_gen_lube" href="topics/starting_generator_lubrication.dita"/>
+        <keydef keys="ignition_safety" href="topics/ignition_repair_safety.dita"/>
+        <keydef keys="ammeter" href="topics/ammeter_operation.dita"/>
+        <keydef keys="starter_gen_repair" href="topics/starter_generator_repair.dita"/>
+        <keydef keys="starter_remove" href="topics/starter_removal.dita"/>
+        <keydef keys="bendix" href="topics/bendix_assembly.dita"/>
+        <keydef keys="gen_disconnect" href="topics/running_engine_generator_disconnected.dita"/>
+        <keydef keys="battery_specs" href="topics/battery_specifications.dita"/>
+        <keydef keys="hydrometer" href="topics/taking_hydrometer_readings.dita"/>
+        <keydef keys="battery_water" href="topics/battery_water_maintenance.dita"/>
+        <keydef keys="battery_connect" href="topics/battery_connection_maintenance.dita"/>
+    </topicgroup>
+    
+    <!-- Engine Troubles Summary -->
+    <topicgroup>
+        <keydef keys="troubles" href="topics/summary_of_engine_troubles_and_their_causes.dita"/>
+        <keydef keys="start_fail" href="topics/engine_start_failure_conditions.dita"/>
+        <keydef keys="low_power" href="topics/engine_low_power_conditions.dita"/>
+        <keydef keys="low_speed" href="topics/engine_low_speed_issues.dita"/>
+        <keydef keys="high_speed" href="topics/engine_high_speed_issues.dita"/>
+        <keydef keys="sudden_stop" href="topics/engine_sudden_stop_conditions.dita"/>
+        <keydef keys="engine_overheat" href="topics/engine_overheating.dita"/>
+        <keydef keys="engine_knock" href="topics/engine_knocking.dita"/>
+    </topicgroup>
+</map>

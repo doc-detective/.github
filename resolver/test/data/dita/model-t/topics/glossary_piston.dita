@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE glossentry PUBLIC "-//OASIS//DTD DITA Glossary Entry//EN" "glossentry.dtd">
+<glossentry id="glossary_piston">
+    <glossterm>Piston</glossterm>
+    <glossdef>A cylindrical component in the <ph keyref="company_name"/>
+        <ph keyref="product_name"/> engine that moves up and down within the cylinder bore,
+        converting the force from expanding gases during combustion into mechanical motion. The <ph
+            keyref="product_name"/> piston was made of cast iron and featured three piston rings to
+        ensure proper sealing within the cylinder.</glossdef>
+    <glossBody>
+        <glossPartOfSpeech value="noun"/>
+        <glossSurfaceForm>piston</glossSurfaceForm>
+        <glossUsage>The term is commonly used in automotive repair manuals and parts catalogs
+            specific to the <ph keyref="company_name"/>
+            <ph keyref="product_name"/>, manufactured from 1908 to 1927.</glossUsage>
+        <glossScopeNote>Applies specifically to the piston used in the <ph keyref="company_name"/>
+            <ph keyref="product_name"/>'s 177 cubic inch (2.9 L) four-cylinder
+            engine.</glossScopeNote>
+        <glossSymbol>
+            <alt>Standard automotive symbol for piston in technical diagrams</alt>
+        </glossSymbol>
+        <glossAlt>
+            <glossSynonym>Ford T series piston</glossSynonym>
+        </glossAlt>
+    </glossBody>
+</glossentry>

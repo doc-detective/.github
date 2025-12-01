@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE reference PUBLIC "-//OASIS//DTD DITA Reference//EN" "reference.dtd">
+<reference id="generator_operation">
+    <title>Generator Operation</title>
+    <shortdesc>The generator mounts on the engine's right side and operates through a
+        speed-dependent charging system regulated by a factory-set cut-out.</shortdesc>
+    <refbody>
+        <section>
+            <title>Generator Location and Drive</title>
+            <p>The generator is:</p> 
+            <ul>
+                <li>Mounted on the right-hand side of the engine</li>
+                <li>Bolted to the cylinder front end cover</li>
+                <li>Driven by the armature shaft pinion engaging with the large time gear</li>
+            </ul>
+        </section>
+        <section>
+            <title>Charging Characteristics</title>
+            <p>The generator's charging system operates with the following characteristics:</p>
+            <ul>
+                <li>Begins charging at engine speeds equivalent to 10 miles per hour in high
+                    speed</li>
+                <li>Reaches maximum charging rate at 20 miles per hour</li>
+                <li>Charge tapers off at higher speeds, which is normal generator behavior</li>
+            </ul>
+        </section>
+        <section>
+            <title>Cut-out Regulation</title>
+            <note type="caution">The cut-out is factory-set and should never be adjusted or tampered
+                with.</note>
+            <p>The cut-out:</p>
+            <ul>
+                <li>Is mounted on the generator</li>
+                <li>Controls the charging system's engagement and disengagement at appropriate
+                    speeds</li>
+            </ul>
+        </section>
+        <section>
+            <title>Reference Figure</title>
+            <fig>
+                <title>Wiring Diagram for a Car Equipped with a Starter</title>
+                <image keyref="starter_wiring_diagram">
+                    <alt>Cutaway diagram showing all of the electrical points for a car equipped
+                        with an electric starting mechanism.</alt>
+                </image>
+            </fig>
+        </section>
+    </refbody>
+</reference>

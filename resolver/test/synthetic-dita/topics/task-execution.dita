@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<task id="task-execution" xml:lang="en-us">
+  <title>Execute Main Workflow</title>
+  
+  <taskbody>
+    <prereq>
+      <p>Complete the <xref href="task-setup.dita" format="dita" scope="local">Environment Setup</xref> task first.</p>
+    </prereq>
+    
+    <steps>
+      <step>
+        <cmd>Click <uicontrol>Run Workflow</uicontrol> in the dashboard.</cmd>
+        <stepresult>
+          <p>The workflow begins processing.</p>
+        </stepresult>
+      </step>
+    </steps>
+  </taskbody>
+</task>

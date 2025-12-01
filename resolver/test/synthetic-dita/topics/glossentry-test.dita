@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE glossentry PUBLIC "-//OASIS//DTD DITA Glossary Entry//EN" "glossentry.dtd">
+<glossentry id="glossentry-test" xml:lang="en-us">
+  <glossterm>Test Suite</glossterm>
+  
+  <glossdef>
+    <p>A collection of test cases organized together to validate a specific feature, workflow, or application component. Test suites provide structure and organization for automated testing, allowing related tests to be executed, reported, and maintained as a group.</p>
+    
+    <p>In Doc Detective, a test suite is defined in a JSON specification file and may include setup actions, teardown operations, and multiple individual test cases with their respective steps and assertions.</p>
+  </glossdef>
+  
+  <glossBody>
+    <glossPartOfSpeech value="noun"/>
+    
+    <glossUsage>
+      <p>Used in software testing, quality assurance, and test automation contexts.</p>
+    </glossUsage>
+    
+    <glossAlt>
+      <glossSynonym>test collection</glossSynonym>
+      <glossSynonym>test set</glossSynonym>
+      <glossSynonym>test group</glossSynonym>
+    </glossAlt>
+    
+    <glossAlt>
+      <glossUsage>
+        <p>Example: "The authentication test suite includes 15 test cases covering login, logout, password reset, and session management."</p>
+      </glossUsage>
+    </glossAlt>
+  </glossBody>
+  
+  <related-links>
+    <link href="concept-comprehensive.dita" format="dita" scope="local">
+      <linktext>Understanding Test Architecture</linktext>
+    </link>
+    <link href="task-comprehensive.dita" format="dita" scope="local">
+      <linktext>Creating Your First Test Suite</linktext>
+    </link>
+  </related-links>
+</glossentry>

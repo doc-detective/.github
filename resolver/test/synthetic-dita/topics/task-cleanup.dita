@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<task id="task-cleanup" xml:lang="en-us">
+  <title>Cleanup After Workflow</title>
+  
+  <taskbody>
+    <steps>
+      <step>
+        <cmd>Run the cleanup command:</cmd>
+        <info>
+          <codeblock outputclass="shell">npm run cleanup</codeblock>
+        </info>
+      </step>
+    </steps>
+    
+    <postreq>
+      <p>Verify all temporary files have been removed from <filepath>/tmp/workflow</filepath>.</p>
+    </postreq>
+  </taskbody>
+</task>

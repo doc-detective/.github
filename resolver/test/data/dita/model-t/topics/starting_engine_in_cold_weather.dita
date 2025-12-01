@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<task id="starting_engine_in_cold_weather">
+    <title>Starting the Engine in Cold Weather</title>
+    <shortdesc>Specialized procedure for starting an engine when temperatures are low and gasoline
+        vaporization is difficult.</shortdesc>
+
+    <taskbody>
+        <prereq>
+            <p>Ensure the vehicle is in a well-ventilated area with the parking brake engaged.</p>
+        </prereq>
+
+        <steps>
+            <step>
+                <cmd>Adjust the carburetor dash adjustment</cmd>
+                <stepxmp>Turn one-quarter turn to the left to allow a richer gasoline
+                    mixture</stepxmp>
+            </step>
+            <step>
+                <cmd>Prime the carburetor</cmd>
+                <substeps>
+                    <substep>
+                        <cmd>Pull out the priming rod</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Turn the crank six to eight one-quarter turns in quick succession</cmd>
+                        <stepxmp>Alternatively, use the starter to turn the motor over a few
+                            times</stepxmp>
+                    </substep>
+                </substeps>
+            </step>
+            <step>
+                <cmd>Prepare engine controls</cmd>
+                <substeps>
+                    <substep>
+                        <cmd>Close throttle lever</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Place spark lever in approximately third notch</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Advance throttle lever several notches</cmd>
+                    </substep>
+                </substeps>
+            </step>
+            <step>
+                <cmd>Activate ignition</cmd>
+                <stepxmp>Throw switch to "Magneto" side</stepxmp>
+            </step>
+            <step>
+                <cmd>Start the engine</cmd>
+                <stepxmp>Give crank one or two turns or close the starting switch</stepxmp>
+            </step>
+            <step>
+                <cmd>Warm up the engine</cmd>
+                <substeps>
+                    <substep>
+                        <cmd>Advance spark eight or ten notches on the quadrant</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Let the motor run until thoroughly heated</cmd>
+                    </substep>
+                </substeps>
+            </step>
+            <step>
+                <cmd>Return carburetor to normal setting</cmd>
+                <stepxmp>Turn carburetor adjustment back one-quarter turn after engine is warmed
+                    up</stepxmp>
+            </step>
+        </steps>
+
+        <result>
+            <p>The engine should now be running smoothly. Avoid immediate driving until the engine
+                is fully warmed.</p>
+            <note>
+                <p>Avoid stopping the engine by pulling out the priming rod unless the car will
+                    stand overnight or long enough to cool off.</p>
+            </note>
+        </result>
+
+    </taskbody>
+</task>

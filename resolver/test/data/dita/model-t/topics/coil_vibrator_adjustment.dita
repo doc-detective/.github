@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE troubleshooting PUBLIC "-//OASIS//DTD DITA Troubleshooting//EN" "troubleshooting.dtd">
+<troubleshooting id="coil_vibrator_adjustment">
+    <title>Coil Vibrator Adjustment Guidelines</title>
+ 
+    <shortdesc>Factory-adjusted coil units should only be readjusted when installing new points or
+        addressing wear-related gap increases, preferably by authorized service
+        stations.</shortdesc>
+
+    <troublebody>
+        <condition>
+            <p>Coil vibrator points require adjustment or maintenance.</p>
+        </condition>
+
+        <troubleSolution>
+            <cause>
+                <p>Points may be worn or pitted, causing increased gap distance.</p>
+            </cause>
+
+            <remedy>
+                <steps>
+                    <step>
+                        <cmd>Visit an authorized service station when possible.</cmd>
+                        <info>Service stations have specialized testing and adjustment
+                            equipment.</info>
+                    </step>
+                </steps>
+            </remedy>
+        </troubleSolution>
+
+        <troubleSolution>
+            <cause>
+                <p>If service station is not available and points are pitted:</p>
+            </cause>
+
+            <remedy>
+                <steps>
+                    <step>
+                        <cmd>File the points flat using a fine double-faced file.</cmd>
+                    </step>
+                    <step>
+                        <cmd>Turn down the adjusting thumb nut.</cmd>
+                        <info>With spring held down, gap should be slightly less than 1/32
+                            inch.</info>
+                    </step>
+                    <step>
+                        <cmd>Secure the lock nut.</cmd>
+                        <info><p>This prevents the adjustment from being disturbed.</p>
+                            <!-- The following was originally set in its own separate remedy section, which was invalid -->
+                            <note type="warning">
+                                <ul>
+                                    <li>Do not bend the vibrators</li>
+                                    <li>Do not hammer on the vibrators</li>
+                                </ul>
+                                <p>These actions can damage the cushion spring of the vibrator
+                                    bridge and reduce unit efficiency.</p>
+                            </note>
+                        </info>
+                    </step>
+                </steps>
+            </remedy>
+        </troubleSolution>
+    </troublebody>
+</troubleshooting>

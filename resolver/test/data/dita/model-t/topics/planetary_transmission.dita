@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<concept id="planetary_transmission">
+    <title>Planetary Transmission</title>
+    <shortdesc>A planetary transmission is a gear system where all gears remain continuously meshed
+        and rotate around a central axis, with speed control achieved through selective gear
+        engagement using brake bands.</shortdesc> 
+    <conbody>
+        <p>The planetary transmission represents an advanced gear system with several distinct
+            characteristics:</p>
+        <ul>
+            <li>All gear groups maintain constant mesh while revolving around a main axis</li>
+            <li>Speed changes are accomplished by controlling the rotation of gear-supporting
+                components</li>
+            <li>Brake band mechanisms are used to stop the rotation of different parts, engaging
+                specific gear sets</li>
+        </ul>
+        <p>This design, notably featured in <ph keyref="company_name"/> vehicles, provides the most
+            straightforward and efficient method of speed control in automotive applications.</p>
+    </conbody>
+</concept>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<concept id="oil_specifications">
+    <title>Oil Specifications for the Model T Motor</title> 
+
+    <shortdesc>The <ph keyref="product_name"/> motor requires medium light high-grade gas engine oil
+        for optimal performance and engine protection.</shortdesc>
+
+    <conbody>
+        <section>
+            <title>Recommended Oil Properties</title>
+            <p>Medium light oil is the optimal choice for the <ph keyref="product_name"/> motor
+                because it:</p>
+            <ul>
+                <li>Reaches bearings more easily than heavy oils</li>
+                <li>Reduces friction-related heat development</li>
+                <li>Maintains sufficient body to protect bearing surfaces</li>
+            </ul>
+        </section>
+
+        <section>
+            <title>Oil Considerations</title>
+            <p>Heavy and inferior oils should be avoided as they can:</p>
+            <ul>
+                <li>Carbonize quickly</li>
+                <li>Cause gumming in piston rings</li>
+                <li>Obstruct valve stems</li>
+                <li>Impair bearing operation</li>
+            </ul>
+        </section>
+
+        <section>
+            <title>Special Requirements</title>
+            <p>Light grade oil with a low cold test is essential for winter operation.</p>
+        </section>
+
+        <section>
+            <title>Important Caution</title>
+            <p>Graphite must not be used as a lubricant in the engine or transmission as it may
+                short-circuit the magneto.</p>
+        </section>
+    </conbody>
+</concept>

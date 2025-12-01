@@ -12,8 +12,14 @@ main();
  */
 async function main() {
   const json = {
-    input: "./dev/cleanup.spec.json",
+    input: "dev/doc-content.dita",
     logLevel: "debug",
+    runOn: [
+      {
+        platforms: ["linux", "mac", "windows"],
+        browsers: ["chrome", "firefox"],
+      },
+    ]
   };
   result = await detectTests({ config: json });
   console.log(JSON.stringify(result, null, 2));

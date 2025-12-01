@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<task id="spark_throttle_operation_task">
+    <title>Using Spark and Throttle Levers</title>
+    <shortdesc>Proper techniques for controlling engine speed and spark timing using steering wheel
+        levers.</shortdesc> 
+    <taskbody>
+        <context>
+            <fig>
+                <title>Steering Wheel, showing reduction gears meshing with the teeth of the gear
+                    case and center pinion</title>
+                <image keyref="steering_wheel">
+                    <alt>Detailed view of steering wheel mechanism and gear interactions.</alt>
+                </image>
+            </fig>
+        </context>
+        <steps>
+            <step>
+                <cmd>Locate two levers under the steering wheel:</cmd>
+                <info>Right-hand lever controls <abbreviated-form keyref="glossary_throttle"/>,
+                    left-hand lever controls spark</info>
+            </step>
+            <step>
+                <cmd>Control engine speed with throttle lever:</cmd>
+                <substeps>
+                    <substep>
+                        <cmd>Move lever downward to increase engine speed.</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Greater downward movement increases power.</cmd>
+                    </substep>
+                </substeps>
+            </step>
+            <step>
+                <cmd>Adjust spark lever timing:</cmd>
+                <substeps>
+                    <substep>
+                        <cmd>Advance lever gradually.</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Move down notch by notch.</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Stop when maximum engine speed is reached.</cmd>
+                    </substep>
+                </substeps>
+                <stepresult>If lever advanced too far, engine will produce a dull
+                    knock.</stepresult>
+            </step>
+        </steps>
+    </taskbody>
+</task>

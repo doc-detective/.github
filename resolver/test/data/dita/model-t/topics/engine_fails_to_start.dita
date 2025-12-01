@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE troubleshooting PUBLIC "-//OASIS//DTD DITA Troubleshooting//EN" "troubleshooting.dtd">
+<troubleshooting id="engine_fails_to_start">
+    <title>Engine Fails to Start</title>
+    <shortdesc>When the engine fails to start despite the starting motor turning the crankshaft, the
+        issue lies outside the starting system.</shortdesc> 
+    <troublebody>
+        <condition>
+            <p>Starting motor turns the crankshaft but engine does not start.</p>
+        </condition>
+        <troubleSolution>
+            <cause>
+                <p>The problem is not in the starting system but may be related to the carburetor or
+                    ignition system.</p>
+            </cause>
+            <remedy>
+                <steps>
+                    <step>
+                        <cmd>Release the starter button immediately to prevent battery
+                            discharge.</cmd>
+                    </step>
+                    <step>
+                        <cmd>Inspect the carburetor system.</cmd>
+                    </step>
+                    <step>
+                        <cmd>Inspect the ignition system.</cmd>
+                    </step>
+                </steps>
+            </remedy>
+        </troubleSolution>
+    </troublebody>
+</troubleshooting>

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE troubleshooting PUBLIC "-//OASIS//DTD DITA Troubleshooting//EN" "troubleshooting.dtd">
+<troubleshooting id="troubleshoot_dirt_carburetor">
+    <title>Troubleshooting Engine Misfiring Due to Dirty Carburetor</title>
+
+    <shortdesc>Diagnose and resolve engine misfiring and performance issues caused by dirt in the
+        carburetor's spraying nozzle.</shortdesc>
+
+    <troublebody>
+        <condition>
+            <title>Condition</title>
+            <p>The engine exhibits these symptoms:</p>
+            <ul>
+                <li>Engine begins to misfire at high speeds</li>
+                <li>Motor slows down after reaching considerable speed</li>
+                <li>Performance deteriorates as speed increases</li>
+            </ul>
+            <p>These symptoms typically occur when:</p>
+            <ul>
+                <li>Dirt or debris becomes lodged in the carburetor's spraying nozzle</li>
+                <li>Increased suction at high speeds draws particles into the nozzle</li>
+                <li>The small orifice becomes partially or fully blocked by foreign matter</li>
+            </ul>
+        </condition>
+        <troubleSolution>
+            <remedy>
+                <title>Solution</title>
+                <steps>
+                    <step>
+                        <cmd>Open the valve needle half a turn</cmd>
+                    </step>
+                    <step>
+                        <cmd>Pull the throttle lever quickly 2-3 times</cmd>
+                        <info>This action may help draw the dirt through the system</info>
+                    </step>
+                    <step>
+                        <cmd>Return the valve needle to its original position</cmd>
+                        <stepresult>If successful, normal engine operation should
+                            resume</stepresult>
+                    </step>
+                    <step>
+                        <cmd>If the above steps do not resolve the issue, drain the carburetor
+                            completely</cmd>
+                        <info>Complete draining is necessary when dirt cannot be cleared through
+                            normal operation</info>
+                    </step>
+                </steps>
+            </remedy>
+        </troubleSolution>
+    </troublebody>
+</troubleshooting>

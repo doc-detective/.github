@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE glossentry PUBLIC "-//OASIS//DTD DITA Glossary//EN" "glossary.dtd">
+<glossentry id="glossary_transmission">
+    <glossterm>Transmission</glossterm>
+    <glossdef>A planetary gear transmission system in the <ph keyref="company_name"/>
+        <ph keyref="product_name"/> automobile (1908-1927) that managed power transfer from the
+        engine to the wheels. This innovative design used foot pedals instead of a gear shift lever,
+        featuring two forward speeds and one reverse, with all gears operating in an oil bath for
+        continuous lubrication.</glossdef>
+    <glossBody>
+        <glossPartOfSpeech value="noun"/>
+        <glossProperty>Automotive drivetrain component</glossProperty>
+        <glossSurfaceForm>transmission</glossSurfaceForm>
+        <glossUsage>The term is frequently referenced when discussing early automotive engineering
+            innovations and in restoration contexts, particularly noting its unique planetary gear
+            design and pedal-operated system.</glossUsage>
+        <glossAlt>
+            <glossSynonym>Ford Model T planetary transmission</glossSynonym>
+        </glossAlt>
+    </glossBody>
+</glossentry>

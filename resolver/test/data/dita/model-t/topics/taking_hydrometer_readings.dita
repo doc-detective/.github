@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<task id="taking_hydrometer_readings">
+    <title>Taking Hydrometer Readings</title>
+    <shortdesc>Check battery charge status every two weeks by taking hydrometer readings of the
+        electrolyte solution.</shortdesc>
+    <taskbody>
+        <context>
+            <p>Regular hydrometer readings help ensure the generator is properly charging the
+                battery.</p> 
+        </context>
+
+        <steps>
+            <step>
+                <cmd>Remove the filling plug from one cell.</cmd>
+                <info>Only remove one plug at a time.</info>
+            </step>
+            <step>
+                <cmd>Insert the hydrometer syringe into the filler tube.</cmd>
+            </step>
+            <step>
+                <cmd>Draw up enough solution to float the glass bulb inside the instrument.</cmd>
+            </step>
+            <step>
+                <cmd>Read the scale at the surface of the liquid.</cmd>
+                <info>Refer to the following image for the proper reading technique. <fig>
+                        <title>Hydrometer Readings</title>
+                        <image keyref="hydrometer_readings">
+                            <alt>Image of two hydrometers displaying different readings.</alt>
+                        </image>
+                    </fig>
+                </info>
+            </step>
+            <step>
+                <cmd>Return the electrolyte to the same cell from which it was taken.</cmd>
+            </step>
+        </steps>
+
+        <result>
+            <p>The reading indicates the strength of the solution and the battery's charge
+                level.</p>
+            <table frame="all">
+                <title>Hydrometer Reading Reference Values</title>
+                <tgroup cols="3">
+                    <colspec colnum="1" colwidth="1*"/>
+                    <colspec colnum="2" colwidth="1.5*"/>
+                    <colspec colnum="3" colwidth="1.5*"/>
+                    <thead>
+                        <row>
+                            <entry>Condition</entry>
+                            <entry>Standard Reading</entry>
+                            <entry>Tropical Climate Reading</entry>
+                        </row>
+                    </thead>
+                    <tbody>
+                        <row>
+                            <entry>Fully charged</entry>
+                            <entry>1.275 or higher</entry>
+                            <entry>1.200 or higher</entry>
+                        </row>
+                        <row>
+                            <entry>Complete discharge</entry>
+                            <entry>1.150 to 1.225</entry>
+                            <entry>1.080 to 1.130</entry>
+                        </row>
+                    </tbody>
+                </tgroup>
+            </table>
+            <note type="important">Wait for newly added water to mix thoroughly with the electrolyte
+                before taking readings.</note>
+            <note type="warning">If the battery is less than half-charged, take it to an authorized
+                Battery Service Station for recharging.</note>
+            <note type="attention">If readings between cells differ by more than 50 points, have the
+                battery inspected by a qualified service technician.</note>
+        </result>
+    </taskbody>
+</task>

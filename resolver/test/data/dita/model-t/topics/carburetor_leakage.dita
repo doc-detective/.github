@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<concept id="carburetor_leakage">
+    <title>Carburetor Leakage Causes</title>
+
+    <shortdesc>Carburetor leakage typically occurs when debris interferes with the float needle
+        mechanism, preventing proper fuel flow regulation.</shortdesc>
+
+    <conbody> 
+        <section>
+            <title>Float Needle Operation</title>
+            <p>The flow of gasoline into the carburetor through the feed pipe is controlled by the
+                float needle's vertical movement in its seat. This automatic regulation system
+                maintains proper fuel levels in the carburetor bowl.</p>
+        </section>
+
+        <section>
+            <title>Common Cause of Leakage</title>
+            <p>When dirt particles become lodged in the needle seat, they can prevent the needle
+                from properly sealing. This malfunction causes gasoline to overflow from the
+                carburetor bowl and leak onto the ground.</p>
+        </section>
+    </conbody>
+</concept>

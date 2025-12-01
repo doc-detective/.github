@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<task id="temp_leak_repair">
+    <!-- First part of original "How are leaks and jams in the Radiator repaired?" topic -->
+    <title>Temporarily Repairing a Radiator Leak</title>
+    <shortdesc>Apply a temporary fix to a leaking radiator using readily available
+        materials.</shortdesc>
+
+    <taskbody>
+        <context>
+            <p>When you discover a small radiator leak and need an immediate temporary repair.</p>
+        </context>
+
+        <steps>
+            <step>
+                <cmd>Select a repair material</cmd>
+                <choices>
+                    <choice>Apply brown soap to the leak</choice>
+                    <choice>Apply white lead to the leak</choice>
+                </choices>
+            </step>
+        </steps>
+
+        <result>
+            <p>The leak will be temporarily sealed.</p>
+        </result>
+
+        <postreq>
+            <note type="important">Schedule a permanent solder repair as soon as possible.</note>
+        </postreq>
+    </taskbody>
+</task>

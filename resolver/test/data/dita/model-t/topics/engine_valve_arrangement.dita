@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<concept id="engine_valve_arrangement">
+    <title>Valve Arrangement in Internal Combustion Engines</title>
+    <shortdesc>An engine's valve system controls the flow of gases into and out of the cylinder
+        during the combustion process.</shortdesc>
+
+    <conbody>
+        <section>
+            <title>Valve Types and Functions</title>
+            <p>Each cylinder in the engine contains two critical valves:</p>
+            <dl>
+                <dlentry>
+                    <dt>Intake Valve</dt>
+                    <dd>Responsible for admitting fresh gas from the carburetor through the inlet
+                        pipe into the cylinder.</dd>
+                </dlentry>
+                <dlentry>
+                    <dt>Exhaust Valve</dt>
+                    <dd>Enables the removal of exploded gases from the cylinder through the exhaust
+                        pipe.</dd>
+                </dlentry>
+            </dl>
+        </section>
+
+        <section>
+            <title>Valve Operation Mechanism</title>
+            <p>The valves operate through a precise mechanical system:</p>
+            <ol>
+                <li>Cams on the cam shaft control valve movement</li>
+                <li>Cams strike against push rods</li>
+                <li>Push rods lift the valves from their seats</li>
+                <li>Valves alternate between open and closed positions</li>
+            </ol>
+            <p>This synchronized mechanism ensures proper gas flow during the engine's combustion
+                cycle.</p>
+        </section>
+    </conbody>
+</concept>

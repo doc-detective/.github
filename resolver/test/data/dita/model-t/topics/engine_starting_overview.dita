@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<concept id="engine_starting_overview">
+    <title>Engine Starting Methods</title>
+    <shortdesc>Understanding the different approaches to starting early automotive
+        engines.</shortdesc>
+    <conbody>
+        <p>Early automobiles were equipped with two primary methods of engine starting:</p>
+
+        <ul>
+            <li>Manual hand-cranking method</li>
+            <li>Electric starter method</li>
+        </ul>
+
+        <section id="starting-considerations">
+            <title>Key Considerations for Engine Starting</title>
+            <p>The starting procedure depends on several critical factors:</p>
+            <ul>
+                <li>Vehicle equipment (manual crank vs. electric starter)</li>
+                <li>Engine temperature</li>
+                <li>Proper lever and switch positioning</li>
+                <li>Careful handling to prevent injury</li>
+            </ul>
+        </section>
+
+        <section id="safety-precautions">
+            <title>Safety Precautions</title>
+            <p>Regardless of the starting method, operators must exercise caution to prevent:</p>
+            <ul>
+                <li>Potential backfire injuries</li>
+                <li>Engine flooding</li>
+                <li>Mechanical damage to the starting mechanism</li>
+            </ul>
+        </section>
+    </conbody>
+</concept>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE glossentry PUBLIC "-//OASIS//DTD DITA Glossary//EN" "glossary.dtd">
+<glossentry id="glossary_carburetor">
+    <glossterm>Carburetor</glossterm>
+    <glossdef>A fuel delivery device in the <ph keyref="company_name"/> <ph keyref="product_name"/> automobile (1908-1927) that mixed air and
+        gasoline in the proper ratio for combustion. The <ph keyref="product_name"/> used a simple Holley-designed
+        updraft carburetor with a float-feed system and manual mixture adjustment, featuring a
+        distinctive needle valve for fuel control and a choke butterfly valve for cold
+        starting.</glossdef>
+    <glossBody>
+        <glossPartOfSpeech value="noun"/>
+        <glossProperty>Automotive fuel system component</glossProperty>
+        <glossSurfaceForm>carburetor</glossSurfaceForm>
+        <glossUsage>The term is frequently referenced in maintenance manuals and restoration guides,
+            particularly noting its adjustable mixture settings and simple but effective design for
+            early automotive fuel delivery.</glossUsage>
+        <glossAlt>
+            <glossSynonym>Ford Model T carburetter</glossSynonym>
+        </glossAlt>
+    </glossBody>
+</glossentry>

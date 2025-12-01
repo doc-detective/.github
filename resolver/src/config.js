@@ -65,6 +65,242 @@ let defaultFileTypes = {
     },
     markup: [],
   },
+  dita_1_0: {
+    name: "dita",
+    extensions: ["dita", "ditamap", "xml"],
+    inlineStatements: {
+      testStart: [
+        "<\\?doc-detective\\s+test([\\s\\S]*?)\\?>",
+        "<!--\\s*test([\\s\\S]+?)-->",
+      ],
+      testEnd: [
+        "<\\?doc-detective\\s+test\\s+end\\s*\\?>",
+        "<!--\\s*test end([\\s\\S]+?)-->",
+      ],
+      ignoreStart: [
+        "<\\?doc-detective\\s+test\\s+ignore\\s+start\\s*\\?>",
+        "<!--\\s*test ignore\\s+start\\s*-->",
+      ],
+      ignoreEnd: [
+        "<\\?doc-detective\\s+test\\s+ignore\\s+end\\s*\\?>",
+        "<!--\\s*test ignore\\s+end\\s*-->",
+      ],
+      step: [
+        "<\\?doc-detective\\s+step\\s+([\\s\\S]*?)\\s*\\?>",
+        "<!--\\s*step([\\s\\S]+?)-->",
+      ],
+    },
+    markup: [
+      // Task Topic - <cmd> with action verbs and UI elements
+      // These patterns extract complete actions from DITA task steps
+      {
+        name: "clickUiControl",
+        regex: [
+          "(?:[Cc]lick|[Tt]ap|[Ss]elect|[Pp]ress|[Cc]hoose)\\s+(?:the\\s+)?<uicontrol>([^<]+)<\\/uicontrol>",
+        ],
+        actions: ["click"],
+      },
+      {
+        name: "typeIntoUiControl",
+        regex: [
+          "(?:[Tt]ype|[Ee]nter|[Ii]nput)\\s+<userinput>([^<]+)<\\/userinput>\\s+(?:in|into)(?:\\s+the)?\\s+<uicontrol>([^<]+)<\\/uicontrol>",
+        ],
+        actions: [
+          {
+            type: {
+              keys: "$1",
+              selector: "$2",
+            },
+          },
+        ],
+      },
+      {
+        name: "navigateToXref",
+        regex: [
+          '(?:[Nn]avigate\\s+to|[Oo]pen|[Gg]o\\s+to|[Vv]isit|[Bb]rowse\\s+to)\\s+<xref\\s+[^>]*href="(https?:\\/\\/[^"]+)"[^>]*>',
+        ],
+        actions: ["goTo"],
+      },
+      {
+        name: "runShellCmdWithCodeblock",
+        regex: [
+          "(?:[Rr]un|[Ee]xecute)\\s+(?:the\\s+)?(?:following\\s+)?(?:command)[^<]*<\\/cmd>\\s*<info>\\s*<codeblock[^>]*outputclass=\"(?:shell|bash)\"[^>]*>([\\s\\S]*?)<\\/codeblock>",
+        ],
+        actions: [
+          {
+            runShell: {
+              command: "$1",
+            },
+          },
+        ],
+      },      
+      // Inline Elements - for finding UI elements and text
+      {
+        name: "findUiControl",
+        regex: [
+          "<uicontrol>([^<]+)<\\/uicontrol>",
+        ],
+        actions: ["find"],
+      },
+      {
+        name: "verifyWindowTitle",
+        regex: [
+          "<wintitle>([^<]+)<\\/wintitle>",
+        ],
+        actions: ["find"],
+      },
+      {
+        name: "EnterKey",
+        regex: [
+          "(?:[Pp]ress)\\s+<shortcut>Enter<\\/shortcut>",
+        ],
+        actions: [
+          {
+            type: {
+              keys: "$1",
+            },
+          },
+        ],
+      },
+      {
+        name: "executeCmdName",
+        regex: [
+          "(?:[Ee]xecute|[Rr]un)\\s+<cmdname>([^<]+)<\\/cmdname>",
+        ],
+        actions: [
+          {
+            runShell: {
+              command: "$1",
+            },
+          },
+        ],
+      },
+      
+      // Links and References - for link validation
+      {
+        name: "checkExternalXref",
+        regex: [
+          '<xref\\s+[^>]*scope="external"[^>]*href="(https?:\\/\\/[^"]+)"[^>]*>',
+          '<xref\\s+[^>]*href="(https?:\\/\\/[^"]+)"[^>]*scope="external"[^>]*>',
+        ],
+        actions: ["checkLink"],
+      },
+      {
+        name: "checkHyperlink",
+        regex: [
+          '<xref\\s+href="(https?:\\/\\/[^"]+)"[^>]*>',
+        ],
+        actions: ["checkLink"],
+      },
+      {
+        name: "checkLinkElement",
+        regex: [
+          '<link\\s+href="(https?:\\/\\/[^"]+)"[^>]*>',
+        ],
+        actions: ["checkLink"],
+      },
+      
+      // Code Execution
+      {
+        name: "runShellCodeblock",
+        regex: [
+          "<codeblock[^>]*outputclass=\"(?:shell|bash)\"[^>]*>([\\s\\S]*?)<\\/codeblock>",
+        ],
+        actions: [
+          {
+            runShell: {
+              command: "$1",
+            },
+          },
+        ],
+      },
+      {
+        name: "runCode",
+        regex: [
+          "<codeblock[^>]*outputclass=\"(python|py|javascript|js)\"[^>]*>([\\s\\S]*?)<\\/codeblock>",
+        ],
+        actions: [
+          {
+            unsafe: true,
+            // This is unsafe because it runs arbitrary code, so it should be used with caution.
+            // It is recommended to use this only in trusted environments or with trusted inputs.
+            runCode: {
+              language: "$1",
+              code: "$2",
+            },
+          },
+        ],
+      },
+      
+      // Legacy patterns for compatibility with existing tests
+      {
+        name: "clickOnscreenText",
+        regex: [
+          "\\b(?:[Cc]lick|[Tt]ap|[Ll]eft-click|[Cc]hoose|[Ss]elect|[Cc]heck)\\b\\s+<b>((?:(?!<\\/b>).)+)<\\/b>",
+        ],
+        actions: ["click"],
+      },
+      {
+        name: "findOnscreenText",
+        regex: ["<b>((?:(?!<\\/b>).)+)<\\/b>"],
+        actions: ["find"],
+      },
+      {
+        name: "goToUrl",
+        regex: [
+          '\\b(?:[Gg]o\\s+to|[Oo]pen|[Nn]avigate\\s+to|[Vv]isit|[Aa]ccess|[Pp]roceed\\s+to|[Ll]aunch)\\b\\s+<xref\\s+href="(https?:\\/\\/[^"]+)"[^>]*>',
+        ],
+        actions: ["goTo"],
+      },
+      {
+        name: "screenshotImage",
+        regex: [
+          '<image\\s+[^>]*href="([^"]+)"[^>]*outputclass="[^"]*screenshot[^"]*"[^>]*\\/>',
+        ],
+        actions: ["screenshot"],
+      },
+      {
+        name: "typeText",
+        regex: ['\\b(?:[Pp]ress|[Ee]nter|[Tt]ype)\\b\\s+"([^"]+)"'],
+        actions: ["type"],
+      },
+      {
+        name: "httpRequestFormat",
+        regex: [
+          "<codeblock[^>]*outputclass=\"http\"[^>]*>\\s*([A-Z]+)\\s+([^\\s]+)(?:\\s+HTTP\\/[\\d.]+)?\\s*(?:\\r?\\n|&#xA;)((?:[^\\s<]+:\\s+[^\\r\\n<]+(?:\\r?\\n|&#xA;))*)(?:\\s*(?:\\r?\\n|&#xA;)([\\s\\S]*?))?\\s*<\\/codeblock>",
+        ],
+        actions: [
+          {
+            httpRequest: {
+              method: "$1",
+              url: "$2",
+              request: {
+                headers: "$3",
+                body: "$4",
+              },
+            },
+          },
+        ],
+      },
+      {
+        name: "runCode",
+        regex: [
+          "<codeblock[^>]*outputclass=\"(bash|python|py|javascript|js)\"[^>]*>([\\s\\S]*?)<\\/codeblock>",
+        ],
+        actions: [
+          {
+            unsafe: true,
+            // This is unsafe because it runs arbitrary code, so it should be used with caution.
+            // It is recommended to use this only in trusted environments or with trusted inputs.
+            runCode: {
+              language: "$1",
+              code: "$2",
+            },
+          },
+        ],
+      },
+    ],
+  },
   html_1_0: {
     name: "html",
     extensions: ["html", "htm"],
@@ -189,6 +425,7 @@ defaultFileTypes = {
   markdown: defaultFileTypes.markdown_1_0,
   asciidoc: defaultFileTypes.asciidoc_1_0,
   html: defaultFileTypes.html_1_0,
+  dita: defaultFileTypes.dita_1_0,
 };
 
 /**

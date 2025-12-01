@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<concept id="accidental_starter_engagement">
+    <title>Accidental Starting Button Engagement During Engine Operation</title>
+    <shortdesc>Accidentally engaging the starting button while the engine runs causes no damage due
+        to the Bendix drive's protective design.</shortdesc>
+    <conbody> 
+        <p>When the starting button is accidentally pressed while the engine is running, the
+            system's safety features prevent any damage from occurring. The process works as
+            follows:</p>
+        <ul>
+            <li>The pinion briefly contacts the revolving flywheel gear</li>
+            <li>The pinion immediately rotates with the threaded shaft</li>
+            <li>The rotation moves the pinion out of contact with the flywheel</li>
+            <li>This disengagement process mirrors the normal starting cycle completion</li>
+        </ul>
+    </conbody>
+</concept>

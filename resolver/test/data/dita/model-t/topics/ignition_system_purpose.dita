@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<concept id="ignition_system_purpose">
+    <title>Purpose of the Ignition System</title>
+
+    <shortdesc>The ignition system provides the essential electric spark that ignites the fuel
+        mixture in the engine's combustion chamber, enabling the car to run.</shortdesc>
+
+    <conbody> 
+        <p>The ignition system plays a crucial role in the operation of the <ph
+                keyref="company_name"/> car by:</p>
+
+        <ul>
+            <li>Generating the electric spark that ignites the fuel mixture in the combustion
+                chamber</li>
+            <li>Converting the ignited charge into power that drives the engine</li>
+            <li>Ensuring precise timing of the spark for optimal engine performance</li>
+        </ul>
+
+        <p>Ford has engineered this system to be exceptionally simple, making it a model of
+            efficient design in automotive engineering.</p>
+        <section>
+            <title>Reference Figure</title>
+            <fig>
+                <title>Wiring of the <ph keyref="company_name"/> Ignition System</title>
+                <image keyref="ignition_system_wiring">
+                    <alt>A view of the components that make up the <ph keyref="company_name"/>
+                        ignition system, showing the connections from the coil box to the engine and
+                        spark plugs, magneto, generator, and front head lights.</alt>
+                </image>
+            </fig>
+        </section>
+    </conbody>
+</concept>

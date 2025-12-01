@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE glossentry PUBLIC "-//OASIS//DTD DITA Glossary//EN" "glossary.dtd">
+<glossentry id="glossary_sparkplug">
+    <glossterm>Spark Plug</glossterm>
+    <glossdef>Essential ignition components in the <ph keyref="company_name"/>
+        <ph keyref="product_name"/> automobile (1908-1927) that created electrical sparks to ignite
+        the fuel-air mixture in the combustion chambers. The <ph keyref="product_name"/> used four
+        7/8-inch diameter spark plugs with a distinctive long reach design, operating on the
+        magneto's low-tension electrical system to produce the necessary spark for engine
+        operation.</glossdef>
+    <glossBody>
+        <glossPartOfSpeech value="noun"/>
+        <glossProperty>Automotive ignition component</glossProperty>
+        <glossSurfaceForm>spark plug</glossSurfaceForm>
+        <glossUsage>The term is commonly used in maintenance discussions and restoration guides,
+            particularly noting their unique size and compatibility requirements specific to the <ph
+                keyref="product_name"/>'s ignition system.</glossUsage>
+        <glossAlt>
+            <glossSynonym>Ford Model T spark plugs</glossSynonym>
+        </glossAlt>
+    </glossBody>
+</glossentry>

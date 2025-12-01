@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<task id="remove_power_plant">
+    <title>Removing the Power Plant from the Car</title>
+    <shortdesc>Follow these steps to safely remove the entire power plant assembly from the vehicle.
+        This procedure requires three people to complete.</shortdesc>
+    <taskbody>
+        <prereq>
+            <p>Ensure you have the following:</p>
+            <ul>
+                <li>Basic hand tools</li>
+                <li>Strong rope</li>
+                <li>10-foot length of 2x4 lumber or sturdy iron pipe</li>
+                <li>Work bench ready to receive the power plant</li>
+                <li>Three people to perform the lift</li>
+            </ul>
+        </prereq>
+        <steps>
+            <step>
+                <cmd>Prepare the cooling system</cmd>
+                <substeps>
+                    <substep>
+                        <cmd>Drain all water from the radiator</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Disconnect the radiator hose</cmd>
+                    </substep>
+                </substeps>
+            </step>
+            <step>
+                <cmd>Remove the radiator</cmd>
+                <substeps>
+                    <substep>
+                        <cmd>Disconnect the radiator stay rod from the dash</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Remove the two bolts securing the radiator to the frame</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Lift off the radiator</cmd>
+                    </substep>
+                </substeps>
+            </step>
+            <step>
+                <cmd>Remove the dash and steering assembly</cmd>
+                <substeps>
+                    <substep>
+                        <cmd>Disconnect all wires</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Disconnect the dash at the two frame-mounted supporting brackets</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Loosen the steering post bracket from the frame</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Remove the dash and steering gear as a single unit</cmd>
+                    </substep>
+                </substeps>
+            </step>
+            <step>
+                <cmd>Disconnect drive components</cmd>
+                <substeps>
+                    <substep>
+                        <cmd>Remove the bolts holding the front radius rods in the crank case
+                            socket</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Remove the four bolts at the universal joint</cmd>
+                    </substep>
+                </substeps>
+            </step>
+            <step>
+                <cmd>Disconnect fuel and exhaust systems</cmd>
+                <substeps>
+                    <substep>
+                        <cmd>Remove pans on both sides of the cylinder casting</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Turn off the gasoline supply</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Disconnect the feed pipe from the carburetor</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Unscrew the large brass pack nut to disconnect the exhaust manifold
+                            from the exhaust pipe</cmd>
+                    </substep>
+                </substeps>
+            </step>
+            <step>
+                <cmd>Remove engine mounting bolts</cmd>
+                <substeps>
+                    <substep>
+                        <cmd>Remove the two cap screws securing the crank case to the front
+                            frame</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Remove the bolts holding the crank case arms to the frame sides</cmd>
+                    </substep>
+                </substeps>
+            </step>
+            <step>
+                <cmd>Prepare for lifting</cmd>
+                <substeps>
+                    <substep>
+                        <cmd>Pass a rope through the opening between the two middle cylinders</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Tie the rope in a loose knot</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Pass the 2x4 or iron pipe through the rope</cmd>
+                    </substep>
+                </substeps>
+            </step>
+            <step>
+                <cmd>Lift out the power plant</cmd>
+                <info>
+                    <note type="important">This step requires three people working together.</note>
+                </info>
+                <substeps>
+                    <substep>
+                        <cmd>Position one person at each end of the lifting pole</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Have the third person hold the starting crank handle</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Lift the power plant as a unit</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Transfer the assembly to the work bench</cmd>
+                    </substep>
+                </substeps>
+            </step>
+        </steps>
+    </taskbody>
+</task>

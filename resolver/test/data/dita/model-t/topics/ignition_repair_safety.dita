@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE reference PUBLIC "-//OASIS//DTD DITA Reference//EN" "reference.dtd">
+<reference id="ignition_repair_safety">
+    <title>Ignition System Repair Safety Procedures</title>
+    <shortdesc>To prevent magnet discharge during ignition system work, proper battery wire
+        disconnection and insulation is required.</shortdesc>
+    <refbody>
+        <section>
+            <title>Required Safety Steps</title>
+            <p>When working on the ignition system or wiring, follow these critical procedures:</p>
+            <ul>
+                <li>Disconnect the positive wire from the battery to prevent battery current from
+                    discharging the magneto magnets</li>
+                <li>Wrap the disconnected wire end with electrical tape to prevent accidental
+                    contact with the terminal</li>
+            </ul>
+            <note type="warning">Battery current introduced into the magneto will discharge the
+                magnets.</note>
+        </section>
+    </refbody>
+</reference>

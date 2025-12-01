@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<task id="tire_removal">
+    <title>Removing <ph keyref="company_name"/> Tires</title>
+    <shortdesc>Step-by-step instructions for safely removing a <ph keyref="company_name"/> tire
+        using tire irons.</shortdesc>
+    <taskbody>
+        <prereq>
+            <p>Ensure you have the following tools:</p>
+            <ul>
+                <li>Jack</li>
+                <li>Three tire irons or levers</li>
+                <li>Soapstone</li>
+            </ul>
+        </prereq>
+        <steps>
+            <step>
+                <cmd>Jack up the wheel clear of the road</cmd>
+            </step>
+            <step>
+                <cmd>Prepare the valve stem</cmd>
+                <substeps>
+                    <substep>
+                        <cmd>Unscrew the valve cap</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Remove the lock nut</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Push the valve stem into the tire until its bead is flush with the
+                            rim</cmd>
+                    </substep>
+                </substeps>
+            </step>
+            <step>
+                <cmd>Loosen the tire bead by hand</cmd>
+                <info>Work and push with your hands to loosen the head of the shoe in the clinch of
+                    the rim</info>
+            </step>
+            <step>
+                <cmd>Insert the tire irons</cmd>
+                <substeps>
+                    <substep>
+                        <cmd>Insert the first tire iron under the beads</cmd>
+                        <info>Push in just enough to get a good hold, but not so far as to pinch the
+                            inner tube</info>
+                    </substep>
+                    <substep>
+                        <cmd>Insert the second iron seven to eight inches from the first</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Insert the third iron seven to eight inches from the second</cmd>
+                    </substep>
+                </substeps>
+            </step>
+            <step>
+                <cmd>Pry the tire over the clinch using the three levers</cmd>
+                <info>Use your knee to hold down one lever while manipulating the other two</info>
+            </step>
+            <step>
+                <cmd>Remove the outer edge of the casing by hand</cmd>
+            </step>
+            <step>
+                <cmd>Remove the inner tube</cmd>
+            </step>
+        </steps>
+        <result>The tire is now ready for tube replacement or repair.</result>
+        <postreq>
+            <p>When replacing the inner tube, always use plenty of soapstone.</p>
+        </postreq>
+    </taskbody>
+</task>

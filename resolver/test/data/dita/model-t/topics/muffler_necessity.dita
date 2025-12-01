@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<concept id="muffler_necessity">
+    <title>Purpose of the Muffler</title>
+    <shortdesc>The muffler reduces engine exhaust noise by controlling gas expansion and release
+        while maintaining efficient exhaust flow.</shortdesc>
+    <conbody>
+        <section> 
+            <title>Noise Reduction Function</title>
+            <p>Without a muffler, engine exhaust flowing through the exhaust pipe would produce
+                constant and distracting noise. The muffler's larger chambers allow the exhaust
+                gases to expand from the smaller exhaust pipe, reducing their force before final
+                discharge. This expansion process results in nearly silent operation.</p>
+        </section>
+        <section>
+            <title><ph keyref="company_name"/> Muffler Design</title>
+            <p>The <ph keyref="company_name"/> muffler is specifically designed to minimize back
+                pressure from escaping gases. This efficient design means there is no performance
+                benefit from installing an exhaust cut-out between the engine and muffler.</p>
+        </section>
+    </conbody>
+</concept>

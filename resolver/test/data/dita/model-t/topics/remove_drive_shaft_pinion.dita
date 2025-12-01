@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<task id="remove_drive_shaft_pinion">
+    <title>Removing the Drive Shaft Pinion</title> 
+    <shortdesc>This task describes how to remove the pinion from the tapered end of the drive shaft
+        where it is secured by a castle nut.</shortdesc>
+    <taskbody>
+        <context>
+            <p>The drive shaft pinion is attached to the tapered end of the shaft using a key and is
+                secured with a castle nut and cotter pin.</p>
+        </context>
+        <steps>
+            <step>
+                <cmd>Remove the cotter pin</cmd>
+                <info>Extract the cotter pin from the castle nut</info>
+            </step>
+            <step>
+                <cmd>Remove the castle nut</cmd>
+                <info>Unscrew the castle nut that secures the pinion to the shaft</info>
+            </step>
+            <step>
+                <cmd>Drive off the pinion</cmd>
+                <info>Use appropriate force to drive the pinion off the tapered end of the
+                    shaft</info>
+            </step>
+        </steps>
+    </taskbody>
+</task>

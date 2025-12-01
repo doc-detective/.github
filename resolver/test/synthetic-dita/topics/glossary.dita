@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE glossgroup PUBLIC "-//OASIS//DTD DITA Glossary Group//EN" "glossgroup.dtd">
+<glossgroup id="glossary" xml:lang="en-us">
+  <title>Doc Detective Glossary</title>
+  
+  <prolog>
+    <author>Doc Detective Team</author>
+    <metadata>
+      <keywords>
+        <keyword>glossary</keyword>
+        <keyword>definitions</keyword>
+        <keyword>terminology</keyword>
+      </keywords>
+    </metadata>
+  </prolog>
+  
+  <glossentry id="gloss-selector">
+    <glossterm>Selector</glossterm>
+    <glossdef>
+      <p>A pattern or identifier used to locate specific elements in a web page or application UI. Selectors can use CSS syntax, ARIA attributes, XPath, or text matching to target elements for test actions.</p>
+    </glossdef>
+    <glossBody>
+      <glossAlt>
+        <glossSynonym>element locator</glossSynonym>
+        <glossSynonym>target identifier</glossSynonym>
+      </glossAlt>
+    </glossBody>
+  </glossentry>
+  
+  <glossentry id="gloss-assertion">
+    <glossterm>Assertion</glossterm>
+    <glossdef>
+      <p>A validation statement that checks whether a specific condition or expected state is true during test execution. Assertions are critical for verifying application behavior and detecting defects.</p>
+    </glossdef>
+    <glossBody>
+      <glossAlt>
+        <glossSynonym>validation</glossSynonym>
+        <glossSynonym>verification</glossSynonym>
+        <glossSynonym>expectation</glossSynonym>
+      </glossAlt>
+    </glossBody>
+  </glossentry>
+  
+  <glossentry id="gloss-action">
+    <glossterm>Test Action</glossterm>
+    <glossdef>
+      <p>An individual step or operation performed during test execution, such as navigating to a URL, clicking a button, typing text, or making an HTTP request.</p>
+    </glossdef>
+  </glossentry>
+  
+  <glossentry id="gloss-context">
+    <glossterm>Test Context</glossterm>
+    <glossdef>
+      <p>The execution environment for tests, including the browser type, platform, viewport size, and other configuration settings that define how and where tests run.</p>
+    </glossdef>
+  </glossentry>
+  
+  <glossentry id="gloss-spec">
+    <glossterm>Test Specification</glossterm>
+    <glossdef>
+      <p>A structured document (typically JSON or YAML) that defines test suites, test cases, steps, and configuration. The specification serves as the executable test definition.</p>
+    </glossdef>
+    <glossBody>
+      <glossAlt>
+        <glossAcronym>spec</glossAcronym>
+        <glossShortForm>test spec</glossShortForm>
+      </glossAlt>
+    </glossBody>
+  </glossentry>
+</glossgroup>

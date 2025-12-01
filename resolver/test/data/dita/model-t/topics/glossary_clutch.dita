@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE glossentry PUBLIC "-//OASIS//DTD DITA Glossary//EN" "glossary.dtd">
+<glossentry id="glossary_clutch">
+    <glossterm>Clutch</glossterm>
+    <glossdef>A mechanical assembly in the <ph keyref="product_name"/>
+        <ph keyref="company_name"/> that enables power transmission between the engine and
+        transmission. The <ph keyref="product_name"/> utilizes a unique multiple-disc clutch design
+        operating in an oil bath, consisting of steel and friction discs that engage and disengage
+        to control power flow from the engine to the planetary transmission.</glossdef>
+    <glossBody>
+        <glossPartOfSpeech value="noun"/>
+        <glossSurfaceForm>clutch</glossSurfaceForm>
+        <glossUsage>The term appears frequently in <ph keyref="product_name"/> service manuals,
+            restoration guides, and technical documentation from the vehicle's production era
+            (1908-1927). The clutch is often discussed in relation to the <ph keyref="product_name"
+            />'s distinctive pedal control system.</glossUsage>
+        <glossAlt>
+            <glossSynonym>Ford Model T transmission clutch</glossSynonym>
+        </glossAlt>
+    </glossBody>
+</glossentry>

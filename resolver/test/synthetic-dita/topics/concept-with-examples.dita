@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<concept id="concept-with-examples" xml:lang="en-us">
+  <title>Test Patterns and Examples</title>
+  
+  <shortdesc>Common testing patterns with practical code examples.</shortdesc>
+  
+  <conbody>
+    <section>
+      <title>Browser Testing Pattern</title>
+      
+      <example>
+        <title>Multi-Step UI Workflow</title>
+        <codeblock outputclass="javascript">// Test automation with Doc Detective
+const test = {
+  id: 'checkout-flow',
+  steps: [
+    { action: 'goTo', url: '/products' },
+    { action: 'click', selector: '[data-product="premium"]' },
+    { action: 'click', selector: 'button.add-to-cart' },
+    { action: 'find', text: 'Added to cart' },
+    { action: 'goTo', url: '/checkout' }
+  ]
+};</codeblock>
+      </example>
+    </section>
+    
+    <section>
+      <title>API Testing Pattern</title>
+      
+      <example>
+        <title>RESTful API Validation</title>
+        <codeblock outputclass="json">{
+  "action": "httpRequest",
+  "method": "GET",
+  "url": "https://api.example.com/users/$USER_ID",
+  "headers": {
+    "Accept": "application/json"
+  },
+  "statusCodes": [200],
+  "responseBody": {
+    "id": "$USER_ID",
+    "status": "active"
+  }
+}</codeblock>
+      </example>
+    </section>
+  </conbody>
+</concept>

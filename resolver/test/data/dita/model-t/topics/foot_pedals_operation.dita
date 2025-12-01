@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<task id="foot_pedals_operation" xml:lang="en-us">
+    <title>Operating Vehicle Foot Pedals</title>
+    <shortdesc>Learn the specific functions and operational mechanics of three foot pedals in a
+        vintage vehicle control system.</shortdesc>
+
+    <taskbody>
+        <context>
+            <p>Understanding the precise operation of foot pedals is crucial for controlling early
+                mechanical vehicles. Each pedal has a distinct function that affects vehicle speed,
+                direction, and braking.</p>
+        </context>
+
+        <steps>
+            <step>
+                <cmd>Identify the left (clutch) pedal</cmd>
+                <stepxmp>Located on the far left side of the pedal configuration</stepxmp>
+                <info>
+                    <p>The clutch pedal has three primary positions:</p>
+                    <ul>
+                        <li>Fully depressed position engages low speed</li>
+                        <li>Half-way depressed position places the clutch in neutral <note>In
+                                neutral, the clutch is disconnected from the driving mechanism of
+                                the rear wheels</note>
+                        </li>
+                        <li>Released position engages the high-speed clutch</li>
+                    </ul>
+                </info>
+            </step>
+
+            <step>
+                <cmd>Identify the center pedal</cmd>
+                <stepxmp>Located in the center of the pedal configuration</stepxmp>
+                <info>
+                    <p>The center pedal has a specific function:</p>
+                    <ul>
+                        <li>Controls the vehicle's reverse operation</li>
+                    </ul>
+                </info>
+            </step>
+
+            <step>
+                <cmd>Identify the right-hand pedal</cmd>
+                <stepxmp>Located on the right side of the pedal configuration</stepxmp>
+                <info>
+                    <p>The right-hand pedal serves a critical braking purpose:</p>
+                    <ul>
+                        <li>Operates the transmission brake</li>
+                    </ul>
+                </info>
+            </step>
+        </steps>
+
+        <result>
+            <p>Mastering these pedal operations allows for precise control of vehicle movement,
+                including speed transitions, directional changes, and stopping.</p>
+        </result>
+    </taskbody>
+</task>

@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE troubleshooting PUBLIC "-//OASIS//DTD DITA Troubleshooting//EN" "troubleshooting.dtd">
+<troubleshooting id="battery_connection_maintenance">
+    <title>Battery Connection and Plug Maintenance</title>
+    <shortdesc>Regular maintenance of battery filling plugs and connections is essential to prevent
+        corrosion, damage, and ensure proper battery operation.</shortdesc> 
+
+    <troublebody>
+        <condition>
+            <title>Signs of Maintenance Need</title>
+            <ul>
+                <li>Dirty battery top</li>
+                <li>Loose connections</li>
+                <li>Corroded terminals</li>
+                <li>Loose mounting clamps</li>
+            </ul>
+        </condition>
+
+        <troubleSolution>
+            <cause>
+                <title>Maintenance Requirements</title>
+                <ul>
+                    <li>Regular cleaning and inspection of battery components</li>
+                    <li>Protection against corrosion</li>
+                    <li>Secure mounting</li>
+                </ul>
+            </cause>
+
+            <remedy>
+                <title>Maintenance Procedures</title>
+                <steps>
+                    <step>
+                        <cmd>Ensure all filling plugs are tight</cmd>
+                    </step>
+                    <step>
+                        <cmd>Verify all connections are secure</cmd>
+                    </step>
+                    <step>
+                        <cmd>Clean the battery top</cmd>
+                        <substeps>
+                            <substep>
+                                <cmd>Wipe with a rag moistened with ammonia to neutralize any
+                                    spilled solution</cmd>
+                            </substep>
+                        </substeps>
+                    </step>
+                    <step>
+                        <cmd>Apply protective coating to connectors</cmd>
+                        <substeps>
+                            <substep>
+                                <cmd>Use heavy oil or vaseline to prevent corrosion</cmd>
+                            </substep>
+                        </substeps>
+                    </step>
+                    <step>
+                        <cmd>Check battery mounting</cmd>
+                        <info>Ensure clamps are tight to prevent battery movement</info>
+                    </step>
+                </steps>
+            </remedy>
+        </troubleSolution>
+        <troubleSolution>
+            <remedy>
+                <steps>
+                    <step>
+                        <cmd/>
+                        <info><note type="important">For any of these conditions, seek professional
+                                service: <ul>
+                                    <li>When repairs are needed</li>
+                                    <li>When preparing for winter storage</li>
+                                    <li>When significant maintenance is required</li>
+                                </ul>
+                            </note>
+                            <note type="warning">Do not allow inexperienced or unskilled persons to
+                                service the battery.</note></info>
+                    </step>
+                </steps>
+            </remedy>
+        </troubleSolution>
+    </troublebody>
+</troubleshooting>

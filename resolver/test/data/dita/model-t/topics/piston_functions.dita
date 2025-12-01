@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<concept id="piston_functions">
+    <title>Functions of Pistons in an Internal Combustion Engine</title>
+    <shortdesc>Pistons play a critical role in the four-stroke engine cycle, managing fuel intake,
+        compression, combustion, and exhaust.</shortdesc>
+
+    <conbody>
+        <section>
+            <title>Four-Stroke Piston Cycle</title>
+            <p>A piston performs four distinct functions during each engine cycle:</p>
+            <ol>
+                <li><b>Intake Stroke (Downward Movement)</b>
+                    <p>The piston moves downward, creating suction that draws fresh gas from the
+                        carburetor through the inlet pipe and valve into the cylinder.</p>
+                </li>
+
+                <li><b>Compression Stroke (Upward Movement)</b>
+                    <p>The piston moves upward, compressing the gas into a small space between the
+                        piston top and the cylinder head's combustion chamber. During this stroke: <ul>
+                            <li>Gases are compressed to approximately 60 pounds per square inch</li>
+                            <li>The compressed mixture becomes highly combustible</li>
+                        </ul>
+                    </p>
+                </li>
+
+                <li><b>Power Stroke (Downward Movement)</b>
+                    <p>An electric spark from the magneto ignites the compressed gases, causing an
+                        explosion that drives the piston downward. This generates the power that
+                        turns the crankshaft.</p>
+                </li>
+
+                <li><b>Exhaust Stroke (Upward Movement)</b>
+                    <p>The piston moves upward, pushing the exploded gases out through the exhaust
+                        valve and pipe to the <abbreviated-form keyref="glossary_muffler"/>,
+                        clearing the cylinder for the next cycle.</p>
+                </li>
+            </ol>
+        </section>
+    </conbody>
+</concept>

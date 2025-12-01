@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<task id="bendix_assembly">
+    <title>Assembling the Bendix Drive to the Starting Motor</title>
+    <shortdesc>Properly assemble the Bendix Drive to prevent damage to the starter
+        motor.</shortdesc>
+    <taskbody>
+        <prereq>
+            <note type="important">The bearing must be properly aligned and not fitted too tightly
+                to prevent damage.</note>
+        </prereq>
+        <steps>
+            <step>
+                <cmd>Apply oil to the bearing.</cmd>
+            </step>
+            <step>
+                <cmd>Fit the stop nut or bearing into the mounting bracket on the starting
+                    motor.</cmd>
+                <info>Ensure the fit allows the bearing to turn easily with your fingers.</info>
+            </step>
+            <step>
+                <cmd>If the bearing fit is too tight, carefully dress it down using an oil
+                    stone.</cmd>
+            </step>
+        </steps>
+        <result>The Bendix Drive will be properly assembled to the starting motor with correct
+            bearing alignment and tension.</result>
+        <postreq>
+            <note type="warning">An overly tight bearing fit can cause the bearing to freeze to the
+                bracket and seriously damage the starter.</note>
+        </postreq>
+    </taskbody>
+</task>

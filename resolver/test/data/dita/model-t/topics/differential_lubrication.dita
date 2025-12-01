@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE reference PUBLIC "-//OASIS//DTD DITA Reference//EN" "reference.dtd">
+<reference id="differential_lubrication">
+    <title>Differential Lubrication Specifications</title> 
+    <shortdesc>Specifications for proper lubrication levels and maintenance intervals of the
+        differential housing.</shortdesc>
+    <refbody>
+        <section>
+            <title>Lubrication Capacity</title>
+            <p>The differential housing should not exceed one-third full capacity of grease.</p>
+        </section>
+        <section>
+            <title>Fluid Level</title>
+            <p>When using fluid grease, maintain the level approximately one and one-half inches
+                below the oil hole.</p>
+        </section>
+        <section>
+            <title>Maintenance Interval</title>
+            <p>Remove the oil plug every 1000 miles to check grease levels. Add more grease if
+                necessary.</p>
+        </section>
+        <section>
+            <title>Factory Specifications</title>
+            <p>The differential comes pre-lubricated from the factory with the required amount of
+                lubricant.</p>
+        </section>
+    </refbody>
+</reference>

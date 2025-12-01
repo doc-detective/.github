@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE reference PUBLIC "-//OASIS//DTD DITA Reference//EN" "reference.dtd">
+<reference id="radiator_freezing">
+    <title>Radiator Freezing Prevention</title>
+    <shortdesc>Information about anti-freezing solutions and their freezing points for radiator
+        protection during winter.</shortdesc>
+
+    <refbody>
+        <section>
+            <title>Overview</title>
+            <p>Without an anti-freezing solution, the radiator system is at risk of freezing and
+                damage. The risk is particularly high before circulation begins, as the water must
+                heat up before circulation starts. Blocked or jammed radiator tubes are especially
+                vulnerable to freezing and bursting.</p>
+        </section>
+
+        <section>
+            <title>Anti-Freeze Solutions</title>
+            <p>Wood or denatured alcohol can be used as effective anti-freezing agents.</p>
+        </section>
+
+        <table frame="all">
+            <title>Alcohol Solution Freezing Points</title>
+            <tgroup cols="2">
+                <colspec colnum="1" colwidth="1.5*"/>
+                <colspec colnum="2" colwidth="1.5*"/>
+                <thead>
+                    <row>
+                        <entry>Alcohol Concentration</entry>
+                        <entry>Freezing Point</entry>
+                    </row>
+                </thead>
+                <tbody>
+                    <row>
+                        <entry>20% solution</entry>
+                        <entry>15 degrees above zero</entry>
+                    </row>
+                    <row>
+                        <entry>30% solution</entry>
+                        <entry>8 degrees below zero</entry>
+                    </row>
+                    <row>
+                        <entry>50% solution</entry>
+                        <entry>34 degrees below zero</entry>
+                    </row>
+                </tbody>
+            </tgroup>
+        </table>
+
+        <section>
+            <title>Recommended Solution</title>
+            <p>A common anti-freeze mixture consists of:</p>
+            <ul>
+                <li>60% water</li>
+                <li>10% glycerine</li>
+                <li>30% alcohol</li>
+            </ul>
+            <p>This solution freezes at approximately 8 degrees below zero.</p>
+        </section>
+        <!-- I added the following section to hold a "stranded" note. -->
+        <section>
+            <title/>
+            <note type="important">Due to evaporation, alcohol must be added regularly to maintain
+                the proper solution ratio.</note>
+        </section>
+    </refbody>
+</reference>

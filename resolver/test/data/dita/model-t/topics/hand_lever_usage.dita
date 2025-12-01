@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<task id="hand_lever_usage">
+    <title>Operating the Hand Lever</title>
+    <shortdesc>Proper positioning and use of the hand lever for clutch control and vehicle
+        safety.</shortdesc>
+
+    <taskbody>
+        <prereq>
+            <p>Familiarize yourself with the hand lever's location and its multiple functions.</p>
+        </prereq>
+
+        <steps>
+            <step>
+                <cmd>Positioning during engine cranking or vehicle at rest</cmd>
+                <stepxmp>Pull the hand lever back as far as it will go</stepxmp>
+                <info>This position holds the clutch in neutral, engages the emergency brake on rear
+                    wheels, and prevents car from moving during engine start.</info>
+            </step>
+
+            <step>
+                <cmd>Positioning for reversing the vehicle</cmd>
+                <stepxmp>Move hand lever to vertical position</stepxmp>
+                <info>Ensures no brake engagement while backing up</info>
+            </step>
+
+            <step>
+                <cmd>Positioning during vehicle operation</cmd>
+                <stepxmp>Push hand lever fully forward</stepxmp>
+                <info>Required when driving in high or low speed</info>
+            </step>
+        </steps>
+
+        <result>
+            <p>Correct hand lever positioning ensures safe and proper vehicle operation.</p>
+        </result>
+    </taskbody>
+</task>

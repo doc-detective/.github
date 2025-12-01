@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE reference PUBLIC "-//OASIS//DTD DITA Reference//EN" "reference.dtd">
+<reference id="radiator_overheating">
+    <title>What Should Be Done When the Radiator Overheats?</title>
+    <shortdesc>While occasional radiator overheating is normal under demanding conditions,
+        persistent overheating requires investigation and remedy of underlying causes.</shortdesc>
+    <refbody>
+        <section>
+            <title>Normal Operating Conditions</title>
+            <p>Keep the following points in mind regarding normal operation:</p>
+            <ul>
+                <li>Maintain a full radiator water level at all times</li>
+                <li>Occasional boiling is normal during: <ul>
+                        <li>Driving through mud</li>
+                        <li>Navigating deep sand</li>
+                        <li>Climbing long hills in extremely warm weather</li>
+                    </ul>
+                </li>
+                <li>Engine efficiency is highest when water temperature is near boiling point</li>
+            </ul>
+        </section>
+
+        <section>
+            <title>Addressing Persistent Overheating</title>
+            <p>When overheating occurs under ordinary conditions:</p>
+            <ol>
+                <li>Investigate common causes: <ul>
+                        <li>Improper driving practices</li>
+                        <li>Carbonized cylinders</li>
+                    </ul>
+                </li>
+                <li>Consider adjusting fan blade angles for increased suction</li>
+                <li>Consult the appropriate manual section for detailed troubleshooting</li>
+            </ol>
+        </section>
+
+        <section>
+            <title>Adding Water to an Overheated Radiator</title>
+            <p>When adding water to an overheated radiator:</p>
+            <ul>
+                <li>It is safe to add cold water if the system is not completely empty</li>
+                <li><b>Important:</b> If the water system is entirely empty, allow the motor to cool
+                    before adding cold water</li>
+            </ul>
+        </section>
+    </refbody>
+</reference>

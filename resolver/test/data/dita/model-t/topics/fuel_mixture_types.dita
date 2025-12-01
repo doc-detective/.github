@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<concept id="fuel_mixture_types">
+    <title>Understanding Fuel Mixture Types</title>
+    <shortdesc>The air-fuel ratio in the carburetor determines whether a mixture is lean or rich,
+        each having distinct characteristics and effects on engine performance.</shortdesc>
+
+    <conbody>
+        <section id="definitions">
+            <title>Basic Definitions</title>
+            <p>Fuel mixtures are classified by their air-to-fuel ratios:</p>
+            <ul>
+                <li><b>Lean mixture:</b> Contains too much air and insufficient gasoline</li>
+                <li><b>Rich mixture:</b> Contains too much gasoline and insufficient air</li>
+            </ul>
+        </section>
+
+        <section id="rich_mixture_effects">
+            <title>Effects of Rich Mixtures</title>
+            <p>Running an engine with a rich mixture causes several problems:</p>
+            <ul>
+                <li>Carbon buildup on cylinders, pistons, and valves</li>
+                <li>Cylinder overheating</li>
+                <li>Excessive fuel consumption</li>
+                <li>Engine choking at slow speeds</li>
+                <li>Heavy, black exhaust smoke with strong odor</li>
+            </ul>
+            <note>Rich mixtures may allow perfect operation at high speeds despite causing problems
+                at lower speeds.</note>
+        </section>
+
+        <section id="lean_mixture_effects">
+            <title>Effects of Lean Mixtures</title>
+            <p>Lean mixtures can cause:</p>
+            <ul>
+                <li>Backfiring through the carburetor due to: <ul>
+                        <li>Slow-burning gas in the cylinder</li>
+                        <li>Continued burning when inlet valve reopens</li>
+                        <li>Ignition of gas in the intake</li>
+                    </ul>
+                </li>
+            </ul>
+        </section>
+
+        <section id="optimal_mixture">
+            <title>Optimal Mixture</title>
+            <p>The ideal fuel mixture should:</p>
+            <ul>
+                <li>Be as lean as possible while maintaining full engine power</li>
+                <li>Produce minimal smoke</li>
+                <li>Create little to no odor</li>
+            </ul>
+        </section>
+    </conbody>
+</concept>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "topic.dtd">
+<topic id="sample_topic_dot_notation">
+  <title>Sample DITA Topic with Dot Notation</title>
+  <?doc-detective test testId="sample-dita-dot-notation-test" detectSteps=false ?>
+  <body>
+    <p>This is a sample DITA topic demonstrating Doc Detective test detection with dot notation for nested objects.</p>
+    
+    <section>
+      <title>HTTP Request Example</title>
+      <p>Using dot notation to create nested httpRequest objects:</p>
+      
+      <?doc-detective step httpRequest.url="https://api.doc-detective.com/v1/health" httpRequest.method="GET" ?>
+      
+      <p>More complex request with headers and body:</p>
+      
+      <?doc-detective step httpRequest.url="https://api.doc-detective.com/v1/submit" httpRequest.method="POST" httpRequest.request.headers="Content-Type: application/json" httpRequest.request.body='{"test": "data"}' ?>
+    </section>
+    
+    <section>
+      <title>Mixed Attributes</title>
+      <p>You can mix dot notation with regular attributes:</p>
+      
+      <?doc-detective step wait=1000 ?>
+      <?doc-detective step find="API Response" timeout=5000 ?>
+    </section>
+  </body>
+  <?doc-detective test end?>
+</topic>

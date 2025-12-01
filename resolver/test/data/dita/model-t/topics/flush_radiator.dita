@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<task id="flush_radiator">
+    <title>Flushing the Radiator System</title>
+    <shortdesc>Periodically flush the circulating system to maintain proper cooling
+        function.</shortdesc> 
+
+    <taskbody>
+        <context>
+            <p>The cooling system requires occasional thorough flushing to maintain optimal
+                performance.</p>
+        </context>
+
+        <steps>
+            <step>
+                <cmd>Disconnect the radiator inlet hose</cmd>
+            </step>
+            <step>
+                <cmd>Disconnect the radiator outlet hose</cmd>
+            </step>
+            <step>
+                <cmd>Flush the radiator</cmd>
+                <substeps>
+                    <substep>
+                        <cmd>Insert water at normal pressure into the filler neck</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Allow water to flow through the tubes</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Let water drain through the drain cock and hose</cmd>
+                    </substep>
+                </substeps>
+            </step>
+            <step>
+                <cmd>Flush the water jackets</cmd>
+                <substeps>
+                    <substep>
+                        <cmd>Insert water into the cylinder head connection</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Allow water to flow through the water jackets</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Let water drain through the side inlet connection</cmd>
+                    </substep>
+                </substeps>
+            </step>
+        </steps>
+
+        <result>
+            <p>The cooling system will be clear of buildup and debris, allowing for optimal
+                circulation.</p>
+            <fig id="cooling_system">
+                <title>The Thermo-Syphon Cooling System</title>
+                <image keyref="thermo_syphon_cooling_system">
+                    <alt>Diagram showing the course of water through water passages.</alt>
+                </image>
+            </fig>
+        </result>
+
+    </taskbody>
+</task>

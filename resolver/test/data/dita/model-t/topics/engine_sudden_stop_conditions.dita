@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE reference PUBLIC "-//OASIS//DTD DITA Reference//EN" "reference.dtd">
+<reference id="engine_sudden_stop_conditions">
+    <title>Engine Sudden Stop Conditions</title>
+    <shortdesc>Common conditions that can cause the engine to stop suddenly during
+        operation.</shortdesc>
+    <refbody>
+        <section>
+            <title>Potential Causes</title>
+            <table frame="all">
+                <title>Sudden Engine Stop Issues</title>
+                <tgroup cols="2">
+                    <colspec colnum="1" colwidth="1*"/>
+                    <colspec colnum="2" colwidth="2*"/>
+                    <thead>
+                        <row>
+                            <entry>System</entry>
+                            <entry>Issue</entry>
+                        </row>
+                    </thead>
+                    <tbody>
+                        <row>
+                            <entry>Fuel System</entry>
+                            <entry>
+                                <ul>
+                                    <li>Empty gasoline tank</li>
+                                    <li>Water in gasoline</li>
+                                    <li>Flooded carburetor</li>
+                                    <li>Dirt in carburetor or feed pipe</li>
+                                    <li>Gas mixture too lean</li>
+                                </ul>
+                            </entry>
+                        </row>
+                        <row>
+                            <entry>Electrical</entry>
+                            <entry>
+                                <ul>
+                                    <li>Loose magneto wire at either terminal</li>
+                                    <li>Obstructed magneto contact point</li>
+                                </ul>
+                            </entry>
+                        </row>
+                        <row>
+                            <entry>Cooling/Lubrication</entry>
+                            <entry>Overheating due to: <ul>
+                                    <li>Lack of oil</li>
+                                    <li>Lack of water</li>
+                                </ul>
+                            </entry>
+                        </row>
+                    </tbody>
+                </tgroup>
+            </table>
+        </section>
+
+        <section>
+            <title>Priority Checks</title>
+            <note type="attention">Some conditions require immediate attention to prevent engine
+                damage: <ul>
+                    <li>Overheating conditions should be addressed before restarting</li>
+                    <li>Water in fuel system should be cleared before attempting restart</li>
+                </ul>
+            </note>
+        </section>
+    </refbody>
+</reference>

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<concept id="roller_bearing_installation">
+    <title>Roller Bearing Cup Installation</title>
+    <shortdesc>Professional installation requirements for roller bearing cups to ensure proper fit
+        and longevity.</shortdesc> 
+    <conbody>
+        <section id="installation_requirements">
+            <title>Installation Requirements</title>
+            <p>Roller bearing cup installation requires:</p>
+            <ul>
+                <li>Professional service facilities</li>
+                <li>Specialized equipment</li>
+                <li>Precise fitting techniques</li>
+            </ul>
+        </section>
+        <section id="professional_service">
+            <title>Professional Service Necessity</title>
+            <p>Professional installation is required in two scenarios:</p>
+            <ul>
+                <li>Converting from ball bearings to roller bearings</li>
+                <li>Replacing worn bearing cups</li>
+            </ul>
+        </section>
+        <section id="precision_importance">
+            <title>Importance of Precision</title>
+            <p>Absolute true fitting of bearing cups is essential to prevent: <ul>
+                    <li>Premature bearing wear</li>
+                    <li>Improper bearing operation</li>
+                    <li>Potential bearing failure</li>
+                </ul>
+            </p>
+            <fig id="hub_diagram">
+                <title>Hub and Roller Bearing Assembly</title>
+                <image keyref="section_view_hub_roller_bearings">
+                    <alt>Sectional view showing the installation of roller bearings in a hub
+                        assembly.</alt>
+                </image>
+            </fig>
+        </section>
+        <section id="equipment">
+            <p>This procedure requires specialized equipment typically found only in professional
+                service facilities.</p>
+        </section>
+
+    </conbody>
+</concept>

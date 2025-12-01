@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE glossentry PUBLIC "-//OASIS//DTD DITA Glossary//EN" "glossary.dtd">
+<glossentry id="glossary_bendix_drive">
+    <glossterm>Bendix Drive</glossterm>
+    <glossdef>A mechanical device in the <ph keyref="product_name"/>
+        <ph keyref="company_name"/>'s starting system that automatically engages and disengages the
+        starter motor pinion gear with the engine's flywheel ring gear. The Bendix drive uses
+        inertia and a spiral-cut drive sleeve to temporarily couple the starter motor to the engine
+        during starting, then automatically disengages once the engine begins running.</glossdef>
+    <glossBody>
+        <glossPartOfSpeech value="noun"/>
+        <glossSurfaceForm>Bendix drive</glossSurfaceForm>
+        <glossUsage>The term is commonly found in <ph keyref="product_name"/> electrical system
+            documentation, repair manuals, and starter motor specifications. It represents a
+            significant advancement in self-starting technology for early automobiles.</glossUsage>
+        <glossAlt>
+            <glossSynonym>Bendix starter drive</glossSynonym>
+        </glossAlt>
+    </glossBody>
+</glossentry>

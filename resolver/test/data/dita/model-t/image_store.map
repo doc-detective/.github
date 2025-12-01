@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE map PUBLIC "-//OASIS//DTD DITA Map//EN" "map.dtd">
+<map id="image_store">
+    <title>Reusable Image Store</title>
+    <keydef keys="logo" href="images/ill-001.jpg" format="jpg"/>
+    <keydef keys="steering_wheel" href="images/ill-004.jpg" format="jpg"/>
+    <keydef keys="section_view_model_t_motor" href="images/ill-010.jpg" format="jpg"/>
+    <keydef keys="cylinder_assembly" href="images/ill-011.jpg" format="jpg"/>
+    <keydef keys="valve_lifting_tool_usage" href="images/ill-012.jpg" format="jpg"/>
+    <keydef keys="grinding_valve_method" href="images/ill-013.jpg" format="jpg"/>
+    <keydef keys="thermo_syphon_cooling_system" href="images/ill-018.jpg" format="jpg"/>
+    <keydef keys="carburetion_principle" href="images/ill-020.jpg" format="jpg"/>
+    <keydef keys="ignition_system_wiring" href="images/ill-024.jpg" format="jpg"/>
+    <keydef keys="commutator" href="images/ill-026.jpg" format="jpg"/>
+    <keydef keys="magneto" href="images/ill-028.jpg" format="jpg"/>
+    <keydef keys="transmission_gears" href="images/ill-030.jpg" format="jpg"/>
+    <keydef keys="transmission_connections" href="images/ill-032.jpg" format="jpg"/>
+    <keydef keys="transmission_assembly_parts" href="images/ill-034.jpg" format="jpg"/>
+    <keydef keys="real_axle_system" href="images/ill-036.jpg" format="jpg"/>
+    <keydef keys="emergency_brake" href="images/ill-038.jpg" format="jpg"/>
+    <keydef keys="spindle_and_front_hub_assembly" href="images/ill-040.jpg" format="jpg"/>
+    <keydef keys="section_view_hub_roller_bearings" href="images/ill-042.jpg" format="jpg"/>
+    <keydef keys="lubrication_chart" href="images/ill-045.jpg" format="jpg"/>
+    <keydef keys="oiling_commutator" href="images/ill-047.jpg" format="jpg"/>
+    <keydef keys="truck_rear_axle_longitudinal_view" href="images/ill-052.jpg" format="jpg"/>
+    <keydef keys="truck_rear_axle_cross_section_worm_and_gear" href="images/ill-053.jpg"
+        format="jpg"/>
+    <keydef keys="starter_and_generator_units" href="images/ill-054.jpg" format="jpg"/>
+    <keydef keys="starter_wiring_diagram" href="images/ill-056.jpg" format="jpg"/>
+    <keydef keys="hydrometer_readings" href="images/ill-059.jpg" format="jpg"/>
+</map>

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE reference PUBLIC "-//OASIS//DTD DITA Reference//EN" "reference.dtd">
+<reference id="engine_low_power_conditions">
+    <title>Engine Low Power and Irregular Running at Low Speeds</title>
+    <shortdesc>Common conditions that can cause the engine to run with reduced power or irregularly
+        at low speeds.</shortdesc>
+    <refbody>
+        <section>
+            <title>Compression Issues</title>
+            <ul>
+                <li>Poor compression due to leaky valves</li>
+                <li>Air leak in intake manifold</li>
+                <li>Weak exhaust valve spring</li>
+            </ul>
+        </section>
+
+        <section>
+            <title>Fuel Mixture Issues</title>
+            <ul>
+                <li>Gas mixture too rich</li>
+                <li>Gas mixture too lean</li>
+            </ul>
+        </section>
+
+        <section>
+            <title>Ignition System Issues</title>
+            <ul>
+                <li>Dirty spark plugs</li>
+                <li>Improper coil vibrator adjustment</li>
+                <li>Incorrect spark plug gap (too close between points)</li>
+            </ul>
+        </section>
+
+        <section>
+            <title>Mechanical Issues</title>
+            <ul>
+                <li>Excessive clearance between valve stem and push rod</li>
+            </ul>
+        </section>
+
+        <section>
+            <title>Component Relationships</title>
+            <note type="important">Multiple conditions may be present simultaneously. For example: <ul>
+                    <li>Valve issues can affect both compression and mechanical operation</li>
+                    <li>Ignition problems may compound fuel mixture issues</li>
+                </ul>
+            </note>
+        </section>
+    </refbody>
+</reference>

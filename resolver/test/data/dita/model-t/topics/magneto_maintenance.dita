@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE reference PUBLIC "-//OASIS//DTD DITA Reference//EN" "reference.dtd">
+<reference id="magneto_maintenance">
+    <title>Magneto Troubleshooting and Maintenance</title>
+ 
+    <shortdesc>The <ph keyref="company_name"/> magneto uses permanent magnets that rarely fail
+        unless exposed to demagnetizing forces, though weak current issues may arise from debris
+        accumulation under the contact spring.</shortdesc>
+
+    <refbody>
+        <section>
+            <title>Magnet Durability</title>
+            <p>The permanent magnets in the <ph keyref="company_name"/> magneto are highly durable
+                and rarely lose strength under normal conditions. However, certain conditions can
+                cause demagnetization:</p>
+            <ul>
+                <li>Connection of a storage battery to the magneto terminal</li>
+                <li>Other strong external magnetic forces</li>
+            </ul>
+        </section>
+
+        <section>
+            <title>Magnet Replacement</title>
+            <p>When magnets become demagnetized:</p>
+            <ul>
+                <li>Recharging is not recommended</li>
+                <li>Install a complete new set of magnets</li>
+                <li>Order replacement magnets from the nearest agent or branch house</li>
+                <li>New magnets come pre-arranged on a board matching their required flywheel
+                    positioning</li>
+            </ul>
+        </section>
+
+        <section>
+            <title>Installation Requirements</title>
+            <p>Critical factors for proper magnet installation include:</p>
+            <ul>
+                <li>Careful assembly and alignment of magnets</li>
+                <li>Maintaining precisely 1/32 inch separation between magnet faces and coil spool
+                    surface</li>
+                <li>Proper securing with cap screws and bronze screws</li>
+            </ul>
+        </section>
+
+        <section>
+            <title>Common Misdiagnosis</title>
+            <p>Weak current problems are often incorrectly attributed to magnet failure. A more
+                common cause is debris accumulation under the contact spring. To address this:</p>
+            <ul>
+                <li>Locate the binding post on top of the crank case cover</li>
+                <li>Remove the three binding post screws</li>
+                <li>Remove the binding post and spring</li>
+                <li>Clean away any waste or foreign material</li>
+                <li>Reinstall components</li>
+            </ul>
+        </section>
+    </refbody>
+</reference>

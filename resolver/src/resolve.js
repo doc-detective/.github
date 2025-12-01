@@ -1,5 +1,5 @@
+const crypto = require("crypto");
 const { log } = require("./utils");
-const uuid = require("uuid");
 const { loadDescription } = require("./openapi");
 
 exports.resolveDetectedTests = resolveDetectedTests;
@@ -7,9 +7,12 @@ exports.resolveDetectedTests = resolveDetectedTests;
 // Doc Detective actions that require a driver.
 const driverActions = [
   "click",
+  "dragAndDrop",
   "find",
   "goTo",
+  "loadCookie",
   "record",
+  "saveCookie",
   "screenshot",
   "stopRecord",
   "type",
@@ -143,6 +146,7 @@ async function resolveDetectedTests({ config, detectedTests }) {
   log(config, "debug", `RESOLVING DETECTED TEST SPECS:\n${JSON.stringify(detectedTests, null, 2)}`);
   // Set initial shorthand values
   const resolvedTests = {
+    resolvedTestsId: crypto.randomUUID(),
     config: config,
     specs: [],
   };
@@ -159,7 +163,7 @@ async function resolveDetectedTests({ config, detectedTests }) {
 }
 
 async function resolveSpec({ config, spec }) {
-  const specId = spec.specId || uuid.v4();
+  const specId = spec.specId || crypto.randomUUID();
   log(config, "debug", `RESOLVING SPEC ID ${specId}:\n${JSON.stringify(spec, null, 2)}`);
   const resolvedSpec = {
     ...spec,
@@ -184,7 +188,7 @@ async function resolveSpec({ config, spec }) {
 }
 
 async function resolveTest({ config, spec, test }) {
-  const testId = test.testId || uuid.v4();
+  const testId = test.testId || crypto.randomUUID();
   log(config, "debug", `RESOLVING TEST ID ${testId}:\n${JSON.stringify(test, null, 2)}`);
   const resolvedTest = {
     ...test,
@@ -217,7 +221,7 @@ async function resolveTest({ config, spec, test }) {
 }
 
 async function resolveContext({ config, test, context }) {
-  const contextId = context.contextId || uuid.v4();
+  const contextId = context.contextId || crypto.randomUUID();
   log(config, "debug", `RESOLVING CONTEXT ID ${contextId}:\n${JSON.stringify(context, null, 2)}`);
   const resolvedContext = {
     ...context,

@@ -1,13 +1,22 @@
 {
   "tests": [
     {
-      "after": "cleanup.spec.json",
       "steps": [
         {
           "goTo": "https://duckduckgo.com"
         },
         {
-          "find": "/Set As.+/"
+          "saveCookie": {
+            "name": "FOOBAR",
+            "path": "auth-cookie.txt",
+            "overwrite": true
+          }
+        },
+        {
+          "loadCookie": {
+            "name": "FOOBAR",
+            "path": "auth-cookie.txt"
+          }
         }
       ]
     }

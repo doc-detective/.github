@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<task id="install_roller_bearings">
+    <title>Installing Roller Bearings</title>
+    <shortdesc>Detailed procedure for properly installing and adjusting roller bearings in wheel
+        hubs.</shortdesc> 
+    <taskbody>
+        <prereq>
+            <note type="important">Ensure you have clean, high-quality cup grease available.</note>
+            <note type="caution">Verify correct thread direction for the spindle side. Right-hand
+                threads are on the left side of the car, left-hand threads are on the right
+                side.</note>
+        </prereq>
+        <steps>
+            <step>
+                <cmd>Pack the hub with clean cup grease.</cmd>
+            </step>
+            <step>
+                <cmd>Prepare the inner cone assembly.</cmd>
+                <substeps>
+                    <substep>
+                        <cmd>Pack the inner cone and rollers thoroughly with grease.</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Place inner cone into the larger cup.</cmd>
+                    </substep>
+                </substeps>
+            </step>
+            <step>
+                <cmd>Install the dust ring with felt washer.</cmd>
+                <info>Drive it into the inner end of the hub until flush.</info>
+            </step>
+            <step>
+                <cmd>Mount the wheel assembly onto the spindle.</cmd>
+                <info>The inner cone should have a slip fit (one-thousandth) on the spindle - no
+                    forcing required.</info>
+            </step>
+            <step>
+                <cmd>Prepare and install the outer cone assembly.</cmd>
+                <substeps>
+                    <substep>
+                        <cmd>Pack the outer cone and rollers with cup grease.</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Place the cone on the spindle.</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Tighten until the wheel binds slightly.</cmd>
+                    </substep>
+                </substeps>
+            </step>
+            <step>
+                <cmd>Adjust the bearing clearance.</cmd>
+                <substeps>
+                    <substep>
+                        <cmd>Rotate the wheel several times to ensure proper contact.</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Back off the cone ¼ to ½ turn.</cmd>
+                        <stepresult>Wheel should rotate freely without end play.</stepresult>
+                    </substep>
+                </substeps>
+            </step>
+            <step>
+                <cmd>Test for end play.</cmd>
+                <info>
+                    <note type="tip">To distinguish between loose bearings and loose spindle
+                        bushings, insert a cold chisel between axle and spindle while
+                        testing.</note>
+                </info>
+            </step>
+            <step>
+                <cmd>Install the spindle washer and nut.</cmd>
+                <substeps>
+                    <substep>
+                        <cmd>Tighten the nut firmly.</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Verify the cone adjustment hasn't changed by rotating the wheel.</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Insert the cotter pin to lock the nut.</cmd>
+                    </substep>
+                </substeps>
+            </step>
+            <step>
+                <cmd>Complete the installation.</cmd>
+                <substeps>
+                    <substep>
+                        <cmd>Fill the hub cap with grease.</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Install the hub cap onto the hub.</cmd>
+                    </substep>
+                </substeps>
+            </step>
+        </steps>
+        <result>The roller bearings should now be properly installed and adjusted for optimal
+            performance.</result>
+    </taskbody>
+</task>

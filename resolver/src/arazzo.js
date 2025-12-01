@@ -1,4 +1,4 @@
-const { v4: uuid } = require("uuid");
+const crypto = require("crypto");
 
 /**
  * Translates an Arazzo description into a Doc Detective test specification
@@ -8,7 +8,7 @@ const { v4: uuid } = require("uuid");
 function workflowToTest(arazzoDescription, workflowId, inputs) {
   // Initialize the Doc Detective test specification
   const test = {
-    id: arazzoDescription.info.title || `${uuid()}`,
+    id: arazzoDescription.info.title || `${crypto.randomUUID()}`,
     description:
       arazzoDescription.info.description || arazzoDescription.info.summary,
     steps: [],

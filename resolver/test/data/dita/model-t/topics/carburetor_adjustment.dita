@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<task id="carburetor_adjustment">
+    <title>Adjusting the Carburetor</title>
+    <shortdesc>Adjust the carburetor needle valve to achieve optimal fuel mixture for maximum engine
+        performance.</shortdesc>
+
+    <taskbody>
+        <prereq>
+            <p>Before beginning the adjustment:</p>
+            <ul>
+                <li>Ensure the engine is running</li>
+                <li>Have necessary tools ready for loosening and tightening the lock nut</li>
+            </ul>
+        </prereq>
+
+        <steps>
+            <step>
+                <cmd>Set the initial throttle position</cmd>
+                <substeps>
+                    <substep>
+                        <cmd>Advance the throttle lever to the sixth notch</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Retard the spark to the fourth notch</cmd>
+                    </substep>
+                </substeps>
+            </step>
+
+            <step>
+                <cmd>Check if needle valve adjustment requires more than a quarter turn</cmd>
+                <info>If more than a quarter turn is needed, proceed with step 3. If not, skip to
+                    step 4.</info>
+            </step>
+
+            <step>
+                <cmd>Loosen the lock nut on top of the carburetor where the needle passes
+                    through</cmd>
+                <info>This prevents damage to the needle and seat</info>
+            </step>
+
+            <step>
+                <cmd>Adjust the fuel mixture</cmd>
+                <substeps>
+                    <substep>
+                        <cmd>Turn the needle valve to the right until the engine begins to
+                            misfire</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Gradually open the needle valve until the motor reaches its highest
+                            speed</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Continue adjusting until no black smoke appears from the exhaust</cmd>
+                    </substep>
+                </substeps>
+            </step>
+
+            <step>
+                <cmd>Tighten the needle valve lock nut to secure the adjustment</cmd>
+            </step>
+        </steps>
+
+        <result>
+            <p>The carburetor will be properly adjusted for optimal engine performance.</p>
+        </result>
+
+        <postreq>
+            <note type="tip">For average running conditions, maintain the mixture slightly on the
+                lean side for best results.</note>
+            <note type="warning">Do not turn the needle down too tightly as this can damage both the
+                needle and its seat, making future adjustments difficult.</note>
+        </postreq>
+    </taskbody>
+</task>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<concept id="cork_float">
+    <title>Cork Float</title>
+    <shortdesc>The cork float is a carburetor component that automatically regulates gasoline flow
+        for proper engine operation.</shortdesc>
+    <conbody>
+        <p>The cork float maintains proper fuel levels within the carburetor by controlling gasoline
+            flow. Correct float height is critical for engine performance:</p>
+        <ul>
+            <li>If positioned too low, engine starting becomes difficult</li>
+            <li>If positioned too high, the carburetor will flood and leak fuel</li>
+        </ul>
+        <section>
+            <title>Maintenance</title>
+            <p>When a cork float becomes fuel soaked, it should be either:</p>
+            <ul>
+                <li>Replaced with a new float</li>
+                <li>Thoroughly dried and waterproofed with two coats of liquid shellac</li>
+            </ul>
+        </section>
+    </conbody>
+</concept>

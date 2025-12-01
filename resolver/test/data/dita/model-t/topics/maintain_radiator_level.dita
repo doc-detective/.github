@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<task id="maintain_radiator_level">
+    <title>Maintaining Normal Radiator Operation</title>
+    <shortdesc>Keep the radiator properly filled and monitor its operation during challenging
+        driving conditions.</shortdesc>
+    <taskbody>
+        <prereq>Check the radiator water level regularly, especially before long trips.</prereq>
+        <context>Normal operation includes occasional boiling under demanding conditions.</context>
+        <steps>
+            <step>
+                <cmd>Maintain full radiator water level</cmd>
+            </step>
+            <step>
+                <cmd>Monitor radiator temperature during challenging conditions</cmd>
+                <info>
+                    <ul>
+                        <li>Driving through mud</li>
+                        <li>Navigating deep sand</li>
+                        <li>Climbing long hills in warm weather</li>
+                    </ul>
+                </info>
+            </step>
+            <step>
+                <cmd>Allow water temperature to reach near boiling point for optimal
+                    efficiency</cmd>
+                <info>The engine operates most efficiently at higher water temperatures.</info>
+            </step>
+        </steps>
+    </taskbody>
+</task>

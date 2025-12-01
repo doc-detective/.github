@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<task id="task-setup" xml:lang="en-us">
+  <title>Environment Setup</title>
+  
+  <taskbody>
+    <context>
+      <p>This task must be completed before executing the main workflow.</p>
+    </context>
+    
+    <steps>
+      <step>
+        <cmd>Run the initialization script:</cmd>
+        <info>
+          <codeblock outputclass="shell">./scripts/init-environment.sh</codeblock>
+        </info>
+        <stepresult>
+          <screen>Initializing environment...
+✓ Database connected
+✓ Cache cleared
+✓ Configuration loaded
+Environment ready!</screen>
+        </stepresult>
+      </step>
+    </steps>
+  </taskbody>
+</task>

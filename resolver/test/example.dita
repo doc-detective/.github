@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "topic.dtd">
+<topic id="sample_topic">
+  <title>Sample DITA Topic with Doc Detective Tests</title>
+  <?doc-detective test
+testId: sample-dita-test
+detectSteps: false
+?>
+  <body>
+    <p>This is a sample DITA topic demonstrating Doc Detective test detection.</p>
+    
+    <section>
+      <title>Test Steps</title>
+      <p>The following processing instructions contain test steps:</p>
+      
+      <?doc-detective step checkLink: "https://doc-detective.com" ?>
+      
+      <p>You can also verify text on screen:</p>
+      
+      <?doc-detective step find: "Sample DITA Topic" ?>
+    </section>
+  </body>
+  <?doc-detective test end?>
+</topic>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE reference PUBLIC "-//OASIS//DTD DITA Reference//EN" "reference.dtd">
+<reference id="engine_knocking">
+    <title>Engine Knocking</title>
+    <shortdesc>Common causes of engine knocking and their identification.</shortdesc>
+    <refbody>
+        <section>
+            <title>Causes</title>
+            <ul>
+                <li>Carbon deposits accumulated on piston heads</li>
+                <li>Connecting rod bearing has become loose</li>
+                <li>Crankshaft bearing has become loose</li>
+                <li>Spark timing advanced beyond specification</li>
+                <li>Engine operating above normal temperature range</li>
+            </ul> 
+        </section>
+    </refbody>
+</reference>

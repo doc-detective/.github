@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE glossentry PUBLIC "-//OASIS//DTD DITA Glossary//EN" "glossary.dtd">
+<glossentry id="glossary_throttle">
+    <glossterm>Throttle</glossterm>
+    <glossdef>A manual control mechanism in the <ph keyref="company_name"/>
+        <ph keyref="product_name"/> automobile (1908-1927) that regulated engine speed by
+        adjusting the fuel-air mixture entering the engine. Located on the steering wheel as a
+        lever, the throttle worked in conjunction with the carburetor to control engine power output
+        and vehicle speed, operating opposite to modern cars with a "pull back to accelerate"
+        action.</glossdef>
+    <glossBody>
+        <glossPartOfSpeech value="noun"/>
+        <glossProperty>Automotive control component</glossProperty>
+        <glossSurfaceForm>throttle</glossSurfaceForm>
+        <glossUsage>The term is commonly referenced when discussing <ph keyref="product_name"/>
+            operation procedures and in restoration manuals, particularly noting its unique
+            placement and operation compared to modern automobiles.</glossUsage>
+        <glossAlt>
+            <glossSynonym>Ford Model T hand throttle</glossSynonym>
+        </glossAlt>
+    </glossBody>
+</glossentry>

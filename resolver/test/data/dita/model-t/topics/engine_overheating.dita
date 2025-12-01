@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE reference PUBLIC "-//OASIS//DTD DITA Reference//EN" "reference.dtd">
+<reference id="engine_overheating">
+    <title>Engine Overheating</title>
+    <shortdesc>Common causes of engine overheating and their identification.</shortdesc>
+    <refbody>
+        <section> 
+            <title>Causes</title>
+            <ul>
+                <li>Lack of water in the cooling system</li>
+                <li>Insufficient oil level or poor oil circulation</li>
+                <li>Fan belt issues (torn, loose, or slipping)</li>
+                <li>Carbon deposits accumulated in the combustion chamber</li>
+                <li>Incorrectly timed spark (retarded too far)</li>
+                <li>Overly rich fuel mixture</li>
+                <li>Restricted water circulation due to radiator sediment</li>
+                <li>Fouled spark plugs</li>
+            </ul>
+        </section>
+    </refbody>
+</reference>

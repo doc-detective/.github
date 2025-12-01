@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<task id="test_replace_valve_springs">
+    <title>Testing and Replacing Valve Springs</title>
+    <shortdesc>Test valve springs for weakness and replace if necessary to ensure proper engine
+        operation.</shortdesc>
+
+    <taskbody>
+        <prereq>
+            <p>Ensure the engine is in a condition where it can be safely operated for testing.</p>
+        </prereq>
+        <context>
+            <p>Improperly seated valves may indicate weak or broken valve springs. While weak inlet
+                springs have minimal impact, weak exhaust valve springs can cause significant
+                performance issues including:</p>
+            <ul>
+                <li>Uneven engine action</li>
+                <li>Engine lag</li>
+                <li>Loss of compression</li>
+                <li>Reduced explosion force</li>
+            </ul>
+        </context>
+        <steps>
+            <step>
+                <cmd>Locate and remove the plate at the side of the cylinder that encloses the valve
+                    springs</cmd>
+            </step>
+            <step>
+                <cmd>Start the engine</cmd>
+            </step>
+            <step>
+                <cmd>Insert a screwdriver between the coils of the spring while the engine is
+                    running</cmd>
+                <info>This action adds tension to the spring</info>
+                <stepxmp>The screwdriver should fit securely between the coils without damaging
+                    them</stepxmp>
+            </step>
+            <step>
+                <cmd>Observe the engine's response to the added tension</cmd>
+                <stepresult>If the engine speed increases, the spring is weak and requires
+                    replacement</stepresult>
+            </step>
+            <step>
+                <cmd>Replace the weak spring with a new one if necessary</cmd>
+            </step>
+        </steps>
+
+        <result>
+            <p>After replacing a weak spring, the valve should seat properly and engine performance
+                should improve, eliminating uneven action and compression loss.</p>
+        </result>
+    </taskbody>
+</task>

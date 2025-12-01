@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<task id="prepare_radiator_task">
+    <title>Preparing the Radiator Before Starting the Vehicle</title>
+    <shortdesc>Step-by-step process for properly filling the vehicle's <abbreviated-form
+            keyref="glossary_radiator"/> with water before initial operation.</shortdesc> 
+    <taskbody>
+        <prereq>Ensure clean water is available; muslin or straining cloth recommended if water
+            quality is questionable</prereq>
+        <steps>
+            <step>
+                <cmd>Remove the radiator cap</cmd>
+            </step>
+            <step>
+                <cmd>Fill radiator with clean, fresh water</cmd>
+                <substeps>
+                    <substep>
+                        <cmd>Strain water through muslin if cleanliness is uncertain.</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Fill to approximately three gallons</cmd>
+                    </substep>
+                </substeps>
+            </step>
+            <step>
+                <cmd>Verify complete water system filling</cmd>
+                <stepresult>Water should overflow from the pipe when system is fully
+                    filled</stepresult>
+            </step>
+            <step>
+                <cmd>Confirm water covers both radiator and cylinder water jackets</cmd>
+            </step>
+        </steps>
+
+        <result>Properly prepared radiator ready for vehicle operation</result>
+
+        <postreq>
+            <ul>
+                <li>Check water levels frequently during initial driving period</li>
+                <li>Prefer soft rain water over hard water with alkalies and salts</li>
+            </ul>
+        </postreq>
+    </taskbody>
+</task>

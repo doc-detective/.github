@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<task id="add_water_overheated_radiator">
+    <title>Adding Water to an Overheated Radiator</title>
+    <shortdesc>Safely add water to an overheated radiator based on its current
+        condition.</shortdesc> 
+    <taskbody>
+        <prereq>Determine if the water system is completely empty or partially filled.</prereq>
+        <context>Adding cold water to an overheated radiator requires different procedures depending
+            on the current water level.</context>
+        <steps>
+            <step>
+                <cmd>Check the current water level in the system</cmd>
+            </step>
+            <step>
+                <cmd>If the system is partially filled:</cmd>
+                <info>You may add cold water directly to the radiator</info>
+            </step>
+            <step>
+                <cmd>If the system is completely empty:</cmd>
+                <substeps>
+                    <substep>
+                        <cmd>Turn off the engine</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Allow the motor to cool completely</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Add cold water to the radiator</cmd>
+                    </substep>
+                </substeps>
+            </step>
+        </steps>
+    </taskbody>
+</task>

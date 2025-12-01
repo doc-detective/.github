@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<task id="starter_removal">
+    <title>Removing the Starter</title>
+    <shortdesc>Remove the starter for transmission band replacement or other
+        maintenance.</shortdesc> 
+    <taskbody>
+        <prereq>
+            <note type="caution">Handle all parts with care and keep track of small components like
+                keys and screws.</note>
+        </prereq>
+        <steps>
+            <step>
+                <cmd>Remove the engine pan on the left-hand side of the engine.</cmd>
+            </step>
+            <step>
+                <cmd>Remove the four small screws holding the shaft cover to the transmission cover
+                    using a screwdriver.</cmd>
+            </step>
+            <step>
+                <cmd>Remove the cover and gasket.</cmd>
+            </step>
+            <step>
+                <cmd>Turn the Bendix drive shaft until the set screw is at the top.</cmd>
+            </step>
+            <step>
+                <cmd>Bend back the lip of the lock washer that is against the set screw.</cmd>
+            </step>
+            <step>
+                <cmd>Remove the set screw.</cmd>
+            </step>
+            <step>
+                <cmd>Pull the Bendix assembly out of the housing, ensuring the small key is not
+                    lost.</cmd>
+            </step>
+            <step>
+                <cmd>Remove the four screws holding the starter housing to the transmission
+                    cover.</cmd>
+            </step>
+            <step>
+                <cmd>Pull the starter down through the chassis.</cmd>
+            </step>
+        </steps>
+        <result>The starter is now removed from the vehicle.</result>
+        <postreq>
+            <note>When replacing the starter: <ul>
+                    <li>Use a new lock washer</li>
+                    <li>Position the terminal connection at the top</li>
+                    <li>If operating the vehicle without the starter, install transmission cover
+                        plates (available from dealers)</li>
+                </ul>
+            </note>
+        </postreq>
+    </taskbody>
+</task>

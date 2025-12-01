@@ -99,7 +99,7 @@ jobs:
         # Remove ^ or ~ if present
         COMMON_VERSION_CLEAN=$(echo "$COMMON_VERSION" | sed 's/^[^0-9]*//')
         # Query GitHub API for release notes
-        RELEASE_INFO=$(gh release view "v$COMMON_VERSION_CLEAN" --repo doc-detective/doc-detective-common --json body --jq .body || echo "No release notes found.")
+        RELEASE_INFO=$(gh release view "v$COMMON_VERSION_CLEAN" --repo doc-detective/common --json body --jq .body || echo "No release notes found.")
         echo "release_notes<<EOF" >> $GITHUB_OUTPUT
         echo "$RELEASE_INFO" >> $GITHUB_OUTPUT
         echo "EOF" >> $GITHUB_OUTPUT
