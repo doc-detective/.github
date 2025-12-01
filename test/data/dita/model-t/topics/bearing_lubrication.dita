@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<concept id="bearing_lubrication">
+    <title>Bearing Lubrication Schedule</title>
+    <shortdesc>Regular maintenance schedule and procedures for wheel bearing
+        lubrication.</shortdesc>
+    <conbody>
+        <section id="maintenance_interval">
+            <title>Maintenance Interval</title>
+            <p>Wheel bearing maintenance should be performed every three to four months.</p>
+        </section>
+        <section id="maintenance_procedure">
+            <title>Maintenance Process</title>
+            <p>The complete maintenance procedure includes: <ul>
+                    <li>Removing the wheels</li>
+                    <li>Removing all old grease</li>
+                    <li>Thoroughly cleaning hubs and bearings with kerosene</li>
+                    <li>Repacking hubs and bearings with clean grease</li>
+                    <li>Readjusting bearing settings</li>
+                </ul>
+            </p>
+        </section>
+    </conbody>
+</concept>

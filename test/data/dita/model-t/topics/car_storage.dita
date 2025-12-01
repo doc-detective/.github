@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<task id="car_storage">
+    <title>Storing Your Car</title>
+    <shortdesc>Prepare your car for long-term storage by protecting the engine, draining fluids, and
+        covering the exterior.</shortdesc> 
+    <taskbody>
+        <steps>
+            <step>
+                <cmd>Drain the radiator and add denatured alcohol</cmd>
+                <info>
+                    <ul>
+                        <li>Remove all water from the radiator</li>
+                        <li>Add one quart of denatured alcohol to prevent freezing of residual
+                            water</li>
+                    </ul>
+                </info>
+            </step>
+            <step>
+                <cmd>Clean the combustion chamber</cmd>
+                <substeps>
+                    <substep>
+                        <cmd>Remove the cylinder head</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Clean out any carbon deposits in the combustion chamber</cmd>
+                    </substep>
+                </substeps>
+            </step>
+            <step>
+                <cmd>Manage fluid systems</cmd>
+                <substeps>
+                    <substep>
+                        <cmd>Drain all gasoline from the tank</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Remove dirty oil from the crank case</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Clean engine with kerosene</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Add fresh oil to the crank case</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Turn engine to distribute oil across components</cmd>
+                    </substep>
+                </substeps>
+            </step>
+            <step>
+                <cmd>Remove and store tires</cmd>
+            </step>
+            <step>
+                <cmd>Protect the exterior</cmd>
+                <substeps>
+                    <substep>
+                        <cmd>Wash the car thoroughly</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Cover the body with muslin to protect the finish</cmd>
+                    </substep>
+                </substeps>
+            </step>
+        </steps>
+    </taskbody>
+</task>

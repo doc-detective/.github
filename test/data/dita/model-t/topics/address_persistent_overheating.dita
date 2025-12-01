@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<task id="address_persistent_overheating">
+    <title>Addressing Persistent Radiator Overheating</title>
+    <shortdesc>Investigate and resolve radiator overheating that occurs during normal driving
+        conditions.</shortdesc> 
+    <taskbody>
+        <prereq>Confirm that overheating is occurring under ordinary driving conditions.</prereq>
+        <context>Persistent overheating during normal operation indicates a problem that requires
+            attention.</context>
+        <steps>
+            <step>
+                <cmd>Check for improper driving practices</cmd>
+            </step>
+            <step>
+                <cmd>Inspect cylinders for carbon buildup</cmd>
+            </step>
+            <step>
+                <cmd>Adjust fan blade angles if necessary</cmd>
+                <info>Increasing the blade angle can produce more suction</info>
+            </step>
+            <step>
+                <cmd>Consult the manual for additional troubleshooting</cmd>
+                <info>Reference the appropriate section for specific causes and solutions</info>
+            </step>
+        </steps>
+    </taskbody>
+</task>

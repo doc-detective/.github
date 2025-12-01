@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<concept id="clutch_purpose">
+    <title>Purpose of the Clutch</title>
+    <shortdesc>The clutch enables gradual power transfer between the crankshaft and drive shaft,
+        allowing smooth vehicle start-up and preventing sudden movement when the engine
+        starts.</shortdesc> 
+    <conbody>
+        <p>The clutch serves as a critical connection point in the vehicle's power delivery system.
+            Without it, the direct connection between the engine and wheels would create significant
+            operational problems:</p>
+        <ul>
+            <li>A direct connection would cause the vehicle to lurch forward immediately upon engine
+                start-up</li>
+            <li>Starting the engine would be extremely difficult or impossible with such a direct
+                connection</li>
+        </ul>
+        <p>To solve these issues, the shaft system is divided into two main components:</p>
+        <ul>
+            <li>The forward section (crankshaft), which receives power directly from the running
+                engine</li>
+            <li>The rear section (drive shaft), which transfers power to the wheels</li>
+        </ul>
+        <p>The clutch mechanism bridges these two sections, allowing for controlled, gradual
+            engagement that eliminates jolts and jarring movements during vehicle start-up.</p>
+    </conbody>
+</concept>

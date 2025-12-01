@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<task id="remove_connecting_rod">
+    <title>Removing a Connecting Rod</title>
+    <shortdesc>Procedure for removing a connecting rod from an engine when the babbitt bearing is
+        worn or damaged.</shortdesc>
+
+    <taskbody>
+        <prereq>
+            <p>Before beginning, ensure you have: <ul>
+                    <li>Appropriate tools for engine disassembly</li>
+                    <li>Clean workspace</li>
+                    <li>Proper safety equipment</li>
+                </ul>
+            </p>
+        </prereq>
+
+        <context>
+            <p>A connecting rod is a steel rod that links the piston to the crankshaft. When the
+                babbitt bearing becomes worn or burns out due to lack of oil, the entire connecting
+                rod may need replacement. This can be identified by a knocking sound in the
+                engine.</p>
+        </context>
+
+        <steps>
+            <step>
+                <cmd>Drain oil from the crank case</cmd>
+                <info>Remove all oil to prevent spillage during disassembly.</info>
+            </step>
+
+            <step>
+                <cmd>Remove the cylinder head</cmd>
+                <info>Carefully detach the cylinder head to access internal engine
+                    components.</info>
+            </step>
+
+            <step>
+                <cmd>Remove the detachable plate on the bottom of the crank case</cmd>
+                <info>This provides access to the lower portion of the engine's internal
+                    mechanism.</info>
+            </step>
+
+            <step>
+                <cmd>Disconnect the connecting rod from the crankshaft</cmd>
+                <info>Carefully separate the connecting rod from its connection point on the
+                    crankshaft.</info>
+            </step>
+
+            <step>
+                <cmd>Remove the piston and rod through the top of the cylinder</cmd>
+                <info>Carefully extract the entire piston and connecting rod assembly from the
+                    cylinder.</info>
+            </step>
+        </steps>
+
+        <result>
+            <p>The connecting rod has been successfully removed from the engine, allowing for
+                inspection, repair, or replacement.</p>
+        </result>
+
+        <postreq>
+            <p>After removal: <ul>
+                    <li>Inspect the connecting rod and babbitt bearing for damage</li>
+                    <li>Clean all components thoroughly</li>
+                    <li>Replace parts as necessary</li>
+                    <li>Prepare for reassembly</li>
+                </ul>
+            </p>
+        </postreq>
+    </taskbody>
+</task>

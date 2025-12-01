@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE reference PUBLIC "-//OASIS//DTD DITA Reference//EN" "reference.dtd">
+<reference id="rear_axle_lubrication">
+    <title>Rear Axle Lubrication Requirements</title>
+    <shortdesc>Proper lubrication procedures and maintenance schedules for the truck rear axle
+        differential and bearings.</shortdesc> 
+    <refbody>
+        <section id="lubricant_specs">
+            <title>Lubricant Specifications</title>
+            <p>Use A-1 heavy fluid or semi-fluid oil such as:</p>
+            <ul>
+                <li>Mobiloil C</li>
+                <li>Whittemore's Worm Gear Protective</li>
+            </ul>
+            <p>Maintain oil level even with upper oil plug.</p>
+        </section>
+
+        <section id="maintenance_schedule">
+            <table>
+                <title>Maintenance Schedule</title>
+                <tgroup cols="2">
+                    <colspec colnum="1" colwidth="1.5*"/>
+                    <colspec colnum="2" colwidth="1.5*"/>
+                    <thead>
+                        <row>
+                            <entry>Mileage</entry>
+                            <entry>Required Maintenance</entry>
+                        </row>
+                    </thead>
+                    <tbody>
+                        <row>
+                            <entry>500 miles</entry>
+                            <entry>First oil change</entry>
+                        </row>
+                        <row>
+                            <entry>1000 miles</entry>
+                            <entry>Second oil change</entry>
+                        </row>
+                        <row>
+                            <entry>Every 100 miles</entry>
+                            <entry>Turn outer bearing dope cups one full turn</entry>
+                        </row>
+                    </tbody>
+                </tgroup>
+            </table>
+        </section>
+
+        <section id="post_service">
+            <title>Post-Service Procedure</title>
+            <ol>
+                <li>Fill differential with oil</li>
+                <li>Jack up axle</li>
+                <li>Run for 5-10 minutes to ensure proper bearing lubrication</li>
+            </ol>
+        </section>
+
+        <section id="figures">
+            <title>Reference Figures</title>
+            <fig id="truck_axel_longitudinal_view">
+                <title>Truck Rear Axle: Longitudinal View</title>
+                <image keyref="truck_rear_axle_longitudinal_view">
+                    <alt>A longitudinal view of the truck rear axle.</alt>
+                </image>
+            </fig>
+            <fig id="truck_axel_cross_section">
+                <title>Truck Rear Axle: Cross Section Showing Worm and Worm Gear</title>
+                <image keyref="truck_rear_axle_cross_section_worm_and_gear">
+                    <alt>A cross section of the truck real axel showing the worm and worm
+                        gear.</alt>
+                </image>
+            </fig>
+            <fig id="starter_and_generator">
+                <title>Starter and Generator Units</title>
+                <image keyref="starter_and_generator_units">
+                    <alt>Image showing the parts of the starter and generator.</alt>
+                </image>
+            </fig>
+        </section>
+    </refbody>
+</reference>

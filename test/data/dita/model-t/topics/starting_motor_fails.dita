@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE troubleshooting PUBLIC "-//OASIS//DTD DITA Troubleshooting//EN" "troubleshooting.dtd">
+<troubleshooting id="starting_motor_fails">
+    <title>Starting Motor Fails to Operate</title>
+    <shortdesc>When the starting motor does not operate after pushing the button, inspect
+        connections, wiring, and battery charge level.</shortdesc>
+    <troublebody> 
+        <condition>
+            <p>Starting motor does not operate when start button is pushed.</p>
+        </condition>
+        <troubleSolution>
+            <cause>
+                <p>The issue may be due to loose connections, damaged wiring, or a weak battery.</p>
+                <note type="important">If hydrometer reading is less than 1.225, the problem is
+                    likely due to a weak or discharged battery.</note>
+            </cause>
+            <remedy>
+                <steps>
+                    <step>
+                        <cmd>Inspect all terminal connections for tightness:</cmd>
+                        <substeps>
+                            <substep>
+                                <cmd>Check starting motor terminal</cmd>
+                            </substep>
+                            <substep>
+                                <cmd>Check both battery terminals</cmd>
+                            </substep>
+                            <substep>
+                                <cmd>Check both starting switch terminals</cmd>
+                            </substep>
+                        </substeps>
+                    </step>
+                    <step>
+                        <cmd>Examine wiring for breaks in insulation that could cause short
+                            circuits</cmd>
+                    </step>
+                    <step>
+                        <cmd>If connections and wiring are functioning properly, test battery with
+                            hydrometer</cmd>
+                    </step>
+                </steps>
+            </remedy>
+        </troubleSolution>
+    </troublebody>
+</troubleshooting>

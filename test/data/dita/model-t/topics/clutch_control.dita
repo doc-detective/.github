@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE reference PUBLIC "-//OASIS//DTD DITA Reference//EN" "reference.dtd">
+<reference id="clutch_control">
+    <title>Clutch Control</title>
+    <shortdesc>The clutch is primarily controlled through the left foot pedal, with specific
+        measurements and maintenance requirements for proper operation.</shortdesc>
+    <refbody> 
+        <section>
+            <title>Control Mechanism</title>
+            <p>The clutch is operated using the left pedal at the driver's feet.</p>
+        </section>
+        <section>
+            <title>Specifications</title>
+            <ul>
+                <li>Pedal travel from high speed to neutral: 1¾ inches when clutch is released via
+                    hand lever</li>
+            </ul>
+        </section>
+        <section>
+            <title>Troubleshooting</title>
+            <table frame="all">
+                <tgroup cols="2">
+                    <colspec colnum="1" colwidth="1.5*"/>
+                    <colspec colnum="2" colwidth="1.5*"/>
+                    <thead>
+                        <row>
+                            <entry>Issue</entry>
+                            <entry>Solution</entry>
+                        </row>
+                    </thead>
+                    <tbody>
+                        <row>
+                            <entry>Pedal sticking in slow speed</entry>
+                            <entry>Tighten the slow speed band</entry>
+                        </row>
+                        <row>
+                            <entry>Vehicle creeping forward during cranking</entry>
+                            <entry>Adjust clutch lever screw with additional turn to maintain
+                                neutral position</entry>
+                        </row>
+                    </tbody>
+                </tgroup>
+            </table>
+        </section>
+        <section>
+            <title>Maintenance Guidelines</title>
+            <ul>
+                <li>Ensure proper hub brake shoe and connection maintenance to prevent excessive
+                    forward creep</li>
+                <li>Verify slow speed band is not overtightened to prevent binding</li>
+                <li>Avoid heavy-grade oil in cold weather to prevent congealing between clutch
+                    discs</li>
+            </ul>
+        </section>
+    </refbody>
+</reference>

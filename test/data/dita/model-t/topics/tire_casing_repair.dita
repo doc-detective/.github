@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<task id="tire_casing_repair">
+    <title>Repairing Tire Casings</title>
+    <shortdesc>Instructions for temporary and preventive tire casing repairs.</shortdesc>
+    <taskbody>
+        <context> 
+            <p>These procedures address both emergency repairs for damaged casings and preventive
+                maintenance for small cuts.</p>
+        </context>
+        <steps>
+            <step>
+                <cmd>Repair a damaged casing temporarily</cmd>
+                <substeps>
+                    <substep>
+                        <cmd>Clean the affected area with gasoline</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Allow the area to dry completely</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Apply rubber cement to both casing and canvas patch</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Cement the canvas patch to the inside of the casing</cmd>
+                    </substep>
+                </substeps>
+            </step>
+            <step>
+                <cmd>Maintain tire casings preventively</cmd>
+                <substeps>
+                    <substep>
+                        <cmd>Identify small cuts in the tread</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Fill cuts with patching cement</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Apply manufacturer-supplied plastic compound</cmd>
+                    </substep>
+                </substeps>
+            </step>
+        </steps>
+        <postreq>
+            <p>Have temporarily repaired casings vulcanized at the earliest opportunity.</p>
+        </postreq>
+    </taskbody>
+</task>

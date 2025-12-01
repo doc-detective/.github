@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE reference PUBLIC "-//OASIS//DTD DITA Reference//EN" "reference.dtd">
+<reference id="reference-cli" xml:lang="en-us">
+  <title>Command-Line Interface Reference</title>
+  
+  <shortdesc>Complete CLI reference for the doc-detective command-line tool.</shortdesc>
+  
+  <refbody>
+    <section>
+      <title>doc-detective run</title>
+      
+      <refsyn>
+        <title>Syntax</title>
+        <synph>
+          <kwd>doc-detective</kwd>
+          <sep> </sep>
+          <kwd>run</kwd>
+          <sep> </sep>
+          <var>testFile</var>
+          <sep> </sep>
+          <oper>[</oper>
+          <var>options</var>
+          <oper>]</oper>
+        </synph>
+      </refsyn>
+      
+      <properties>
+        <prophead>
+          <proptypehd>Type</proptypehd>
+          <propvaluehd>Option</propvaluehd>
+          <propdeschd>Description</propdeschd>
+        </prophead>
+        
+        <property>
+          <proptype>flag</proptype>
+          <propvalue>
+            <option>--verbose</option>
+          </propvalue>
+          <propdesc>Enable verbose output logging. Short: <option>-v</option></propdesc>
+        </property>
+        
+        <property>
+          <proptype>flag</proptype>
+          <propvalue>
+            <option>--debug</option>
+          </propvalue>
+          <propdesc>Enable debug mode with additional logging.</propdesc>
+        </property>
+        
+        <property>
+          <proptype>string</proptype>
+          <propvalue>
+            <option>--config</option>
+          </propvalue>
+          <propdesc>Path to configuration file. Default: <filepath>./doc-detective.json</filepath></propdesc>
+        </property>
+        
+        <property>
+          <proptype>string</proptype>
+          <propvalue>
+            <option>--output</option>
+          </propvalue>
+          <propdesc>Output format. Options: <codeph>json</codeph>, <codeph>html</codeph>, <codeph>markdown</codeph>. Short: <option>-o</option></propdesc>
+        </property>
+        
+        <property>
+          <proptype>number</proptype>
+          <propvalue>
+            <option>--timeout</option>
+          </propvalue>
+          <propdesc>Global timeout in milliseconds. Default: <codeph>30000</codeph></propdesc>
+        </property>
+      </properties>
+      
+      <?doc-detective setVar="testFile=tests/example.spec.json" ?>
+      <example>
+        <title>Basic Usage</title>
+        <codeblock outputclass="shell">doc-detective run tests/example.spec.json</codeblock>
+      </example>
+      
+      <example>
+        <title>With Options</title>
+        <codeblock outputclass="shell">doc-detective run tests/example.spec.json \
+  --verbose \
+  --config custom-config.json \
+  --output html \
+  --timeout 60000</codeblock>
+      </example>
+      
+      <?doc-detective screenshot="cli-output.png" ?>
+      <example>
+        <title>Expected Output</title>
+        <screen>Doc Detective v3.0.0
+Running tests from: tests/example.spec.json
+
+✓ Test suite: User Management
+  ✓ Create user account (2.1s)
+  ✓ Verify user permissions (0.8s)
+  ✓ Delete user account (1.2s)
+
+Summary:
+  Tests: 3 passed, 0 failed, 3 total
+  Duration: 4.1s
+  
+All tests passed!</screen>
+      </example>
+    </section>
+    
+    <section>
+      <title>doc-detective init</title>
+      
+      <refsyn>
+        <synph>
+          <kwd>doc-detective</kwd>
+          <sep> </sep>
+          <kwd>init</kwd>
+          <sep> </sep>
+          <oper>[</oper>
+          <var>directory</var>
+          <oper>]</oper>
+        </synph>
+      </refsyn>
+      
+      <p>Initialize a new Doc Detective project in the specified directory.</p>
+      
+      <example>
+        <codeblock outputclass="shell">doc-detective init my-tests</codeblock>
+      </example>
+      
+      <example>
+        <title>Generated Files</title>
+        <codeblock outputclass="yaml">my-tests/
+├── doc-detective.json
+├── tests/
+│   └── example.spec.json
+└── README.md</codeblock>
+      </example>
+    </section>
+    
+    <section>
+      <title>doc-detective validate</title>
+      
+      <refsyn>
+        <synph>
+          <kwd>doc-detective</kwd>
+          <sep> </sep>
+          <kwd>validate</kwd>
+          <sep> </sep>
+          <var>testFile</var>
+        </synph>
+      </refsyn>
+      
+      <p>Validate test file syntax without executing tests.</p>
+      
+      <example>
+        <codeblock outputclass="shell">doc-detective validate tests/example.spec.json</codeblock>
+      </example>
+    </section>
+    
+    <section>
+      <title>Environment Variables</title>
+      
+      <properties>
+        <prophead>
+          <proptypehd>Type</proptypehd>
+          <propvaluehd>Variable</propvaluehd>
+          <propdeschd>Description</propdeschd>
+        </prophead>
+        
+        <property>
+          <proptype>string</proptype>
+          <propvalue>
+            <varname>DD_API_TOKEN</varname>
+          </propvalue>
+          <propdesc>API authentication token for remote test execution.</propdesc>
+        </property>
+        
+        <property>
+          <proptype>string</proptype>
+          <propvalue>
+            <varname>DD_BASE_URL</varname>
+          </propvalue>
+          <propdesc>Base URL for application under test.</propdesc>
+        </property>
+        
+        <property>
+          <proptype>boolean</proptype>
+          <propvalue>
+            <varname>DD_HEADLESS</varname>
+          </propvalue>
+          <propdesc>Run browser tests in headless mode. Default: <codeph>true</codeph></propdesc>
+        </property>
+      </properties>
+    </section>
+  </refbody>
+</reference>

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<task id="car_stopping_procedure">
+    <title>Stopping the Car</title>
+    <shortdesc>Safely bring the car to a stop using a precise sequence of throttle, clutch, and
+        brake operations.</shortdesc>
+    <taskbody>
+        <prereq>
+            <p>Be prepared to control the car's speed and engine throughout the stopping
+                process.</p>
+        </prereq>
+
+        <steps>
+            <step>
+                <cmd>Partially close the throttle to reduce speed.</cmd>
+            </step>
+            <step>
+                <cmd>Press the clutch pedal forward into neutral to release high speed.</cmd>
+            </step>
+            <step>
+                <cmd>Apply the foot brake slowly but firmly until the car comes to a complete
+                    stop.</cmd>
+            </step>
+            <step>
+                <cmd>Pull the hand lever back to the neutral position.</cmd>
+                <info>Do not remove your foot from the clutch pedal before moving the hand lever to
+                    neutral, or the engine will stall.</info>
+            </step>
+            <step>
+                <cmd>To stop the motor completely:</cmd>
+                <substeps>
+                    <substep>
+                        <cmd>Open the throttle slightly to accelerate the motor</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Throw off the switch</cmd>
+                    </substep>
+                </substeps>
+                <info>This method leaves the cylinders full of explosive gas, which helps with
+                    future starting.</info>
+            </step>
+        </steps>
+        <result>
+            <p>The car is now safely stopped and the engine is turned off.</p>
+        </result>
+
+        <postreq>
+            <p>Aim to make these actions—disengaging the clutch and applying the brake—become
+                automatic, especially in emergency situations.</p>
+        </postreq>
+    </taskbody>
+</task>

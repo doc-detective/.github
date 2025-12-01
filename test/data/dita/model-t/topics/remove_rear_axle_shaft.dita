@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<task id="remove_rear_axle_shaft">
+    <title>Removing and Maintaining the Rear Axle Shaft</title>
+    <shortdesc>This task describes how to remove the rear axle shaft and includes important
+        maintenance information for proper reassembly and ongoing care.</shortdesc>
+    <taskbody>
+        <prereq>
+            <p>Please refer to the following figure before attempting to remove the real axle shaft.</p>
+            <fig>
+                <title>The <ph keyref="company_name"/>
+                    <ph keyref="product_name"/> Emergency Brake</title>
+                <image keyref="emergency_brake">
+                    <alt>The <ph keyref="company_name"/>
+                        <ph keyref="product_name"/> Emergency Brake</alt>
+                </image>
+            </fig>
+        </prereq>
+        <steps>
+            <step>
+                <cmd>Disconnect the drive shaft assembly</cmd>
+                <info>Unbolt where it connects to the rear axle housing at the differential</info>
+            </step>
+            <step>
+                <cmd>Disconnect the rods</cmd>
+                <substeps>
+                    <substep>
+                        <cmd>Disconnect the radius rods at the outer ends of the housing</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Disconnect the brake rods at the outer ends of the housing</cmd>
+                    </substep>
+                </substeps>
+            </step>
+            <step>
+                <cmd>Remove the rear axle housing</cmd>
+                <substeps>
+                    <substep>
+                        <cmd>Remove the bolts holding the two housing halves together at the
+                            center</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Remove the housing</cmd>
+                    </substep>
+                </substeps>
+            </step>
+            <step>
+                <cmd>Remove the axle shaft</cmd>
+                <substeps>
+                    <substep>
+                        <cmd>Disassemble the inner differential casing</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Draw out the axle shaft</cmd>
+                    </substep>
+                </substeps>
+            </step>
+        </steps>
+        <postreq>
+            <note type="important">When reassembling:</note>
+            <ul>
+                <li>Ensure rear wheels are firmly wedged on at the outer end of the axle shaft</li>
+                <li>Verify the key is in proper position</li>
+                <li>After 30 days of driving, remove the hub cap and adjust the lock nut to
+                    eliminate any play</li>
+            </ul>
+            <note type="warning">
+                <ul>
+                    <li>Keep rear wheels tight to prevent keyway damage</li>
+                    <li>If axle or wheel becomes sprung due to accident or skidding, repair
+                        immediately</li>
+                    <li>A bent axle shaft should ideally be replaced rather than straightened</li>
+                </ul>
+            </note>
+        </postreq>
+    </taskbody>
+</task>

@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<task id="remove_carbon">
+    <title>Removing Carbon from the Combustion Chamber</title>
+    <shortdesc>Follow these steps to safely remove carbon buildup from the engine's combustion
+        chamber and cylinder head.</shortdesc>
+    <taskbody>
+        <prereq>
+            <p>Ensure the engine is cool before beginning this procedure.</p>
+        </prereq>
+        <steps>
+            <step>
+                <cmd>Drain the cooling system</cmd>
+                <substeps>
+                    <substep>
+                        <cmd>Locate the pet cock at the bottom of the radiator</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Open the pet cock to drain the water</cmd>
+                    </substep>
+                </substeps>
+            </step>
+            <step>
+                <cmd>Disconnect the electrical and cooling components</cmd>
+                <substeps>
+                    <substep>
+                        <cmd>Disconnect the wires at the top of the motor</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Remove the radiator connection attached to the radiator</cmd>
+                    </substep>
+                </substeps>
+            </step>
+            <step>
+                <cmd>Remove the cylinder head</cmd>
+                <substeps>
+                    <substep>
+                        <cmd>Remove the 15 cap screws holding the cylinder head in place</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Lift off the cylinder head</cmd>
+                    </substep>
+                </substeps>
+            </step>
+            <step>
+                <cmd>Remove the carbon deposits</cmd>
+                <substeps>
+                    <substep>
+                        <cmd>Using a putty knife or screwdriver, carefully scrape the carbonized
+                            matter from the cylinder head</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Clean the carbon from the top of the pistons</cmd>
+                    </substep>
+                </substeps>
+                <stepresult>
+                    <note type="caution">Take care to prevent carbon particles from falling into the
+                        cylinders or bolt holes.</note>
+                </stepresult>
+            </step>
+            <step>
+                <cmd>Reinstall the cylinder head</cmd>
+                <substeps>
+                    <substep>
+                        <cmd>Rotate the motor until pistons No. 1 and No. 4 are at top center</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Place the new gasket in position over the pistons</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Set the cylinder head in place</cmd>
+                    </substep>
+                </substeps>
+            </step>
+            <step>
+                <cmd>Secure the cylinder head</cmd>
+                <info>
+                    <note type="important">Tighten the cylinder head bolts gradually and evenly. Do
+                        not fully tighten bolts on one end before tightening the other end.</note>
+                </info>
+                <substeps>
+                    <substep>
+                        <cmd>Install all cylinder head bolts finger-tight</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Gradually tighten each bolt a few turns at a time in a cross-pattern
+                            sequence</cmd>
+                    </substep>
+                </substeps>
+            </step>
+        </steps>
+    </taskbody>
+</task>

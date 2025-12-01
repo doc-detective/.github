@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<concept id="coil_adjustment_starting">
+    <title>Impact of Coil Adjustment on Engine Starting</title>
+
+    <shortdesc>Proper coil vibrator adjustment is crucial for efficient engine starting, as it
+        affects the current required for point contact and spark generation.</shortdesc>
+
+    <conbody>
+        <p>Improper vibrator adjustment increases the current required to make and break contact
+            between points. At cranking speeds, this can prevent spark generation between spark plug
+            points, making engine starting difficult.</p>
+
+        <section>
+            <title>Point Contact Maintenance</title>
+            <p>Contact points must be maintained to prevent them from becoming ragged. Ragged points
+                can lead to:</p>
+            <ul>
+                <li>Difficulties in engine starting</li>
+                <li>Occasional engine misfiring during operation</li>
+            </ul>
+        </section>
+    </conbody>
+</concept>

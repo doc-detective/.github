@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<task id="engine_oil_maintenance_task">
+    <title>Maintaining Vehicle Engine Oil System</title>
+    <shortdesc>Procedures for properly filling and maintaining the engine's oil reservoir during
+        initial and ongoing vehicle operation.</shortdesc> 
+    <taskbody>
+        <prereq>Use medium light, high-grade gas engine oil</prereq>
+
+        <steps>
+            <step>
+                <cmd>Fill crankcase with oil through front breather pipe</cmd>
+                <stepxmp>Remove metal cap, pour oil slowly</stepxmp>
+            </step>
+            <step>
+                <cmd>Check oil level in flywheel casing</cmd>
+                <substeps>
+                    <substep>
+                        <cmd>Locate two pet cocks in flywheel casing.</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Pour oil until it runs out of upper cock.</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Leave upper cock open until flow stops.</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Close upper cock.</cmd>
+                    </substep>
+                </substeps>
+            </step>
+            <step>
+                <cmd>Maintain optimal oil level</cmd>
+                <stepresult>Keep oil midway between two cocks, never below lower cock</stepresult>
+            </step>
+        </steps>
+
+        <result>Properly maintained engine oil system</result>
+
+        <postreq>
+            <ul>
+                <li>Check and fill grease cups</li>
+                <li>Verify oil supply to necessary parts</li>
+            </ul>
+        </postreq>
+    </taskbody>
+</task>

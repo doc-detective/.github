@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<concept id="engine_valve_timing">
+    <title>Valve Timing in Internal Combustion Engines</title>
+    <shortdesc>Precise valve timing is crucial for engine performance, determining the exact moments
+        when intake and exhaust valves open and close during the engine cycle.</shortdesc>
+
+    <conbody> 
+        <section>
+            <title>Valve Timing Fundamentals</title>
+            <p>Valve timing is typically set at the factory during engine construction. Retiming
+                becomes necessary only when critical components such as the cam shaft, time gears,
+                or valves are removed during engine overhaul.</p>
+        </section>
+
+        <section>
+            <title>Timing Gear Configuration</title>
+            <p>Proper valve timing requires precise gear alignment:</p>
+            <ul>
+                <li>The first cam must point in a direction opposite to the zero mark</li>
+                <li>Time gears must mesh so that the zero-marked tooth on the small time gear is
+                    positioned between two teeth on the large gear at the zero point</li>
+            </ul>
+        </section>
+
+        <section>
+            <title>Valve Opening and Closing Specifications</title>
+            <p>Precise valve timing involves specific measurements:</p>
+            <simpletable>
+                <sthead>
+                    <stentry>Valve Type</stentry>
+                    <stentry>Opening Point</stentry>
+                    <stentry>Closing Point</stentry>
+                </sthead>
+                <strow>
+                    <stentry>Exhaust Valve</stentry>
+                    <stentry>5/16" below bottom center</stentry>
+                    <stentry>At top center (5/16" above cylinder casting)</stentry>
+                </strow>
+                <strow>
+                    <stentry>Intake Valve</stentry>
+                    <stentry>1/16" after top center</stentry>
+                    <stentry>9/16" after bottom center</stentry>
+                </strow>
+            </simpletable>
+        </section>
+
+        <section>
+            <title>Push Rod and Valve Stem Clearance</title>
+            <p>Critical clearance specifications:</p>
+            <ul>
+                <li>Maximum clearance: 1/32"</li>
+                <li>Minimum clearance: 1/64"</li>
+                <li>Optimal clearance: Midpoint between maximum and minimum (approximately
+                    3/64")</li>
+                <li>Measurement should be taken when the push rod is on the heel of the cam</li>
+            </ul>
+        </section>
+
+        <section>
+            <title>Firing Order</title>
+            <p>For the specific engine model described, the cylinder firing order is: 1, 2, 4,
+                3.</p>
+        </section>
+
+        <section>
+            <title>Reference Figures</title>
+            <fig>
+                <title>Sectional View of the <ph keyref="product_name"/> Motor.</title>
+                <image keyref="section_view_model_t_motor">
+                    <alt>A cut-away diagram of the parts of a <ph keyref="product_name"/>
+                        engine.</alt>
+                </image>
+            </fig>
+            <fig>
+                <title>Cylinder Assembly, showing the correct position of the valves with time gears
+                    properly set according to punch marks on the gears. The firing order of the
+                    cylinders is 1, 2, 4, 3.</title>
+                <image keyref="cylinder_assembly">
+                    <alt>Image depicts the relative position of the pistons in their strokes as
+                        indicated above</alt>
+                </image>
+            </fig>
+            <fig>
+                <title>How the valve lifting tool should be used</title>
+                <image keyref="valve_lifting_tool_usage">
+                    <alt>A hand holding the valve lifting tool showing the valve assembly.</alt>
+                </image>
+            </fig>
+        </section>
+
+    </conbody>
+</concept>

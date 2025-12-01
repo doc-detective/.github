@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<task id="transmission_assembly">
+    <title>Assembling the Transmission</title>
+    <shortdesc>Complete procedure for assembling the transmission system, including proper component
+        placement and clutch assembly.</shortdesc> 
+
+    <taskbody>
+        <prereq>
+            <ul>
+                <li>All transmission parts are clean and ready for assembly</li>
+                <li>Reference the following figure for parts positioning</li>
+                <li>Proper tools are available</li>
+            </ul>
+            <fig>
+                <title><ph keyref="company_name"/> <ph keyref="product_name"/> Transmission Parts</title>
+                <image keyref="transmission_assembly_parts">
+                    <alt>Diagram showing the course of water through water passages.</alt>
+                </image>
+            </fig>
+        </prereq>
+
+        <context>
+            <p>Assembly occurs in sequential groups (as shown in the previous image). Follow these
+                steps carefully to ensure proper transmission function.</p>
+        </context>
+
+        <steps>
+            <stepsection>Group No. 2 Assembly</stepsection>
+            <step>
+                <cmd>Position the brake drum</cmd>
+                <substeps>
+                    <substep>
+                        <cmd>Place brake drum on table</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Ensure hub is in vertical position</cmd>
+                    </substep>
+                </substeps>
+            </step>
+            <step>
+                <cmd>Install the speed plates</cmd>
+                <substeps>
+                    <substep>
+                        <cmd>Place slow speed plate over hub with gear uppermost</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Position reverse plate over slow speed plate</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Verify reverse gear surrounds slow speed gear</cmd>
+                    </substep>
+                </substeps>
+            </step>
+            <step>
+                <cmd>Install hub keys and driven gear</cmd>
+                <substeps>
+                    <substep>
+                        <cmd>Fit two keys in hub above slow speed gear</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Position driven gear with teeth downward</cmd>
+                    </substep>
+                </substeps>
+            </step>
+            <step>
+                <cmd>Install triple gears</cmd>
+                <substeps>
+                    <substep>
+                        <cmd>Align triple gears with driven gear according to punch marks</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Position smallest (reverse) gear downward</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Secure gears with cord around outside</cmd>
+                    </substep>
+                </substeps>
+            </step>
+
+            <stepsection>Flywheel Assembly</stepsection>
+            <step>
+                <cmd>Prepare flywheel</cmd>
+                <substeps>
+                    <substep>
+                        <cmd>Place flywheel face-down on table</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Ensure transmission shaft is vertical</cmd>
+                    </substep>
+                </substeps>
+            </step>
+            <step>
+                <cmd>Mount assembled group</cmd>
+                <substeps>
+                    <substep>
+                        <cmd>Invert assembled group over transmission shaft</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Align triple gear pins with triple gears</cmd>
+                    </substep>
+                </substeps>
+            </step>
+
+            <stepsection>Clutch Assembly</stepsection>
+            <step>
+                <cmd>Install clutch components</cmd>
+                <substeps>
+                    <substep>
+                        <cmd>Fit clutch drum key in transmission shaft</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Install clutch disc drum and secure with set screw</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Install clutch discs, alternating large and small, ending with large
+                            disc</cmd>
+                    </substep>
+                </substeps>
+                <info>Important: Always end with a large disc to prevent speed change issues</info>
+            </step>
+            <step>
+                <cmd>Complete clutch assembly</cmd>
+                <substeps>
+                    <substep>
+                        <cmd>Install clutch push ring with pins projecting upward</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Bolt driving plate in position</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Test transmission movement manually</cmd>
+                    </substep>
+                </substeps>
+            </step>
+            <step>
+                <cmd>Install final clutch components</cmd>
+                <substeps>
+                    <substep>
+                        <cmd>Install clutch shift over hub</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Install clutch spring and support</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Compress spring to 2 to 2-1/16 inches</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Adjust clutch finger screws for even compression</cmd>
+                    </substep>
+                </substeps>
+            </step>
+        </steps>
+
+        <result>
+            <p>When properly assembled, the transmission should rotate freely when tested
+                manually.</p>
+        </result>
+
+        <postreq>
+            <note type="important">Verify even clutch spring compression and proper clutch finger
+                adjustment before operation.</note>
+        </postreq>
+    </taskbody>
+</task>

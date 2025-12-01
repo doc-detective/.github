@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<task id="clean_spark_plugs">
+    <title>Cleaning Spark Plugs</title>
+    <shortdesc>Follow these steps to properly clean and reassemble <abbreviated-form
+            keyref="glossary_sparkplug"/>s to ensure optimal performance.</shortdesc>
+    <taskbody>
+        <context> 
+            <note type="tip">Dirty spark plugs are often caused by excessive oil in the crank case
+                or the use of poor quality oil.</note>
+        </context>
+        <steps>
+            <step>
+                <cmd>Perform initial cleaning</cmd>
+                <substeps>
+                    <substep>
+                        <cmd>Remove the spark plug from the engine</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Clean the points using an old tooth-brush dipped in gasoline</cmd>
+                    </substep>
+                </substeps>
+            </step>
+            <step>
+                <cmd>Disassemble the spark plug</cmd>
+                <substeps>
+                    <substep>
+                        <cmd>Secure the large hexagon steel shell in a vise</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Loosen the pack nut that holds the porcelain in place</cmd>
+                    </substep>
+                </substeps>
+            </step>
+            <step>
+                <cmd>Remove carbon deposits</cmd>
+                <substeps>
+                    <substep>
+                        <cmd>Using a small knife, carefully remove carbon deposits from the
+                            porcelain</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Clean carbon deposits from the shell</cmd>
+                    </substep>
+                </substeps>
+                <stepresult>
+                    <note type="caution">Do not scrape off the glazed surface of the porcelain as
+                        this may lead to quick carbonization.</note>
+                </stepresult>
+            </step>
+            <step>
+                <cmd>Clean all components</cmd>
+                <substeps>
+                    <substep>
+                        <cmd>Wash the porcelain and all parts in gasoline</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Wipe all parts dry with a clean cloth</cmd>
+                    </substep>
+                </substeps>
+            </step>
+            <step>
+                <cmd>Reassemble the spark plug</cmd>
+                <info>
+                    <note type="caution">Do not over-tighten the pack nut as this may crack the
+                        porcelain.</note>
+                </info>
+                <substeps>
+                    <substep>
+                        <cmd>Reassemble all components</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Adjust the distance between sparking points to 1/32″ (approximately the
+                            thickness of a smooth dime)</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Carefully tighten the pack nut</cmd>
+                    </substep>
+                </substeps>
+            </step>
+        </steps>
+    </taskbody>
+</task>

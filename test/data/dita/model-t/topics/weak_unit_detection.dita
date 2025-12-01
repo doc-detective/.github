@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<concept id="weak_unit_detection">
+    <title>Detecting a Weak Unit</title>
+
+    <shortdesc>A systematic approach to identifying weak units involves testing unit position
+        changes and checking multiple potential failure points before concluding the coil is at
+        fault.</shortdesc>
+ 
+    <conbody>
+        <section>
+            <title>Primary Diagnostic Steps</title>
+            <p>When a cylinder shows signs of failure or weak performance:</p>
+            <ol>
+                <li>Change the unit's position to verify if the problem follows the unit</li>
+                <li>Listen for vibrator buzzing without spark at plug, which indicates a defective
+                    unit</li>
+            </ol>
+        </section>
+
+        <section>
+            <title>Other Potential Causes</title>
+            <p>Before determining the coil is faulty, check these common issues:</p>
+            <ul>
+                <li>Loose wire connections</li>
+                <li>Faulty spark plugs</li>
+                <li>Worn commutator</li>
+            </ul>
+            <note type="important">These components can cause similar symptoms to a weak unit and
+                should be investigated first.</note>
+        </section>
+    </conbody>
+</concept>

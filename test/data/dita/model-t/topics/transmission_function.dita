@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<concept id="transmission_function">
+    <title>Function of the Transmission</title>
+    <shortdesc>The <abbreviated-form keyref="glossary_transmission"/> is the automotive component
+        that enables speed control between the crankshaft and drive shaft, allowing for variable
+        forward speeds and reverse operation.</shortdesc> 
+    <conbody>
+        <p>The transmission is a crucial mechanism in an automobile that connects the crankshaft to
+            the drive shaft. This component serves as the vehicle's speed gear, enabling the
+            following functions:</p>
+        <ul>
+            <li>Controls the relative speeds between the crankshaft and drive shaft</li>
+            <li>Enables forward movement at both low and high speeds</li>
+            <li>Provides reverse movement capability</li>
+        </ul>
+        <section><title>Reference Figure</title>
+            <fig>
+                <title>Transmission Showing All Gears in Mesh</title>
+                <image keyref="transmission_gears">
+                    <alt>Image pointing out all of the parts of the transmission.</alt>
+                </image>
+            </fig>
+        </section>
+    </conbody>
+</concept>

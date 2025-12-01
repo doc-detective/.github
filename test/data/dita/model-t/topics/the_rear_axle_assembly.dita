@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<concept id="the_rear_axle_assembly">
+    <title>The Rear Axle Assembly</title>
+    <shortdesc/> 
+    <conbody>
+        <section><title>Reference Figure</title>
+            <fig>
+                <title>The Rear Axle System</title>
+                <image keyref="real_axle_system">
+                    <alt>Image showing all of the key parts of the real axle system.</alt>
+                </image>
+            </fig>
+        </section>        
+    </conbody>
+</concept>

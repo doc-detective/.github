@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE troubleshooting PUBLIC "-//OASIS//DTD DITA Troubleshooting//EN" "troubleshooting.dtd">
+<troubleshooting id="priming_rod_warm_motor">
+    <title>Using Priming Rod with Warm Motor</title>
+ 
+    <shortdesc>Guidance on proper usage of the priming rod when starting a warm motor, including
+        recovery steps if engine flooding occurs.</shortdesc>
+
+    <troublebody>
+        <condition>
+            <p>Motor is warm and needs to be started.</p>
+        </condition>
+
+        <troubleSolution>
+            <cause>
+                <p>Using the priming rod when the motor is warm can flood the engine with excess
+                    fuel, creating a mixture too rich to ignite properly.</p>
+            </cause>
+
+            <remedy>
+                <steps>
+                    <step>
+                        <cmd>Do not use the priming rod when starting a warm motor.</cmd>
+                        <info>The carburetor typically doesn't require priming when warm.</info>
+                    </step>
+                </steps>
+            </remedy>
+        </troubleSolution>
+
+        <troubleSolution>
+            <cause>
+                <p>If engine becomes flooded</p>
+            </cause>
+            <remedy>
+                <steps>
+                    <step>
+                        <cmd>Turn the carburetor adjusting needle clockwise (to the right) until it
+                            seats.</cmd>
+                    </step>
+                    <step>
+                        <cmd>Turn the engine over several times.</cmd>
+                        <info>This will help exhaust the overly rich gas mixture.</info>
+                    </step>
+                    <step>
+                        <cmd>Once the motor starts, turn the needle counterclockwise (to the
+                            left).</cmd>
+                    </step>
+                    <step>
+                        <cmd>Readjust the carburetor to proper settings.</cmd>
+                    </step>
+                </steps>
+            </remedy>
+        </troubleSolution>
+    </troublebody>
+</troubleshooting>

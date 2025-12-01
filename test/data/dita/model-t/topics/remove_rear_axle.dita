@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<task id="remove_rear_axle">
+    <title>Removing the Rear Axle</title>
+    <shortdesc>This task describes the procedure for removing the rear <abbreviated-form
+            keyref="glossary_axle"/> from the vehicle.</shortdesc>
+    <taskbody>
+        <prereq>
+            <p>Ensure you have access to the vehicle's underside and appropriate tools for the
+                procedure.</p>
+        </prereq>
+        <steps>
+            <step>
+                <cmd>Jack up the car and remove the rear wheels</cmd>
+            </step>
+            <step>
+                <cmd>Remove the universal ball cap bolts</cmd>
+                <info>Take out the four bolts that connect the universal ball cap to the
+                    transmission case and cover</info>
+            </step>
+            <step>
+                <cmd>Disconnect the brake rods</cmd>
+            </step>
+            <step>
+                <cmd>Remove the spring perch nuts</cmd>
+                <info>Remove the nuts that secure the spring perches to the rear axle housing
+                    flanges</info>
+            </step>
+            <step>
+                <cmd>Raise the frame and remove the axle</cmd>
+                <substeps>
+                    <substep>
+                        <cmd>Raise the frame at the rear end</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Withdraw the axle</cmd>
+                    </substep>
+                </substeps>
+            </step>
+        </steps>
+    </taskbody>
+</task>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<task id="differential_gear_removal"> 
+    <title>Removing the Differential Gear</title>
+    <shortdesc>Remove the differential gear from the rear axle shaft by manipulating the retaining
+        ring and splines.</shortdesc>
+    <taskbody>
+        <context>The differential gear connects to the rear axle shaft via splines and is secured by
+            a two-piece retaining ring in the shaft groove.</context>
+        <steps>
+            <step>
+                <cmd>Push the gear away from attachment end</cmd>
+                <info>Force the gear down the shaft, away from its mounted position</info>
+            </step>
+            <step>
+                <cmd>Remove the retaining ring</cmd>
+                <substeps>
+                    <substep>
+                        <cmd>Locate the two-piece ring in shaft groove</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Use screwdriver or chisel to drive out both ring halves</cmd>
+                    </substep>
+                </substeps>
+            </step>
+            <step>
+                <cmd>Remove the gear</cmd>
+                <info>Force the gear off the end of the shaft</info>
+            </step>
+        </steps>
+    </taskbody>
+</task>

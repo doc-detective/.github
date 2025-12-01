@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<concept id="ford_genuine_parts_concept">
+    <title>Importance of Genuine <ph keyref="company_name"/> Parts</title>
+    <shortdesc><ph keyref="company_name"/> owners must use authentic <ph keyref="company_name"
+        />-manufactured parts from authorized agents to ensure vehicle quality and
+        performance.</shortdesc> 
+    <conbody>
+        <section id="authenticity-warning">
+            <title>Avoiding Counterfeit Parts</title>
+            <p>Imitation or counterfeit parts of inferior quality are being sold as "<ph
+                    keyref="company_name"/> Parts," which can compromise vehicle reliability and
+                performance.</p>
+        </section>
+
+        <section id="recommended-action">
+            <title>Recommended Purchasing Strategy</title>
+            <ul>
+                <li>Always insist on genuine <ph keyref="company_name"/>-manufactured materials</li>
+                <li>Purchase replacement parts only from authorized <ph keyref="company_name"/>
+                    agents</li>
+                <li>Reject inferior or counterfeit parts to maintain vehicle integrity</li>
+            </ul>
+        </section>
+    </conbody>
+</concept>

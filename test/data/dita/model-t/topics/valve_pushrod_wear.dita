@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<concept id="valve_pushrod_wear">
+    <title>Valve and Push Rod Wear Impact</title>
+    <shortdesc>Understanding the effects of worn valves and push rods on motor performance and
+        proper maintenance procedures.</shortdesc>
+    <conbody>
+        <p>When valves or push rods become worn, they create excessive play between components,
+            which reduces valve lift and diminishes motor power. In these cases, installing new push
+            rods is the recommended solution.</p>
+
+        <section>
+            <title>Clearance Specifications</title>
+            <p>The clearance between push rods and valve stems must be maintained within specific
+                limits:</p>
+            <ul>
+                <li>Maximum clearance: 1/32 inch</li>
+                <li>Minimum clearance: 1/64 inch</li>
+            </ul>
+        </section>
+
+        <section>
+            <title>Effects of Improper Clearance</title>
+            <ul>
+                <li>Excessive clearance (over 1/32 inch) causes: <ul>
+                        <li>Late valve opening</li>
+                        <li>Early valve closing</li>
+                        <li>Uneven motor operation</li>
+                    </ul>
+                </li>
+                <li>Insufficient clearance (under 1/64 inch) risks: <ul>
+                        <li>Valves remaining partially open continuously</li>
+                    </ul>
+                </li>
+            </ul>
+        </section>
+
+        <section>
+            <title>Maintenance Recommendations</title>
+            <ul>
+                <li>Replace push rods first when addressing clearance issues</li>
+                <li>If proper clearance isn't achieved with new push rods, replace the valve</li>
+                <li>Valve stem modification is not recommended due to: <ul>
+                        <li>Required expertise</li>
+                        <li>Cost inefficiency compared to replacement</li>
+                    </ul>
+                </li>
+            </ul>
+        </section>
+    </conbody>
+</concept>

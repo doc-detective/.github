@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<concept id="water_in_carburetor">
+    <title>Water in the Carburetor</title>
+
+    <shortdesc>Water contamination in the carburetor or gasoline tank can cause engine starting
+        problems, misfiring, and stalling. Regular maintenance and proper draining procedures can
+        prevent these issues.</shortdesc> 
+
+    <conbody>
+        <section>
+            <title>Effects of Water Contamination</title>
+            <p>Even small amounts of water in the carburetor or gasoline tank can significantly
+                impact engine performance. Due to water being heavier than gasoline, it settles at
+                the bottom of the tank and accumulates in the sediment bulb along with other
+                contaminants.</p>
+        </section>
+
+        <section>
+            <title>Prevention and Maintenance</title>
+            <p>Since modern gasoline often contains impurities, particularly water, regular
+                maintenance is essential. Frequent draining of the sediment bulb beneath the
+                gasoline tank helps prevent water-related problems.</p>
+        </section>
+
+        <section>
+            <title>Cold Weather Considerations</title>
+            <p>In cold conditions, accumulated water in the sediment bulb may freeze, blocking
+                gasoline flow to the carburetor. To resolve this:</p>
+            <ul>
+                <li>Wrap a cloth around the sediment bulb</li>
+                <li>Keep the cloth saturated with hot water</li>
+                <li>Maintain this treatment briefly</li>
+                <li>Drain the water completely</li>
+            </ul>
+            <note>This same hot water treatment can be applied if water freezes inside the
+                carburetor itself.</note>
+        </section>
+    </conbody>
+</concept>

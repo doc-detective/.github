@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<concept id="ford_car_ownership_concept">
+    <title>Understanding Your <ph keyref="company_name"/> Vehicle</title>
+    <shortdesc><ph keyref="company_name"/> vehicles are designed for ease of use, with widespread
+        service support and simple mechanical design that empowers owners to understand their
+        car.</shortdesc>
+    <conbody>
+        <p>Most <ph keyref="company_name"/> car owners are laymen with limited mechanical
+            experience. The vehicle's design intentionally minimizes the technical knowledge
+            required for operation.</p>
+
+        <section id="service-support">
+            <title>Global Service Network</title>
+            <p><ph keyref="company_name"/> provides an extensive service infrastructure with over
+                twenty thousand service stations worldwide, ensuring owners can quickly obtain
+                adjustments and repairs.</p>
+        </section>
+
+        <section id="owner-knowledge">
+            <title>Benefits of Vehicle Understanding</title>
+            <ul>
+                <li>Owners gain mastery over their vehicle's maintenance</li>
+                <li>Enables more economical car maintenance</li>
+                <li>Prolongs the vehicle's useful life</li>
+                <li>Increases owner's enjoyment through deeper comprehension</li>
+            </ul>
+        </section>
+
+        <section id="vehicle-complexity">
+            <title>Simplified Design</title>
+            <p>The <ph keyref="company_name"/> vehicle is intentionally designed as the simplest
+                car, making it easy to understand and maintain. Comprehensive knowledge of the car's
+                construction is neither difficult nor time-consuming to acquire.</p>
+        </section>
+    </conbody>
+</concept>

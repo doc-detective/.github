@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<task id="gasoline_tank_preparation_task">
+    <title>Preparing and Managing Vehicle Gasoline Tank</title>
+    <shortdesc>Safety procedures and maintenance guidelines for filling and managing the vehicle's
+        gasoline tank.</shortdesc>
+    <taskbody>
+        <prereq>Ensure a safe working environment free from open flames:</prereq>
+
+        <steps>
+            <step>
+                <cmd>Fill gasoline tank to nearly full capacity (ten gallons)</cmd>
+                <stepxmp>Maintain fuel level to prevent running low</stepxmp>
+            </step>
+            <step>
+                <cmd>Exercise caution during fuel handling:</cmd>
+                <substeps>
+                    <substep>
+                        <cmd>Keep flames away from tank during filling.</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Avoid lighting matches near spilled gasoline.</cmd>
+                    </substep>
+                </substeps>
+            </step>
+            <step>
+                <cmd>Maintain tank vent hole.</cmd>
+                <stepresult>Ensure vent hole remains unobstructed for proper fuel flow.</stepresult>
+            </step>
+        </steps>
+
+        <result>Safely prepared gasoline tank with proper fuel management.</result>
+
+        <postreq>
+            <ul>
+                <li>Drain tank using sediment bulb pet cock if necessary.</li>
+                <li>Be aware of explosive vapor risks.</li>
+            </ul>
+        </postreq>
+    </taskbody>
+</task>

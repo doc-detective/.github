@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE reference PUBLIC "-//OASIS//DTD DITA Reference//EN" "reference.dtd">
+<reference id="overheating_causes">
+    <title>What are the Causes of Overheating?</title>
+    <shortdesc>Engine overheating can be caused by various factors including mechanical issues,
+        operational practices, and maintenance problems.</shortdesc>
+    <refbody>
+        <section>
+            <title>Common Causes of Engine Overheating</title>
+            <ul>
+                <li>Carbonized cylinders</li>
+                <li>Excessive low-speed driving</li>
+                <li>Over-retarded spark timing</li>
+                <li>Poor ignition system performance</li>
+                <li>Insufficient or poor quality oil</li>
+                <li>Engine racing</li>
+                <li>Clogged muffler</li>
+                <li>Improper carburetor adjustment</li>
+                <li>Fan malfunction due to: <ul>
+                        <li>Broken belt</li>
+                        <li>Slipping belt</li>
+                    </ul>
+                </li>
+                <li>Improper water circulation caused by: <ul>
+                        <li>Clogged radiator tubes</li>
+                        <li>Jammed radiator tubes</li>
+                        <li>Leaky connections</li>
+                        <li>Low water level</li>
+                    </ul>
+                </li>
+            </ul>
+        </section>
+    </refbody>
+</reference>

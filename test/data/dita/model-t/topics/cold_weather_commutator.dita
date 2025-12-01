@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<concept id="cold_weather_commutator">
+    <title>Cold Weather Effects on the Commutator</title>
+
+    <shortdesc>Cold temperatures can cause lubricating oil in the commutator to congeal, preventing
+        proper contact between the roller and contact points and leading to difficult starting
+        conditions.</shortdesc>
+ 
+    <conbody>
+        <section>
+            <title>Oil Congealing Problems</title>
+            <p>In cold weather, even high-quality lubricating oils tend to congeal. Within the
+                commutator, this congealing creates two specific problems:</p>
+            <ul>
+                <li>The roller cannot make perfect contact with the fiber-embedded contact
+                    points</li>
+                <li>The roller arm spring lacks sufficient strength to clear away the oil film
+                    covering the contact points</li>
+            </ul>
+        </section>
+
+        <section>
+            <title>Symptoms</title>
+            <p>During cold-weather starts, you may notice that only one or two cylinders fire
+                initially. This limited firing pattern indicates imperfect contact across the four
+                terminals due to congealed oil.</p>
+        </section>
+
+        <section>
+            <title>Preventive Solution</title>
+            <p>To prevent oil congealing and protect against contact point rust, mix the commutator
+                lubricating oil with kerosene in the following ratio:</p>
+            <ul>
+                <li>75% commutator lubricating oil</li>
+                <li>25% kerosene</li>
+            </ul>
+            <p>This mixture maintains appropriate viscosity in cold conditions, preventing the oil
+                from freezing.</p>
+        </section>
+        <!-- following should lead to an image
+        <related-links>
+            <link href="images/magneto-diagram.dita" format="dita">
+                <linktext>Cut No. 10: Ford Magneto - Flywheel and Stationary Magneto Coils</linktext>
+            </link>
+        </related-links> -->
+    </conbody>
+</concept>

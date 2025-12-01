@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<task id="convertible_top_care">
+    <title>Maintaining Your Convertible Top</title>
+    <shortdesc>Properly fold the convertible top and apply dressing to maintain its
+        condition.</shortdesc> 
+    <taskbody>
+        <steps>
+            <step>
+                <cmd>Fold the convertible top carefully</cmd>
+                <info>When lowering the top, ensure the fabric doesn't get pinched between the bow
+                    spacers to prevent damage.</info>
+            </step>
+            <step>
+                <cmd>Apply top dressing</cmd>
+                <info>Use a quality top dressing product to improve an old top's appearance.</info>
+            </step>
+        </steps>
+    </taskbody>
+</task>

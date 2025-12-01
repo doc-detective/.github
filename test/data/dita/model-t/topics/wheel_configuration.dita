@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<concept id="wheel_configuration">
+    <title>Front and Rear Wheel Configuration Differences</title>
+    <shortdesc>Understanding the distinct design characteristics of front and rear wheels and their
+        impact on vehicle performance.</shortdesc> 
+    <conbody>
+        <section id="front_wheel_design">
+            <title>Front Wheel Design Features</title>
+            <p>Front wheels incorporate two distinct design elements: <ul>
+                    <li>Dished construction with outward-flaring spokes to provide flexible
+                        resistance to side stresses</li>
+                    <li>Angled positioning with approximately three inches greater distance between
+                        wheel tops than bottoms, enhancing steering quality and reducing tire wear
+                        during turns</li>
+                </ul>
+            </p>
+        </section>
+        <section id="rear_wheel_design">
+            <title>Rear Wheel Design Features</title>
+            <p>Rear wheels feature straight spokes, contrasting with the dished design of the front
+                wheels.</p>
+        </section>
+        <section id="alignment_requirements">
+            <title>Wheel Alignment Specifications</title>
+            <p>Proper wheel alignment is critical for optimal steering and tire longevity: <ul>
+                    <li>Front wheels should maintain parallel alignment when viewed from above</li>
+                    <li>Maximum allowable toe-in should not exceed one-quarter inch</li>
+                    <li>Alignment can be adjusted using the yoke at the spindle connecting rod's
+                        left end</li>
+                </ul>
+            </p>
+        </section>
+    </conbody>
+</concept>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE glossentry PUBLIC "-//OASIS//DTD DITA Glossary//EN" "glossary.dtd">
+<glossentry id="glossary_radiator">
+    <glossterm>Radiator</glossterm>
+    <glossdef>A gravity-fed cooling system component in the <ph keyref="company_name"/>
+        <ph keyref="product_name"/> automobile (1908-1927) that circulates water to prevent
+        engine overheating. The brass-tank radiator features a distinctive vertical tube design with
+        horizontal fins for heat dissipation.</glossdef>
+    <glossBody>
+        <glossPartOfSpeech value="noun"/>
+        <glossProperty>Automotive cooling system component</glossProperty>
+        <glossSurfaceForm>radiator</glossSurfaceForm>
+        <glossUsage>The term is commonly used when discussing early automotive cooling systems or
+                <ph keyref="product_name"/> restoration projects.</glossUsage>
+        <glossAlt>
+            <glossSynonym>Ford T radiator</glossSynonym>
+        </glossAlt>
+    </glossBody>
+</glossentry>

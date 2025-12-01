@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<task id="clutch_adjustment">
+    <title>Adjusting the Clutch</title> 
+    <shortdesc>Proper clutch adjustment involves accessing and adjusting the clutch finger set
+        screws, with special attention to maintaining equal adjustments across all
+        fingers.</shortdesc>
+    <taskbody>
+        <prereq>
+            <p>Ensure the vehicle is stationary and in a safe working position.</p>
+        </prereq>
+
+        <context>
+            <p>Over time, normal wear may require clutch adjustment. This procedure details the
+                steps for adjusting the clutch finger set screws.</p>
+        </context>
+
+        <steps>
+            <step>
+                <cmd>Remove the transmission cover plate</cmd>
+                <info>The plate is located under the floor boards at the driver's feet</info>
+            </step>
+            <step>
+                <cmd>Remove the cotter key from the first clutch finger</cmd>
+            </step>
+            <step>
+                <cmd>Adjust the first clutch finger set screw</cmd>
+                <substeps>
+                    <substep>
+                        <cmd>Using a screwdriver, turn the set screw ½ to 1 full turn to the
+                            right</cmd>
+                    </substep>
+                </substeps>
+            </step>
+            <step>
+                <cmd>Repeat the adjustment for all remaining clutch finger set screws</cmd>
+                <info>Ensure each screw receives exactly the same number of turns</info>
+            </step>
+            <step>
+                <cmd>Replace all cotter keys</cmd>
+            </step>
+        </steps>
+
+        <result>
+            <p>The clutch adjustment is complete when all set screws have been equally adjusted and
+                all cotter keys are properly replaced.</p>
+        </result>
+
+        <postreq>
+            <note type="important">After extended service, if adjustment screws have been turned in
+                significantly, consider installing new clutch discs rather than continuing to adjust
+                the current ones.</note>
+            <note type="warning">When working with small tools or objects near the transmission
+                case, always attach them to a wire or cord. Items dropped into the transmission case
+                are extremely difficult to retrieve without removing the transmission cover.</note>
+            <fig>
+                <title>Diagram Displaying the Parts of a <ph keyref="company_name"/>
+                    <ph keyref="product_name"/></title>
+                <image keyref="transmission_connections">
+                    <alt>A drawing of the transmission that shows the operation of clutch, reverse
+                        and brake pedals.</alt>
+                </image>
+            </fig>
+        </postreq>
+    </taskbody>
+</task>

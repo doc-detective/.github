@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<task id="engine_startup_preparation">
+    <title>Preparing to Start the Engine</title>
+    <shortdesc>Verify the necessary safety and operational steps before attempting to start the
+        engine.</shortdesc>
+
+    <taskbody>
+        <prereq>
+            <p>Ensure you are familiar with the vehicle's controls and are seated in the driver's
+                position.</p>
+        </prereq>
+
+        <steps>
+            <step>
+                <cmd>Pull the hand lever, located on the floor to the left of the driver, all the
+                    way back</cmd>
+                <stepxmp>This action holds the <abbreviated-form keyref="glossary_clutch"/> in
+                    neutral and engages the hub brake to prevent vehicle movement.</stepxmp>
+            </step>
+
+            <step>
+                <cmd>Prepare the electrical switch</cmd>
+                <substeps>
+                    <substep>
+                        <cmd>Insert the switch key into the switch on the coil box</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Throw the switch lever as far to the left as possible, to the
+                                "<abbreviated-form keyref="glossary_magneto"/>" position</cmd>
+                        <stepxmp>This connects the magneto to the engine, which is necessary for
+                            starting.</stepxmp> 
+                    </substep>
+                </substeps>
+            </step>
+        </steps>
+
+        <result>
+            <p>The vehicle is now prepared for engine startup, with the clutch in neutral and the
+                electrical system connected.</p>
+        </result>
+
+        <postreq>
+            <p>Proceed with engine start sequence.</p>
+        </postreq>
+    </taskbody>
+</task>

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<task id="remove_commutator">
+    <title>Removing and Replacing the Commutator</title>
+
+    <shortdesc>Remove the commutator assembly from the engine and properly reinstall it, ensuring
+        correct alignment with the first cylinder's exhaust valve.</shortdesc>
+    <taskbody> 
+        <prereq>
+            <p>Before beginning this procedure, ensure you have access to:</p>
+            <ul>
+                <li>The valve door area</li>
+                <li>The timing gear cover</li>
+            </ul>
+        </prereq>
+        <context>
+            <p>The commutator must be properly removed to perform maintenance or replacement.
+                Correct reinstallation is critical for engine timing.</p>
+        </context>
+        <steps>
+            <step>
+                <cmd>Remove the cotter pin from the spark rod</cmd>
+            </step>
+            <step>
+                <cmd>Detach the spark rod from the commutator</cmd>
+            </step>
+            <step>
+                <cmd>Loosen the cap screw that passes through the breather pipe</cmd>
+                <info>This screw is located on top of the timing gear cover</info>
+            </step>
+            <step>
+                <cmd>Remove the commutator case</cmd>
+                <info>The loosened cap screw will have released the holding spring, allowing easy
+                    removal</info>
+            </step>
+            <step>
+                <cmd>Unscrew the lock nut</cmd>
+            </step>
+            <step>
+                <cmd>Withdraw the steel brush cap</cmd>
+            </step>
+            <step>
+                <cmd>Drive out the retaining pin</cmd>
+            </step>
+            <step>
+                <cmd>Remove the brush from the cam shaft</cmd>
+            </step>
+        </steps>
+        <result>
+            <p>The commutator assembly is now fully disassembled and removed from the engine.</p>
+        </result>
+        <postreq>
+            <p>When reinstalling the brush:</p>
+            <ol>
+                <li>Remove the valve door to observe No. 1 valve operation</li>
+                <li>Position the brush so it points upward when the first cylinder's exhaust valve
+                    is closed</li>
+                <li>Verify proper alignment before completing reassembly</li>
+            </ol>
+            <note type="important">Correct brush alignment is critical for proper engine timing and
+                operation.</note>
+        </postreq>
+    </taskbody>
+</task>

@@ -1,0 +1,3 @@
+# Placeholder Image
+# This would be execution-flow.png
+# Replace with actual sequence diagram showing test execution lifecycle

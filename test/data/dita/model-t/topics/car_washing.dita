@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<task id="car_washing">
+    <title>Washing Your Car</title>
+    <shortdesc>Proper procedure for washing and polishing your automobile to protect its
+        finish.</shortdesc> 
+    <taskbody>
+        <prereq>
+            <ul>
+                <li>Cold or lukewarm water</li>
+                <li>Ivory or linseed oil soap</li>
+                <li>Sponge</li>
+                <li>Chamois skin</li>
+                <li>Body polish</li>
+                <li>Metal polish</li>
+            </ul>
+        </prereq>
+        <steps>
+            <step>
+                <cmd>Rinse the car</cmd>
+                <info>Use moderate water pressure to avoid damaging the varnish</info>
+            </step>
+            <step>
+                <cmd>Clean with soap solution</cmd>
+                <substeps>
+                    <substep>
+                        <cmd>Prepare tepid soap solution</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Clean body and running gear with sponge</cmd>
+                    </substep>
+                </substeps>
+            </step>
+            <step>
+                <cmd>Rinse with cold water</cmd>
+            </step>
+            <step>
+                <cmd>Dry and polish body with chamois skin</cmd>
+            </step>
+            <step>
+                <cmd>Apply body polish for extra lustre</cmd>
+            </step>
+            <step>
+                <cmd>Clean running gear</cmd>
+                <info>Use gasoline-soaked sponge to remove grease</info>
+            </step>
+            <step>
+                <cmd>Polish nickeled parts with metal polish</cmd>
+            </step>
+        </steps>
+        <result>The car will be clean with a protected, lustrous finish.</result>
+    </taskbody>
+</task>

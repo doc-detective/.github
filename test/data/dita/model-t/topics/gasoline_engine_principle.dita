@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<concept id="gasoline_engine_principle">
+    <title>Principle of the Gasoline-Driven Engine</title>
+    <shortdesc>A gasoline engine converts chemical energy from fuel into mechanical motion through a
+        controlled explosive process.</shortdesc>
+
+    <conbody>
+        <section> 
+            <title>Combustion Mechanism</title>
+            <p>In a gasoline engine, the operation relies on a precise sequence of events involving
+                fuel, air, compression, and ignition:</p>
+            <ol>
+                <li>A mixture of gasoline and air is drawn into a cylinder</li>
+                <li>The mixture is compressed by an advancing <abbreviated-form
+                        keyref="glossary_piston"/></li>
+                <li>An electric spark ignites the compressed mixture</li>
+                <li>The resulting explosion forces the piston downward</li>
+                <li>The piston's motion is transferred to the <abbreviated-form
+                        keyref="glossary_crankshaft"/> via a connecting rod, creating rotary
+                    motion</li>
+            </ol>
+        </section>
+
+        <section>
+            <title>Explosive Nature</title>
+            <p>Gasoline, when mixed with air and compressed, becomes highly explosive. An explosion
+                is defined as a violent expansion caused by the instantaneous combustion of confined
+                gases.</p>
+        </section>
+    </conbody>
+</concept>

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<task id="remove_front_axle">
+    <title>Removing the Front Axle</title>
+    <shortdesc>Instructions for safely removing the front axle from the vehicle.</shortdesc>
+    <taskbody>
+        <prereq>Ensure you have the proper tools and equipment for lifting the vehicle
+            safely.</prereq> 
+        <steps>
+            <step>
+                <cmd>Jack up the front of the car until the wheels can be removed.</cmd>
+                <info>Refer to procedure #89 for detailed jacking instructions.</info>
+            </step>
+            <step>
+                <cmd>Disconnect the steering gear ball arm from the spindle connecting rod.</cmd>
+            </step>
+            <step>
+                <cmd>Disconnect the radius rod at the ball joint.</cmd>
+                <substeps>
+                    <substep>
+                        <cmd>Remove the cotter-pinned nuts securing the radius rod to the
+                            axle.</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Remove the two bolts from the ball joint.</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Remove the lower half of the cap.</cmd>
+                    </substep>
+                </substeps>
+            </step>
+            <step>
+                <cmd>Remove the front spring attachments.</cmd>
+                <substeps>
+                    <substep>
+                        <cmd>Locate the spring shackles on both sides.</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Remove two cotter pin bolts from each spring shackle.</cmd>
+                    </substep>
+                </substeps>
+                <stepresult>The front spring will detach from the assembly.</stepresult>
+            </step>
+        </steps>
+    </taskbody>
+</task>

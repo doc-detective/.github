@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<concept id="engine_knocking_causes">
+    <title>Causes of Engine Knocking</title>
+    <shortdesc>Understanding the various causes of engine knocking and the importance of prompt
+        professional diagnosis.</shortdesc>
+    <conbody>
+        <p>Engine knocking can occur due to several different mechanical issues. Early
+            identification and professional repair are essential for preventing further damage.</p>
+
+        <section>
+            <title>Common Causes</title>
+            <ul>
+                <li>Carbon knock <ul>
+                        <li>Most frequent cause</li>
+                        <li>Results from cylinder carbonization</li>
+                    </ul>
+                </li>
+                <li>Advanced spark timing <ul>
+                        <li>Occurs when spark timing is set too early in the cycle</li>
+                    </ul>
+                </li>
+                <li>Connecting rod issues <ul>
+                        <li>Creates distinctive knocking sound</li>
+                    </ul>
+                </li>
+                <li>Crankshaft main bearing problems <ul>
+                        <li>Related to bearing wear or damage</li>
+                    </ul>
+                </li>
+                <li>Piston problems <ul>
+                        <li>Can be caused by loose-fitting piston</li>
+                        <li>May result from broken piston rings</li>
+                    </ul>
+                </li>
+                <li>Cylinder head gasket contact <ul>
+                        <li>Occurs when piston strikes the gasket</li>
+                    </ul>
+                </li>
+            </ul>
+        </section>
+
+        <section>
+            <title>Professional Assessment</title>
+            <p>When engine knocking occurs, regardless of the suspected cause, immediate inspection
+                by a qualified mechanic is necessary to diagnose and address the underlying
+                problem.</p>
+        </section>
+    </conbody>
+</concept>

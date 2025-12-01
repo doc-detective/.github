@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<concept id="running_engine_generator_disconnected">
+    <title>Running the Engine with Generator Disconnected</title>
+    <shortdesc>When running the engine with the generator disconnected from the battery, proper
+        grounding procedures must be followed to prevent serious damage to the
+        generator.</shortdesc> 
+    <conbody>
+        <p>If you need to run the engine with the generator disconnected from the battery (such as
+            during a block test or when the battery is removed for repair or recharging), you must
+            properly ground the generator.</p>
+        <section>
+            <title>Grounding Requirements</title>
+            <ul>
+                <li>Connect a wire from the generator terminal to one of the dust cover screws in
+                    the yoke</li>
+                <li>Two strands of shipping tag wire are sufficient for this connection</li>
+                <li>Ensure tight connections at both ends of the wire</li>
+            </ul>
+        </section>
+        <section>
+            <title>Important Safety Warnings</title>
+            <note type="warning">Failure to ground the generator when running the engine
+                disconnected from the battery will result in serious generator damage.</note>
+            <note type="danger">Never ground the generator through the cut-out.</note>
+        </section>
+    </conbody>
+</concept>

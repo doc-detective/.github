@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<task id="adjust_main_bearings">
+    <title>Adjusting Crankshaft Main Bearings</title>
+    <shortdesc>Follow these steps to adjust or replace worn crankshaft main bearings when engine
+        pounding indicates wear.</shortdesc>
+    <taskbody>
+        <prereq>
+            <p>Before beginning this procedure, the engine must be removed from the car.</p>
+            <p>You will need:</p>
+            <ul>
+                <li>Prussian blue or red lead</li>
+                <li>Gasoline for cleaning</li>
+                <li>Brass shims</li>
+                <li>New gaskets</li>
+                <li>Basic hand tools</li>
+                <li>Lubricating oil</li>
+            </ul>
+        </prereq>
+        <steps>
+            <step>
+                <cmd>Disassemble the engine</cmd>
+                <substeps>
+                    <substep>
+                        <cmd>Remove the crank case</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Remove the transmission cover</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Remove the cylinder head</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Remove pistons and connecting rods</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Remove transmission</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Remove magneto coils</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Remove the three babbitted caps</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Clean all bearing surfaces with gasoline</cmd>
+                    </substep>
+                </substeps>
+            </step>
+            <step>
+                <cmd>Prepare for bearing fitting</cmd>
+                <substeps>
+                    <substep>
+                        <cmd>Apply Prussian blue or red lead to crankshaft bearing surfaces</cmd>
+                        <info>
+                            <note type="tip">This coating will help indicate contact points during
+                                fitting</note>
+                        </info>
+                    </substep>
+                </substeps>
+            </step>
+            <step>
+                <cmd>Adjust the rear bearing</cmd>
+                <substeps>
+                    <substep>
+                        <cmd>Position the rear cap</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Tighten bolts firmly without stripping threads</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Test the fit by turning crankshaft by hand</cmd>
+                        <info>
+                            <note type="important">Crankshaft should turn with one hand. If too
+                                tight, add brass shims. If too loose, remove shims and file cap
+                                surface.</note>
+                        </info>
+                    </substep>
+                    <substep>
+                        <cmd>Check blue/red markings for full-length bearing contact</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Scrape babbitt and refit if necessary until proper contact is
+                            achieved</cmd>
+                    </substep>
+                </substeps>
+            </step>
+            <step>
+                <cmd>Adjust remaining bearings</cmd>
+                <substeps>
+                    <substep>
+                        <cmd>Repeat fitting process for center bearing</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Repeat fitting process for front bearing</cmd>
+                        <info>
+                            <note type="tip">Adjust each bearing individually with other bearings
+                                removed</note>
+                        </info>
+                    </substep>
+                </substeps>
+            </step>
+            <step>
+                <cmd>Perform final assembly</cmd>
+                <substeps>
+                    <substep>
+                        <cmd>Clean all babbitt surfaces thoroughly</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Apply lubricating oil to all bearing surfaces and crankshaft</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Install shims in their proper positions</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Tighten cap bolts fully</cmd>
+                        <info>
+                            <note type="tip">Don't worry about over-tightening - shims and oil will
+                                prevent too close contact</note>
+                        </info>
+                    </substep>
+                </substeps>
+            </step>
+        </steps>
+        <result>
+            <note type="warning">Failure to oil bearing surfaces before assembly can result in
+                babbitt damage during initial startup.</note>
+        </result>
+        <postreq>
+            <p>When reinstalling crank case and transmission cover:</p>
+            <ul>
+                <li>Use new gaskets to prevent oil leaks</li>
+                <li>Ensure all assemblies are properly aligned</li>
+                <li>Verify all fasteners are properly torqued</li>
+            </ul>
+        </postreq>
+    </taskbody>
+</task>

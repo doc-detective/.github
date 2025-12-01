@@ -20,8 +20,8 @@ function execCommand(command, options = {}) {
 
 function main() {
   // Clean git state
-    execCommand("git checkout -- .");
-    execCommand("git clean -fd");
+  execCommand("git checkout -- .");
+  execCommand("git clean -fd");
 
   // Get current project version
   const packageJsonPath = path.join(process.cwd(), "package.json");
@@ -54,42 +54,36 @@ function main() {
   // Extract major and minor versions using semver
   const projMajor = semver.major(projVersion);
   const projMinor = semver.minor(projVersion);
+  const projPatch = semver.patch(projVersion);
   const commonMajor = semver.major(commonVersion);
   const commonMinor = semver.minor(commonVersion);
+  const commonPatch = semver.patch(commonVersion);
 
-  console.log(`Project version: ${projMajor}.${projMinor}.x`);
-  console.log(`Common version: ${commonMajor}.${commonMinor}.x`);
+  console.log(`Project version: ${projMajor}.${projMinor}.${projPatch}`);
+  console.log(`Common version: ${commonMajor}.${commonMinor}.${commonPatch}`);
 
   let newVersion;
 
   if (projMajor !== commonMajor || projMinor !== commonMinor) {
     // Major or minor mismatch: set version to match doc-detective-common major.minor.0
     newVersion = `${commonMajor}.${commonMinor}.0`;
-
-    // Validate the new version before setting it
-    if (!semver.valid(newVersion)) {
-      console.error(`Error: Generated invalid version: ${newVersion}`);
-      process.exit(1);
-    }
-
     console.log(`Version mismatch detected. Setting version to: ${newVersion}`);
-    execCommand(`npm version --no-git-tag-version ${newVersion}`);
   } else {
     // Project version is already equal or greater than common version, just bump patch
-    console.log("Project version is current or ahead. Bumping patch version.");
-    execCommand("npm version patch --no-git-tag-version");
-    // Get the new version after bumping
-    const updatedPackageJson = JSON.parse(
-      fs.readFileSync(packageJsonPath, "utf8")
-    );
-    newVersion = updatedPackageJson.version;
+    newVersion = `${projMajor}.${projMinor}.${projPatch + 1}`;
+    console.log("Project version is current or ahead. Bumping patch version to:", newVersion);
   }
+  // Validate the new version before setting it
+  if (!semver.valid(newVersion)) {
+    console.error(`Error: Generated invalid version: ${newVersion}`);
+    process.exit(1);
+  }
+
+  execCommand(`npm version --no-git-tag-version ${newVersion}`);
 
   // Commit changes
   execCommand("git add package.json package-lock.json");
-  execCommand(
-    `git commit -m "Update doc-detective-common [skip ci]"`
-  );
+  execCommand(`git commit -m "Update doc-detective-common [skip ci]"`);
 
   // Create tag
   execCommand(`git tag "v${newVersion}"`);

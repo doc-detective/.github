@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<task id="headlight_cleaning">
+    <title>Cleaning the Headlight Assembly</title>
+    <shortdesc>Clean headlight components using appropriate materials to maintain optimal
+        performance.</shortdesc>
+    <taskbody>
+        <prereq>Ensure you have a clean, soft flannel cloth before beginning.</prereq>
+        <steps>
+            <step>
+                <cmd>Remove the headlight door if necessary</cmd>
+            </step>
+            <step>
+                <cmd>Clean the components</cmd> 
+                <info>
+                    <ul>
+                        <li>Use only soft, clean flannel cloth</li>
+                        <li>Avoid direct contact with silver-plated reflector</li>
+                        <li>Handle bulb carefully through cloth</li>
+                    </ul>
+                </info>
+            </step>
+            <step>
+                <cmd>Replace headlight door securely</cmd>
+            </step>
+        </steps>
+    </taskbody>
+</task>

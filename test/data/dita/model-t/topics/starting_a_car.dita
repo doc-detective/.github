@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<task id="starting_a_car" xml:lang="en-us">
+    <title>Starting a Car</title>
+    <shortdesc>Learn the precise steps to start and operate a manual transmission
+        vehicle.</shortdesc>
+
+    <taskbody>
+        <context>
+            <p>Starting a car requires a delicate sequence of mechanical interactions different from
+                modern vehicles. Precise control of the throttle, clutch, and hand lever is
+                essential for smooth operation.</p>
+        </context>
+
+        <steps>
+            <step>
+                <cmd>Slightly accelerate the engine by opening the throttle marginally</cmd>
+            </step>
+
+            <step>
+                <cmd>Press the clutch pedal half way forward</cmd>
+                <info>This holds the clutch in a neutral position</info>
+            </step>
+
+            <step>
+                <cmd>Throw the hand lever forward</cmd>
+            </step>
+
+            <step>
+                <cmd>Press the pedal forward into slow speed</cmd>
+            </step>
+
+            <step>
+                <cmd>Allow the vehicle to gain headway (20 to 30 feet)</cmd>
+            </step>
+
+            <step>
+                <cmd>Slowly drop the pedal back into high speed</cmd>
+                <info>Partially close the throttle to allow the engine to pick up its load
+                    smoothly</info>
+            </step>
+        </steps>
+
+        <result>
+            <p>With practice, you will be able to change speeds smoothly and maintain the vehicle's
+                optimal performance.</p>
+        </result>
+
+        <postreq>
+            <p>Monitor the engine's response and adjust your technique as needed for different
+                vehicle conditions.</p>
+        </postreq>
+    </taskbody>
+</task>

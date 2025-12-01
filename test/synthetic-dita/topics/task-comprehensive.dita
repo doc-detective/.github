@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<task id="task-comprehensive" xml:lang="en-us">
+  <title>Comprehensive Task: User Account Setup and Testing</title>
+  
+  <shortdesc>This comprehensive task demonstrates all task elements, inline elements, and processing instructions for Doc Detective conversion testing.</shortdesc>
+  
+  <taskbody>
+    <!-- Demonstrates prereq -->
+    <prereq>
+      <?doc-detective id="prereq-check" ?>
+      <?doc-detective description="Verify prerequisites are met" ?>
+      <p>Before starting, ensure you have:</p>
+      <ul>
+        <li>Administrator access to the system</li>
+        <li>A valid email address at <filepath>/config/admin-email.txt</filepath></li>
+        <li>Network connectivity to <systemoutput>https://api.example.com</systemoutput></li>
+      </ul>
+    </prereq>
+    
+    <!-- Demonstrates context -->
+    <context>
+      <?doc-detective setVar="username=testuser123" ?>
+      <?doc-detective setVar="baseURL=https://app.example.com" ?>
+      <p>This task guides you through creating a new user account, configuring permissions, and verifying the setup. You will interact with both the web UI and command-line interface.</p>
+      <p>The process includes navigation through <menucascade><uicontrol>Settings</uicontrol><uicontrol>Users</uicontrol><uicontrol>Add New User</uicontrol></menucascade>.</p>
+    </context>
+    
+    <!-- Demonstrates steps with all action types -->
+    <steps>
+      <!-- Navigation step with goTo -->
+      <step>
+        <?doc-detective timeout="10000" ?>
+        <cmd>Navigate to the application homepage at <xref href="https://app.example.com" format="html" scope="external">https://app.example.com</xref></cmd>
+        <info>
+          <p>The homepage should display the login form.</p>
+        </info>
+        <stepresult>
+          <p>You should see the <wintitle>Welcome to Example App</wintitle> window with a login form.</p>
+        </stepresult>
+      </step>
+      
+      <!-- Click action -->
+      <step>
+        <?doc-detective wait="2000" ?>
+        <cmd>Click the <uicontrol>Sign In</uicontrol> button.</cmd>
+        <stepresult>
+          <p>The login modal appears.</p>
+        </stepresult>
+      </step>
+      
+      <!-- TypeKeys action with userinput -->
+      <step>
+        <cmd>In the <uicontrol>Username</uicontrol> field, type <userinput>admin@example.com</userinput></cmd>
+        <info>Use your administrator email address.</info>
+      </step>
+      
+      <step>
+        <cmd>In the <uicontrol>Password</uicontrol> field, enter your password.</cmd>
+        <tutorialinfo>
+          <p>For testing purposes, use <userinput>TestPassword123!</userinput></p>
+        </tutorialinfo>
+      </step>
+      
+      <!-- Keyboard shortcut -->
+      <step>
+        <cmd>Press <shortcut>Enter</shortcut> or click <uicontrol>Log In</uicontrol>.</cmd>
+        <?doc-detective screenshot="login-complete.png" ?>
+        <stepresult>
+          <p>You are redirected to the dashboard showing <systemoutput>Welcome, Admin</systemoutput> message.</p>
+        </stepresult>
+      </step>
+      
+      <!-- Menu cascade navigation -->
+      <step>
+        <cmd>Navigate to <menucascade><uicontrol>Settings</uicontrol><uicontrol>User Management</uicontrol><uicontrol>Add User</uicontrol></menucascade></cmd>
+        <stepresult>
+          <p>The <wintitle>New User</wintitle> dialog opens.</p>
+        </stepresult>
+      </step>
+      
+      <!-- Multiple field inputs -->
+      <step>
+        <cmd>Fill in the new user details:</cmd>
+        <substeps>
+          <substep>
+            <cmd>Type <userinput>testuser123</userinput> in the <uicontrol>Username</uicontrol> field</cmd>
+          </substep>
+          <substep>
+            <cmd>Type <userinput>test.user@example.com</userinput> in the <uicontrol>Email</uicontrol> field</cmd>
+          </substep>
+          <substep>
+            <cmd>Type <userinput>Test User</userinput> in the <uicontrol>Display Name</uicontrol> field</cmd>
+          </substep>
+        </substeps>
+      </step>
+      
+      <!-- Choices demonstration -->
+      <step>
+        <cmd>Select a user role:</cmd>
+        <choices>
+          <choice>Click <uicontrol>Developer</uicontrol> for development access</choice>
+          <choice>Click <uicontrol>Tester</uicontrol> for testing access</choice>
+          <choice>Click <uicontrol>Viewer</uicontrol> for read-only access</choice>
+        </choices>
+        <stepresult>
+          <p>The selected role is highlighted and permissions update accordingly.</p>
+        </stepresult>
+      </step>
+      
+      <!-- Code execution via runShell -->
+      <step>
+        <?doc-detective optional="true" ?>
+        <cmd>Run the following command to verify the user was created:</cmd>
+        <info>
+          <codeblock outputclass="shell">curl -X GET https://api.example.com/users/testuser123 \
+  -H "Authorization: Bearer $API_TOKEN"</codeblock>
+        </info>
+        <stepresult>
+          <p>The command returns user details:</p>
+          <codeblock outputclass="json">{
+  "username": "testuser123",
+  "email": "test.user@example.com",
+  "status": "active"
+}</codeblock>
+        </stepresult>
+      </step>
+      
+      <!-- API validation with apiname and parmname -->
+      <step>
+        <cmd>Verify the <apiname>getUserPermissions</apiname> API endpoint:</cmd>
+        <info>
+          <p>Call the API with parameter <parmname>userId</parmname>=<codeph>testuser123</codeph></p>
+          <codeblock outputclass="shell">curl -X GET "https://api.example.com/users/testuser123/permissions"</codeblock>
+        </info>
+        <stepresult>
+          <p>Expected response includes:</p>
+          <msgblock>HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "permissions": ["read", "write"],
+  "role": "developer"
+}</msgblock>
+        </stepresult>
+      </step>
+      
+      <!-- Command-line with cmdname and option -->
+      <step>
+        <cmd>Execute the <cmdname>doc-detective</cmdname> command with <option>--verbose</option> flag:</cmd>
+        <info>
+          <codeblock outputclass="shell">doc-detective run tests/user-creation.spec.json --verbose</codeblock>
+        </info>
+        <stepresult>
+          <p>The terminal displays:</p>
+          <screen>✓ Test suite: User Creation
+  ✓ Navigate to homepage (1.2s)
+  ✓ Login as admin (0.8s)
+  ✓ Create new user (2.1s)
+  ✓ Verify permissions (0.5s)
+
+All tests passed (4/4)</screen>
+        </stepresult>
+      </step>
+      
+      <!-- Visual validation with image -->
+      <step>
+        <cmd>Confirm the user appears in the user list:</cmd>
+        <stepxmp>
+          <fig>
+            <title>User List with New User</title>
+            <image href="../images/user-list-with-testuser.png" placement="break">
+              <alt>Screenshot showing testuser123 in the user list table</alt>
+            </image>
+          </fig>
+        </stepxmp>
+        <stepresult>
+          <p>The user <codeph>testuser123</codeph> appears in the table with status <systemoutput>Active</systemoutput>.</p>
+        </stepresult>
+      </step>
+      
+      <!-- Troubleshooting step -->
+      <step importance="optional">
+        <cmd>If the user does not appear, check the console for errors:</cmd>
+        <steptroubleshooting>
+          <p>Common issues include:</p>
+          <ul>
+            <li>Network timeout - retry the request</li>
+            <li>Permission denied - verify admin token is valid</li>
+            <li>Duplicate username - error <msgph>ERROR_USER_EXISTS</msgph> will display</li>
+          </ul>
+        </steptroubleshooting>
+      </step>
+      
+      <!-- Link validation with xref -->
+      <step>
+        <?doc-detective optional="true" ?>
+        <cmd>Review the <xref href="https://docs.example.com/api/users" format="html" scope="external">User API documentation</xref> for additional details.</cmd>
+      </step>
+      
+      <!-- Internal link check -->
+      <step>
+        <?doc-detective skip="Reference topic not yet created" ?>
+        <cmd>Refer to the <xref href="reference-api.dita" format="dita" scope="local">API Reference</xref> for complete endpoint details.</cmd>
+      </step>
+    </steps>
+    
+    <!-- Demonstrates result -->
+    <result>
+      <?doc-detective screenshot="final-state.png" ?>
+      <p>You have successfully created a new user account with the username <varname>testuser123</varname>. The user is active and has the assigned permissions.</p>
+      <p>The user can now log in at <systemoutput>https://app.example.com/login</systemoutput>.</p>
+    </result>
+    
+    <!-- Demonstrates example -->
+    <example>
+      <title>Automating User Creation with Scripts</title>
+      <p>You can automate this process using the following script:</p>
+      <codeblock outputclass="javascript">const createUser = async (username, email, role) => {
+  const response = await fetch('https://api.example.com/users', {
+    method: 'POST',
+    headers: { 
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${process.env.API_TOKEN}`
+    },
+    body: JSON.stringify({ username, email, role })
+  });
+  return response.json();
+};
+
+// Usage
+createUser('testuser123', 'test.user@example.com', 'developer');</codeblock>
+    </example>
+    
+    <!-- Demonstrates postreq -->
+    <postreq>
+      <?doc-detective eval="console.log('Test completed successfully')" ?>
+      <p>After creating the user:</p>
+      <ul>
+        <li>Send a welcome email to the new user</li>
+        <li>Add the user to relevant team channels</li>
+        <li>Document the account creation in <filepath>/logs/user-accounts.log</filepath></li>
+        <li>Verify the user can access the system by checking <xref href="https://app.example.com/health" format="html" scope="external">system health status</xref></li>
+      </ul>
+    </postreq>
+  </taskbody>
+  
+  <!-- Demonstrates related-links -->
+  <related-links>
+    <link href="https://docs.example.com/user-guide" format="html" scope="external">
+      <linktext>User Guide</linktext>
+    </link>
+    <link href="reference-api.dita" format="dita" scope="local" role="prerequisite">
+      <linktext>API Reference (Prerequisite)</linktext>
+    </link>
+    <link href="concept-comprehensive.dita" format="dita" scope="local">
+      <linktext>Related Concepts</linktext>
+    </link>
+  </related-links>
+</task>

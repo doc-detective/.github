@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<task id="disassemble_rear_axle_differential">
+    <title>Disassembling the Rear Axle and Differential</title> 
+    <shortdesc>This task outlines the procedure for disassembling the rear axle and
+            <abbreviated-form keyref="glossary_differential"/> assembly after the universal joint
+        has been disconnected.</shortdesc>
+    <taskbody>
+        <prereq>
+            <p>The universal joint must be disconnected before beginning this procedure.</p>
+        </prereq>
+        <steps>
+            <step>
+                <cmd>Remove the radius rod nuts</cmd>
+                <info>Remove the nuts from the front end of the radius rods</info>
+            </step>
+            <step>
+                <cmd>Disconnect the drive shaft tube</cmd>
+                <info>Remove the nuts on the studs that secure the drive shaft tube to the rear axle
+                    housing</info>
+            </step>
+            <step>
+                <cmd>Separate the differential housing</cmd>
+                <info>Remove the bolts holding the two halves of the differential housing
+                    together</info>
+            </step>
+        </steps>
+        <result>The differential components will now be exposed for further disassembly.</result>
+        <postreq>
+            <note type="important">When reassembling, ensure all pins, bolts, and keylocks are
+                returned to their exact original positions.</note>
+        </postreq>
+    </taskbody>
+</task>

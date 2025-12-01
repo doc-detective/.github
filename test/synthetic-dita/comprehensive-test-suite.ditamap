@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE bookmap PUBLIC "-//OASIS//DTD DITA BookMap//EN" "bookmap.dtd">
+<bookmap id="comprehensive-test-suite" xml:lang="en-us">
+  <booktitle>
+    <booklibrary>Doc Detective Synthetic Test Suite</booklibrary>
+    <mainbooktitle>Comprehensive DITA Element Coverage</mainbooktitle>
+  </booktitle>
+  
+  <bookmeta>
+    <author>Doc Detective Test Generator</author>
+    <critdates>
+      <created date="2025-10-08"/>
+    </critdates>
+    <bookid>
+      <booknumber>DD-TEST-001</booknumber>
+    </bookid>
+  </bookmeta>
+  
+  <frontmatter>
+    <booklists>
+      <toc/>
+    </booklists>
+  </frontmatter>
+  
+  <chapter>
+    <topicmeta>
+      <navtitle>Task Topic Tests</navtitle>
+      <shortdesc>Comprehensive task topic elements testing</shortdesc>
+    </topicmeta>
+    
+    <!-- Demonstrates topicref with all attributes -->
+    <topicref href="topics/task-comprehensive.dita" type="task" format="dita" scope="local">
+      <topicmeta>
+        <navtitle>Comprehensive Task with All Elements</navtitle>
+        <shortdesc>Tests prereq, context, steps, substeps, stepresult, postreq, and all inline elements</shortdesc>
+      </topicmeta>
+    </topicref>
+    
+    <!-- Demonstrates topicref with chunking -->
+    <topicref href="topics/task-ui-testing.dita" type="task" chunk="to-content">
+      <topicmeta>
+        <navtitle>UI Testing Task (Chunked)</navtitle>
+      </topicmeta>
+    </topicref>
+    
+    <!-- Demonstrates topicgroup -->
+    <topicgroup collection-type="sequence">
+      <topicmeta>
+        <navtitle>Multi-Step Workflow Tasks</navtitle>
+      </topicmeta>
+      
+      <topicref href="topics/task-setup.dita" type="task">
+        <topicmeta>
+          <navtitle>Setup Task</navtitle>
+        </topicmeta>
+      </topicref>
+      
+      <topicref href="topics/task-execution.dita" type="task">
+        <topicmeta>
+          <navtitle>Execution Task</navtitle>
+        </topicmeta>
+      </topicref>
+      
+      <topicref href="topics/task-cleanup.dita" type="task">
+        <topicmeta>
+          <navtitle>Cleanup Task</navtitle>
+        </topicmeta>
+      </topicref>
+    </topicgroup>
+    
+    <!-- Demonstrates topichead -->
+    <topichead>
+      <topicmeta>
+        <navtitle>Advanced Task Scenarios</navtitle>
+      </topicmeta>
+      
+      <topicref href="topics/task-with-choices.dita" type="task">
+        <topicmeta>
+          <navtitle>Task with Choices</navtitle>
+        </topicmeta>
+      </topicref>
+      
+      <topicref href="topics/task-unordered-steps.dita" type="task">
+        <topicmeta>
+          <navtitle>Task with Unordered Steps</navtitle>
+        </topicmeta>
+      </topicref>
+    </topichead>
+  </chapter>
+  
+  <chapter>
+    <topicmeta>
+      <navtitle>Reference Topic Tests</navtitle>
+    </topicmeta>
+    
+    <topicref href="topics/reference-api.dita" type="reference">
+      <topicmeta>
+        <navtitle>API Reference with Properties</navtitle>
+      </topicmeta>
+    </topicref>
+    
+    <topicref href="topics/reference-cli.dita" type="reference">
+      <topicmeta>
+        <navtitle>CLI Reference with Syntax</navtitle>
+      </topicmeta>
+    </topicref>
+  </chapter>
+  
+  <chapter>
+    <topicmeta>
+      <navtitle>Concept Topic Tests</navtitle>
+    </topicmeta>
+    
+    <topicref href="topics/concept-comprehensive.dita" type="concept">
+      <topicmeta>
+        <navtitle>Concept with Links and Media</navtitle>
+      </topicmeta>
+    </topicref>
+    
+    <topicref href="topics/concept-with-examples.dita" type="concept">
+      <topicmeta>
+        <navtitle>Concept with Code Examples</navtitle>
+      </topicmeta>
+    </topicref>
+  </chapter>
+  
+  <chapter>
+    <topicmeta>
+      <navtitle>Troubleshooting Tests</navtitle>
+    </topicmeta>
+    
+    <topicref href="topics/troubleshooting-errors.dita" type="troubleshooting">
+      <topicmeta>
+        <navtitle>Error Handling and Recovery</navtitle>
+      </topicmeta>
+    </topicref>
+  </chapter>
+  
+  <appendices>
+    <topicref href="topics/glossary.dita" type="glossgroup">
+      <topicmeta>
+        <navtitle>Glossary</navtitle>
+      </topicmeta>
+      <topicref href="topics/glossentry-api.dita" type="glossentry"/>
+      <topicref href="topics/glossentry-test.dita" type="glossentry"/>
+    </topicref>
+  </appendices>
+  
+  <!-- Demonstrates reltable for test dependencies -->
+  <reltable title="Topic Relationships and Dependencies">
+    <relheader>
+      <relcolspec type="task"/>
+      <relcolspec type="reference"/>
+      <relcolspec type="concept"/>
+    </relheader>
+    <relrow>
+      <relcell>
+        <topicref href="topics/task-comprehensive.dita" linking="targetonly"/>
+      </relcell>
+      <relcell>
+        <topicref href="topics/reference-api.dita" linking="sourceonly"/>
+      </relcell>
+      <relcell>
+        <topicref href="topics/concept-comprehensive.dita" linking="sourceonly"/>
+      </relcell>
+    </relrow>
+    <relrow>
+      <relcell>
+        <topicref href="topics/task-setup.dita" linking="sourceonly">
+          <topicmeta>
+            <linktext>Setup must complete before execution</linktext>
+          </topicmeta>
+        </topicref>
+      </relcell>
+      <relcell>
+        <topicref href="topics/task-execution.dita" linking="targetonly"/>
+      </relcell>
+      <relcell/>
+    </relrow>
+  </reltable>
+  
+  <backmatter>
+    <topicref href="topics/related-resources.dita">
+      <topicmeta>
+        <navtitle>Related Resources</navtitle>
+      </topicmeta>
+    </topicref>
+  </backmatter>
+</bookmap>

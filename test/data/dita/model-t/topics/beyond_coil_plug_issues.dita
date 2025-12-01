@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<concept id="beyond_coil_plug_issues">
+    <title>Issues Beyond Coil and Plug Problems</title>
+ 
+    <shortdesc>When coil and plug function properly, engine issues may stem from valve seating
+        problems, commutator wear, electrical shorts, or gasket leaks.</shortdesc>
+
+    <conbody>
+        <section>
+            <title>Common Causes</title>
+            <p>When coil and plug issues have been ruled out, consider these potential problems:</p>
+            <ul>
+                <li>Improperly seated valves</li>
+                <li>Worn commutator</li>
+                <li>Short circuit in commutator wiring</li>
+            </ul>
+        </section>
+
+        <section>
+            <title>Testing Valve Compression</title>
+            <p>To check valve strength:</p>
+            <ol>
+                <li>Use the starting crank</li>
+                <li>Lift it slowly through each cylinder's stroke length</li>
+                <li>Test each cylinder in turn</li>
+                <li>Assess compression strength for each valve</li>
+            </ol>
+        </section>
+
+        <section>
+            <title>Checking Gasket Integrity</title>
+            <p>To test for cylinder head gasket leaks:</p>
+            <ol>
+                <li>Apply lubricating oil around the gasket edge</li>
+                <li>Observe for bubble formation</li>
+                <li>Presence of bubbles indicates gas escape under compression</li>
+            </ol>
+        </section>
+    </conbody>
+</concept>

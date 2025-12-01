@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<task id="grinding_valves" xml:lang="en-us">
+    <title>Grinding Valves</title>
+    <shortdesc>Learn how to properly grind valves using grinding paste and a specialized tool to
+        ensure a smooth bearing surface.</shortdesc>
+    <taskbody>
+        <prereq>
+            <ul>
+                <li>Obtain a good grinding paste (ground glass and oil from an auto supply
+                    house)</li>
+                <li>Prepare kerosene and lubricating oil</li>
+                <li>Have a <ph keyref="company_name"/> grinding tool available</li>
+                <li>Work in a clean environment to prevent abrasive substances from entering
+                    cylinders</li>
+            </ul>
+            <note type="important">
+                <ul>
+                    <li>Never turn the valve through a complete revolution to avoid circumferential
+                        scratches</li>
+                    <li>Prevent abrasive substances from entering cylinders or valve guides</li>
+                    <li>If valve seat is severely worn or seamed, consider professional
+                        reseating</li>
+                </ul>
+            </note>
+        </prereq>
+
+        <context>
+            <p>Valve grinding is a critical maintenance procedure that ensures proper valve seating
+                and engine performance. Careful and precise execution is essential.</p>
+        </context>
+
+        <steps>
+            <step>
+                <cmd>Prepare the grinding paste</cmd>
+                <substeps>
+                    <substep>
+                        <cmd>Place a small amount of grinding paste in a suitable dish</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Add 1-2 spoonfuls of kerosene</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Add a few drops of lubricating oil</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Mix to create a thin paste</cmd>
+                    </substep>
+                </substeps>
+            </step>
+
+            <step>
+                <cmd>Apply grinding paste to the valve</cmd>
+                <substeps>
+                    <substep>
+                        <cmd>Apply the paste sparingly to the bevel face of the valve</cmd>
+                    </substep>
+                </substeps>
+            </step>
+
+            <step>
+                <cmd>Grind the valve</cmd>
+                <substeps>
+                    <substep>
+                        <cmd>Position the valve on the valve seat</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Use the <ph keyref="company_name"/> grinding tool to rotate the valve
+                            back and forth (about a quarter turn)</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Lift the valve slightly from the seat</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Change valve position</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Repeat rotation and repositioning</cmd>
+                    </substep>
+                </substeps>
+            </step>
+
+            <step>
+                <cmd>Complete the grinding process</cmd>
+                <substeps>
+                    <substep>
+                        <cmd>Continue until the bearing surface is smooth and bright</cmd>
+                    </substep>
+                </substeps>
+            </step>
+
+            <step>
+                <cmd>Clean the valve and seat</cmd>
+                <substeps>
+                    <substep>
+                        <cmd>Remove the valve from the cylinder</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Wash thoroughly with kerosene</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Wipe the valve seat thoroughly</cmd>
+                    </substep>
+                </substeps>
+            </step>
+        </steps>
+
+        <result>
+            <p>A properly ground valve will have a smooth, bright bearing surface that ensures
+                optimal engine performance and valve sealing.</p>
+            <fig>
+                <title>Valve Grinding Method</title>
+                <image keyref="grinding_valve_method">
+                    <alt>Diagram showing two hands holding the Ford grinding tool in the correct
+                        position.</alt>
+                </image>
+            </fig>
+        </result>
+
+    </taskbody>
+</task>

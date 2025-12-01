@@ -1,0 +1,363 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE bookmap PUBLIC "-//OASIS//DTD DITA BookMap//EN" "bookmap.dtd">
+<bookmap>
+    <booktitle>
+        <mainbooktitle><ph keyref="product_name"/> Manual</mainbooktitle>
+        <booktitlealt>For Owners and Operators of <ph keyref="company_name"/> Cars and
+            Trucks</booktitlealt>
+    </booktitle>
+    <bookmeta>
+        <authorinformation>
+            <organizationinfo>
+                <namedetails>
+                    <organizationnamedetails>
+                        <organizationname>Ford Motor Company</organizationname>
+                    </organizationnamedetails>
+                </namedetails>
+                <addressdetails><locality>Dearborn, Michigan</locality></addressdetails>
+            </organizationinfo>
+        </authorinformation>
+        <permissions view="all"/>
+        <bookchangehistory>
+            <edited>
+                <person>DITAWriter</person>
+                <completed>
+                    <year>2025</year>
+                    <month>January</month>
+                    <day>6</day>
+                </completed>
+            </edited>
+        </bookchangehistory>
+        <bookrights>
+            <copyrfirst>
+                <year>1919</year>
+            </copyrfirst>
+            <copyrlast>
+                <year>2025</year>
+            </copyrlast>
+            <bookowner>
+                <person>DITAWriter</person>
+            </bookowner>
+            <bookrestriction value="Out of Copyright"/>
+        </bookrights>
+    </bookmeta>
+    <frontmatter>
+        <booklists>
+            <toc/>
+            <tablelist/>
+            <figurelist/>
+        </booklists>
+        <keydef keys="company_name">
+            <topicmeta>
+                <keywords>
+                    <keyword>Ford</keyword>
+                </keywords>
+            </topicmeta>
+        </keydef>
+        <keydef keys="product_name">
+            <topicmeta>
+                <keywords>
+                    <keyword>Model T</keyword>
+                </keywords>
+            </topicmeta>
+        </keydef>
+    </frontmatter>
+    <chapter processing-role="resource-only">   
+        <mapref href="image_store.map" processing-role="resource-only"/>
+        <mapref href="keydef_map.map" processing-role="resource-only"/>
+    </chapter>
+    
+    <chapter keyref="ownership"/>
+    <chapter keyref="genuine_parts"/>
+    
+    <chapter keyref="car_operation">
+        <topicref keyref="radiator_prep"/>
+        <topicref keyref="gas_tank_prep"/>
+        <topicref keyref="oil_maintenance"/>
+        <topicref keyref="spark_throttle"/>
+        <topicref keyref="start_lever"/>
+        <topicref keyref="startup_prep"/>
+        <topicref keyref="engine_start">
+            <topicref keyref="manual_start"/>
+            <topicref keyref="electric_start"/>
+        </topicref>
+        <topicref keyref="cold_start"/>
+        <topicref keyref="hand_lever"/>
+        <topicref keyref="foot_pedals"/>
+        <topicref keyref="car_start"/>
+        <topicref keyref="car_reverse"/>
+        <topicref keyref="car_stop"/>
+        <topicref keyref="reverse_procedure"/>
+        <topicref keyref="spark_lever"/>
+        <topicref keyref="speed_control"/>
+        <topicref keyref="owner_maintenance"/>
+        <topicref keyref="new_car_maint"/>
+    </chapter>
+    
+    <chapter keyref="engine">
+        <topicref keyref="engine_principle"/>
+        <topicref keyref="piston"/>
+        <topicref keyref="connect_rod"/>
+        <topicref keyref="valve_arrange"/>
+        <topicref keyref="valve_timing"/>
+        <topicref keyref="valve_care"/>
+        <topicref keyref="valve_grinding"/>
+        <topicref keyref="grinding"/>
+        <topicref keyref="pushrod_wear"/>
+        <topicref keyref="knock_causes"/>
+        <topicref keyref="knocks"/>
+        <topicref keyref="carbon_removal"/>
+        <topicref keyref="spark_plugs"/>
+        <topicref keyref="power_plant"/>
+        <topicref keyref="rod_bearings"/>
+        <topicref keyref="main_bearings"/>
+        <topicref keyref="valve_springs"/>
+    </chapter>
+    
+    <chapter keyref="cooling">
+        <topicref keyref="engine_cool"/>
+        <topicref keyref="water_circ"/>
+        <topicref keyref="overheat_causes"/>
+        <topicref keyref="radiator_level">
+            <topicref keyref="persist_overheat"/>
+            <topicref keyref="add_water"/>
+        </topicref>
+        <topicref keyref="radiator_overheat"/>
+        <topicref keyref="flush"/>
+        <topicref keyref="freezing"/>
+        <topicref keyref="temp_repair"/>
+        <topicref keyref="perm_repair"/>
+    </chapter>
+    
+    <chapter keyref="gas_system">
+        <topicref keyref="carb_function"/>
+        <topicref keyref="dash_adjust"/>
+        <topicref keyref="fuel_mix"/>
+        <topicref keyref="carb_adjust"/>
+        <topicref keyref="carb_water"/>
+        <topicref keyref="carb_leak"/>
+        <topicref keyref="carb_dirt"/>
+        <topicref keyref="speed_issues"/>
+        <topicref keyref="hot_air"/>
+        <topicref keyref="float"/>
+        <topicref keyref="warm_prime"/>
+    </chapter>
+    
+    <chapter keyref="ignition">
+        <topicref keyref="ignition_purpose"/>
+        <topicref keyref="magneto_current"/>
+        <topicref keyref="coil_vibrator"/>
+        <topicref keyref="weak_unit"/>
+        <topicref keyref="comm_short"/>
+        <topicref keyref="coil_start"/>
+        <topicref keyref="comm_purpose"/>
+        <topicref keyref="spark_plug"/>
+        <topicref keyref="ignition_trouble"/>
+        <topicref keyref="missing_cylinder"/>
+        <topicref keyref="beyond_coil"/>
+        <topicref keyref="comm_misfire"/>
+        <topicref keyref="remove_comm"/>
+        <topicref keyref="cold_comm"/>
+        <topicref keyref="remove_magneto"/>
+        <topicref keyref="magneto_maint"/>
+    </chapter>
+    
+    <chapter keyref="transmission">
+        <topicref keyref="trans_function"/>
+        <topicref keyref="planetary"/>
+        <topicref keyref="clutch_purpose"/>
+        <topicref keyref="clutch_control"/>
+        <topicref keyref="clutch_adjust"/>
+        <topicref keyref="band_adjust"/>
+        <topicref keyref="band_remove"/>
+        <topicref keyref="trans_assembly"/>
+    </chapter>
+    
+    <chapter keyref="rear_axle">
+        <topicref keyref="remove_axle"/>
+        <topicref keyref="universal_joint"/>
+        <topicref keyref="axle_differential"/>
+        <topicref keyref="drive_pinion"/>
+        <topicref keyref="diff_gears"/>
+        <topicref keyref="axle_shaft"/>
+    </chapter>
+    
+    <chapter keyref="muffler">
+        <topicref keyref="muffler_need"/>
+        <topicref keyref="disconnect_muff"/>
+    </chapter>
+    
+    <chapter keyref="running_gear">
+        <topicref keyref="gear_maint"/>
+        <topicref keyref="front_axle"/>
+        <topicref keyref="straighten_axle"/>
+        <topicref keyref="wheel_maint"/>
+        <topicref keyref="front_wheels"/>
+        <topicref keyref="rear_wheels"/>
+        <topicref keyref="wheel_config"/>
+        <topicref keyref="roller_bearing"/>
+        <topicref keyref="install_bearing"/>
+        <topicref keyref="bearing_lube"/>
+        <topicref keyref="spring_clip"/>
+        <topicref keyref="steering_maint"/>
+        <topicref keyref="steering_tight"/>
+    </chapter>
+    
+    <chapter keyref="lube_system">
+        <topicref keyref="lubrication"/>
+        <topicref keyref="oil_specs"/>
+        <topicref keyref="drain_oil"/>
+        <topicref keyref="comm_oil"/>
+        <topicref keyref="diff_lube"/>
+    </chapter>
+    
+    <chapter keyref="tire_care">
+        <topicref keyref="tire_remove"/>
+        <topicref keyref="casing_repair"/>
+        <topicref keyref="tube_repair"/>
+    </chapter>
+    
+    <chapter keyref="maintenance">
+        <topicref keyref="car_wash"/>
+        <topicref keyref="top_care"/>
+        <topicref keyref="car_store"/>
+        <topicref keyref="headlight">
+            <topicref keyref="light_clean"/>
+            <topicref keyref="light_focus"/>
+        </topicref>
+    </chapter>
+    
+    <chapter keyref="truck">
+        <topicref keyref="axle_disassembly"/>
+        <topicref keyref="worm_remove"/>
+        <topicref keyref="diff_gear_remove"/>
+        <topicref keyref="rear_axle_lube"/>
+    </chapter>
+    
+    <chapter keyref="starting_lighting">
+        <topicref keyref="start_light"/>
+        <topicref keyref="starter_loc"/>
+        <topicref keyref="engine_fail"/>
+        <topicref keyref="motor_fail"/>
+        <topicref keyref="accident_start"/>
+        <topicref keyref="generator"/>
+        <topicref keyref="start_gen_lube"/>
+        <topicref keyref="ignition_safety"/>
+        <topicref keyref="ammeter"/>
+        <topicref keyref="starter_gen_repair"/>
+        <topicref keyref="starter_remove"/>
+        <topicref keyref="bendix"/>
+        <topicref keyref="gen_disconnect"/>
+        <topicref keyref="battery_specs"/>
+        <topicref keyref="hydrometer"/>
+        <topicref keyref="battery_water"/>
+        <topicref keyref="battery_connect"/>
+    </chapter>
+    
+    <chapter keyref="troubles">
+        <topicref keyref="start_fail"/>
+        <topicref keyref="low_power"/>
+        <topicref keyref="low_speed"/>
+        <topicref keyref="high_speed"/>
+        <topicref keyref="sudden_stop"/>
+        <topicref keyref="engine_overheat"/>
+        <topicref keyref="engine_knock"/>
+    </chapter>
+    
+    <backmatter>
+        <mapref href="image_store.map" processing-role="resource-only"/>
+        <booklists>
+            <glossarylist>
+                <mapref href="glossary_map.map" print="yes"/>
+            </glossarylist>
+            <indexlist/>
+        </booklists>
+    </backmatter>    
+    
+    <reltable>
+        <relrow>
+            <relcell linking="sourceonly">
+                <topicref keyref="car_operation"/>
+            </relcell>
+            <relcell>
+                <topicref keyref="cooling"/>
+            </relcell>
+        </relrow>
+        <relrow>
+            <relcell linking="sourceonly">
+                <topicref keyref="car_operation"/>
+            </relcell>
+            <relcell>
+                <topicref keyref="lube_system"/>
+            </relcell>
+        </relrow>
+        <relrow>
+            <relcell linking="sourceonly">
+                <topicref keyref="radiator_prep"/>
+            </relcell>
+            <relcell>
+                <topicref keyref="ignition"/>
+            </relcell>
+        </relrow>
+        <relrow>
+            <relcell linking="sourceonly">
+                <topicref keyref="gear_maint"/>
+            </relcell>
+            <relcell>
+                <topicref keyref="lube_system"/>
+            </relcell>
+        </relrow>
+        <relrow>
+            <relcell>
+                <topicref keyref="engine_principle"/>
+                <topicref keyref="piston"/>
+                <topicref keyref="valve_arrange"/>
+                <topicref keyref="valve_grinding"/>
+            </relcell>
+            <relcell linking="sourceonly">
+                <topicref keyref="valve_timing"/>
+            </relcell>
+        </relrow>
+        <relrow>
+            <relcell>
+                <topicref keyref="comm_misfire"/>
+            </relcell>
+            <relcell linking="sourceonly">
+                <topicref keyref="comm_purpose"/>
+            </relcell>
+        </relrow>
+        <relrow>
+            <relcell>
+                <topicref keyref="valve_grinding"/>
+            </relcell>
+            <relcell linking="sourceonly">
+                <topicref keyref="valve_timing"/>
+            </relcell>
+        </relrow>
+        <relrow>
+            <relcell>
+                <topicref keyref="band_adjust"/>
+            </relcell>
+            <relcell linking="sourceonly">
+                <topicref keyref="clutch_adjust"/>
+            </relcell>
+        </relrow>
+        <relrow>
+            <relcell>
+                <topicref keyref="steering_maint"/>
+            </relcell>
+            <relcell linking="sourceonly">
+                <topicref keyref="spark_throttle"/>
+            </relcell>
+        </relrow>
+        <relrow>
+            <relcell>
+                <topicref keyref="steering_tight"/>
+            </relcell>
+            <relcell linking="sourceonly">
+                <topicref keyref="straighten_axle"/>
+            </relcell>
+        </relrow>
+    </reltable>    
+    
+</bookmap>

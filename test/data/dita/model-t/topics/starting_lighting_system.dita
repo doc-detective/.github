@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE reference PUBLIC "-//OASIS//DTD DITA Reference//EN" "reference.dtd">
+<reference id="starting_lighting_system">
+    <title>Starting and Lighting System Components</title>
+    <shortdesc>The starting and lighting system uses a two-unit configuration comprising multiple
+        electrical components.</shortdesc>
+    <refbody> 
+        <section>
+            <p>The starting and lighting system consists of the following components:</p>
+            <ul>
+                <li>Starting motor</li>
+                <li>Generator</li>
+                <li>Storage battery</li>
+                <li>Ammeter</li>
+                <li>Lights</li>
+                <li>Associated wiring and connections</li>
+            </ul>
+        </section>
+    </refbody>
+</reference>

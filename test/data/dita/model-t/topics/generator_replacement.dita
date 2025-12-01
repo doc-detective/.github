@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<task id="generator_replacement">
+    <title>Replacing the Generator</title>
+    <shortdesc>Ensure proper gear mesh and alignment when installing the generator.</shortdesc>
+    <taskbody>
+        <prereq> 
+            <note type="important">The generator drive pinion must properly mesh with the time gear
+                to prevent noise and misalignment.</note>
+        </prereq>
+        <steps>
+            <step>
+                <cmd>Position the generator bracket on the crankcase gasket.</cmd>
+                <info>The bracket should rest tightly and align with the time gear case face.</info>
+            </step>
+            <step>
+                <cmd>Adjust the mesh between the generator driving pinion and time gear.</cmd>
+                <info>Use paper gaskets between the bracket and cylinder block to regulate the
+                    mesh.</info>
+            </step>
+            <step>
+                <cmd>Check for proper gear mesh.</cmd>
+                <info>
+                    <note type="warning">Overly tight mesh will cause: <ul>
+                            <li>Humming noise</li>
+                            <li>Generator shaft misalignment</li>
+                        </ul>
+                    </note>
+                </info>
+            </step>
+        </steps>
+        <result>The generator will be properly installed with correct gear mesh and
+            alignment.</result>
+    </taskbody>
+</task>

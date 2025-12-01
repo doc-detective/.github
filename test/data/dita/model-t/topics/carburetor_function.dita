@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<concept id="carburetor_function">
+    <title>Understanding Carburetor Operation</title>
+    <shortdesc>The carburetor is an automatic float feed system that creates and controls the
+        fuel-air mixture needed for engine operation.</shortdesc>
+
+    <conbody> 
+        <section id="overview">
+            <title>Basic Function</title>
+            <p>The carburetor performs two key functions:</p>
+            <ul>
+                <li>Vaporizes gasoline by mixing it with air to create an explosive mixture</li>
+                <li>Controls the amount of this mixture delivered to the engine</li>
+            </ul>
+        </section>
+
+        <section id="float_mechanism">
+            <title>Float Feed Mechanism</title>
+            <p>The automatic float mechanism maintains a constant gasoline level through a cycle of
+                operations:</p>
+            <ol>
+                <li>Gasoline enters the carburetor bowl</li>
+                <li>Rising gasoline lifts the float</li>
+                <li>Float pushes the inlet needle upward into its seat</li>
+                <li>Gasoline flow stops when needle seats</li>
+                <li>As gasoline level drops, float lowers</li>
+                <li>Lowered float allows needle to drop from seat</li>
+                <li>Gasoline flow resumes</li>
+            </ol>
+        </section>
+
+        <section id="mixture_control">
+            <title>Mixture Control</title>
+            <p>Two key adjustments control the fuel mixture:</p>
+            <ul>
+                <li>The needle valve governs the quantity of gasoline in the mixture</li>
+                <li>The throttle controls the total volume of gas mixture entering the intake pipe,
+                    determining engine speed</li>
+            </ul>
+        </section>
+        <section>
+            <title>Reference Figure</title>
+            <fig>
+                <title>Carburetor Cross-Section Diagram</title>
+                <image keyref="carburetion_principle">
+                    <alt>This image illustrates the principle of <ph keyref="company_name"/>
+                        carburetion.</alt>
+                </image>
+            </fig>
+        </section>
+
+    </conbody>
+</concept>

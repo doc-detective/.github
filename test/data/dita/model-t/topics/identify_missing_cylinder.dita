@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE troubleshooting PUBLIC "-//OASIS//DTD DITA Troubleshooting//EN" "troubleshooting.dtd">
+<troubleshooting id="identify_missing_cylinder">
+    <title>Identifying a Missing Cylinder</title>
+
+    <shortdesc>Locate a misfiring cylinder by systematically testing cylinder pairs through
+        manipulation of spark coil vibrators.</shortdesc>
+
+    <troublebody>
+        <condition>
+            <p>When one cylinder is misfiring and needs to be identified.</p>
+        </condition>
+
+        <troubleSolution>
+            <remedy>
+                <steps>
+                    <step>
+                        <cmd>Open the throttle until the engine reaches a good operating
+                            speed.</cmd>
+                    </step>
+
+                    <step>
+                        <cmd>Hold down vibrators for cylinders No. 1 and No. 4 (the outside
+                            vibrators).</cmd>
+                        <info>This prevents these vibrators from buzzing and cuts out their
+                            corresponding cylinders.</info>
+                        <stepresult>Only cylinders No. 2 and No. 3 will be running.</stepresult>
+                    </step>
+
+                    <step>
+                        <cmd>Observe the engine operation.</cmd>
+                        <info>If cylinders No. 2 and No. 3 explode regularly, the problem is in
+                            either cylinder No. 1 or No. 4.</info>
+                    </step>
+
+                    <step>
+                        <cmd>To test cylinder No. 4, release its vibrator while holding down
+                            vibrators for cylinders No. 1, No. 2, and No. 3.</cmd>
+                        <stepresult>If cylinder No. 4 explodes evenly, the misfiring is occurring in
+                            cylinder No. 1.</stepresult>
+                    </step>
+
+                    <step>
+                        <cmd>Repeat this process for remaining cylinders as needed until the
+                            problematic cylinder is identified.</cmd>
+                    </step>
+                </steps>
+            </remedy>
+        </troubleSolution>
+        <!-- interesting to see "strict" and "loose" steps in the same topic -->
+        <troubleSolution>
+            <remedy>
+                <steps-unordered>
+                    <step>
+                        <cmd>Once the problematic cylinder is identified, examine both:</cmd>
+                        <info>
+                            <ul>
+                                <li>The spark plug in the affected cylinder</li>
+                                <li>The vibrator corresponding to that cylinder</li>
+                            </ul>
+                        </info>
+                    </step>
+                </steps-unordered>
+            </remedy>
+        </troubleSolution>
+    </troublebody>
+</troubleshooting>

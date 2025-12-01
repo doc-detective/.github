@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE troubleshooting PUBLIC "-//OASIS//DTD DITA Troubleshooting//EN" "troubleshooting.dtd">
+<troubleshooting id="commutator_misfiring">
+    <title>Troubleshooting Commutator-Related Misfiring</title>
+
+    <shortdesc>Diagnose and resolve engine misfiring caused by commutator issues, particularly at
+        high speeds.</shortdesc>
+
+    <troublebody>
+        <condition>
+            <title>Symptoms</title>
+            <p>Engine misfiring occurs at high speeds due to poor contact between the roller and
+                contact points.</p>
+        </condition>
+
+        <troubleSolution>
+            <cause>
+                <title>Possible Causes</title>
+                <p>The following issues can cause commutator misfiring:</p>
+                <ul>
+                    <li>Worn or dirty commutator surface</li>
+                    <li>Damaged contact points</li>
+                    <li>Worn roller</li>
+                    <li>Weak spring tension</li>
+                    <li>Short-circuited commutator wires</li>
+                </ul>
+            </cause>
+
+            <remedy>
+                <title>Diagnostic Steps</title>
+                <steps-unordered>
+                    <step>
+                        <cmd>Examine the roller travel surface of the commutator circle</cmd>
+                    </step>
+                    <step>
+                        <cmd>Inspect all four contact points</cmd>
+                    </step>
+                    <step>
+                        <cmd>Check the roller condition</cmd>
+                    </step>
+                    <step>
+                        <cmd>Test the spring tension</cmd>
+                    </step>
+                </steps-unordered>
+            </remedy>
+
+            <remedy>
+                <title>Resolution Steps</title>
+                <steps>
+                    <step>
+                        <cmd>Clean any dirty surfaces on the commutator</cmd>
+                        <info>The roller travel surface must be clean and smooth for proper
+                            operation</info>
+                    </step>
+                    <step>
+                        <cmd>Replace worn components as needed</cmd>
+                        <substeps>
+                            <substep>
+                                <cmd>Replace worn fibre</cmd>
+                            </substep>
+                            <substep>
+                                <cmd>Replace damaged contact points</cmd>
+                            </substep>
+                            <substep>
+                                <cmd>Replace worn roller</cmd>
+                            </substep>
+                        </substeps>
+                        <stepresult>Perfect roller contact should be maintained at all
+                            points</stepresult>
+                    </step>
+                    <step>
+                        <cmd>Verify spring tension</cmd>
+                        <info>Spring must provide adequate strength for firm contact</info>
+                    </step>
+                    <step>
+                        <cmd>Inspect commutator wires for short circuits</cmd>
+                    </step>
+                </steps>
+            </remedy>
+        </troubleSolution>
+    </troublebody>
+
+    <!-- link to image
+    <related-links>
+        <link href="images/commutator-diagram.dita" format="dita">
+            <linktext>Cut No. 9: Commutator Roller Diagram</linktext>
+        </link>
+    </related-links>
+    -->
+</troubleshooting>

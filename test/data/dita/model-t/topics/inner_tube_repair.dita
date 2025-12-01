@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<task id="inner_tube_repair">
+    <title>Repairing Inner Tube Punctures</title>
+    <shortdesc>Emergency patch procedure for repairing punctured inner tubes.</shortdesc>
+    <taskbody> 
+        <prereq>
+            <p>Required materials:</p>
+            <ul>
+                <li>Benzine or gasoline</li>
+                <li>Sandpaper</li>
+                <li>Patch</li>
+                <li>Cement</li>
+                <li>Talc powder or soapstone</li>
+            </ul>
+        </prereq>
+        <steps>
+            <step>
+                <cmd>Clean the area around the puncture</cmd>
+                <info>Use benzine or gasoline to clean the rubber</info>
+            </step>
+            <step>
+                <cmd>Roughen the surface with sandpaper</cmd>
+            </step>
+            <step>
+                <cmd>Apply cement in three layers</cmd>
+                <substeps>
+                    <substep>
+                        <cmd>Apply first layer to patch and tube</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Wait five minutes</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Apply second layer</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Wait five minutes</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Apply final layer</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Wait five minutes until sticky</cmd>
+                    </substep>
+                </substeps>
+            </step>
+            <step>
+                <cmd>Press patch firmly against tube</cmd>
+                <info>Remove all air bubbles to ensure proper adhesion</info>
+            </step>
+            <step>
+                <cmd>Apply talc powder over repair</cmd>
+            </step>
+            <step>
+                <cmd>Sprinkle talc powder inside tire casing</cmd>
+            </step>
+        </steps>
+        <postreq>
+            <note type="important">Have the tube vulcanized as soon as possible, as cement patches
+                are temporary.</note>
+            <note type="caution">When replacing tire on rim, avoid pinching the tube.</note>
+        </postreq>
+    </taskbody>
+</task>

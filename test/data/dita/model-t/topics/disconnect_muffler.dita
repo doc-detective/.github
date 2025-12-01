@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<task id="disconnect_muffler">
+    <title>Disconnecting the Muffler</title> 
+    <shortdesc>This task describes how to disconnect the muffler from the exhaust pipe and vehicle
+        frame, and how to disassemble it if needed.</shortdesc>
+    <taskbody>
+        <steps>
+            <step>
+                <cmd>Disconnect the exhaust pipe from the engine</cmd>
+                <info>Unscrew the pack nut connecting the exhaust pipe to the motor</info>
+            </step>
+            <step>
+                <cmd>Remove the muffler mounting bolts</cmd>
+                <info>Remove the bolts securing the muffler to the frame</info>
+            </step>
+            <step>
+                <cmd>Remove the muffler</cmd>
+            </step>
+            <step>
+                <cmd>Disassemble the muffler (if necessary)</cmd>
+                <info>Remove the nut at the rear end of the muffler to disassemble it</info>
+            </step>
+        </steps>
+    </taskbody>
+</task>

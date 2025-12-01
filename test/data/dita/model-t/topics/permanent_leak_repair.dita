@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<task id="permanent_leak_repair">
+    <!-- Second part of original "How are leaks and jams in the Radiator repaired?" topic -->
+    <title>Permanently Repairing a Radiator Leak</title>
+    <shortdesc>Fix a radiator leak using solder for a permanent repair.</shortdesc>
+
+    <taskbody>
+        <prereq>
+            <note type="attention">Ensure the radiator is cool and drained before attempting
+                repair.</note>
+        </prereq>
+
+        <context>
+            <p>After a temporary repair or when discovering a small leak that requires permanent
+                fixing.</p>
+        </context>
+
+        <steps>
+            <step>
+                <cmd>Clean the area around the leak</cmd>
+            </step>
+            <step>
+                <cmd>Apply solder to seal the leak</cmd>
+            </step>
+            <step>
+                <cmd>Allow the solder to cool completely</cmd>
+            </step>
+        </steps>
+
+        <result>
+            <p>The leak will be permanently sealed.</p>
+        </result>
+    </taskbody>
+</task>

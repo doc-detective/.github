@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<concept id="wheel_maintenance">
+    <title>Wheel Maintenance and Bearing Function</title>
+    <shortdesc>Understanding proper wheel operation and bearing maintenance for optimal vehicle
+        performance.</shortdesc>
+    <conbody>
+        <section id="wheel_testing">
+            <title>Wheel Testing</title>
+            <p>Regular wheel testing involves checking for both smooth rotation and proper side
+                play. A properly functioning wheel should come to rest with the tire valve
+                positioned directly below the hub after spinning.</p>
+            <p>Signs of bearing problems include: <ul>
+                    <li>Sharp clicking sounds during wheel rotation</li>
+                    <li>Momentary wheel hesitation during spinning</li>
+                </ul>
+            </p>
+        </section>
+        <section id="bearing_maintenance">
+            <title>Bearing Care</title>
+            <p>Hub bearing wear commonly results from two primary factors: <ul>
+                    <li>Insufficient lubrication</li>
+                    <li>Excessive friction caused by overtightened adjusting cones</li>
+                </ul>
+            </p>
+            <p>Proper bearing maintenance requires: <ul>
+                    <li>Regular cleaning of the bearings</li>
+                    <li>Maintaining adequate grease in the hub</li>
+                    <li>Prompt removal of damaged bearing components to prevent complete bearing
+                        failure</li>
+                </ul>
+            </p>
+        </section>
+    </conbody>
+</concept>

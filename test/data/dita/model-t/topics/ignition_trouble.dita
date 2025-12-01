@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<concept id="ignition_trouble">
+    <title>Identifying Ignition Problems</title>
+ 
+    <shortdesc>Irregular engine exhaust sounds, particularly uneven sputtering and banging, indicate
+        potential ignition problems that require immediate attention to prevent engine
+        damage.</shortdesc>
+
+    <conbody>
+        <section>
+            <title>Warning Signs</title>
+            <p>Key indicators of ignition problems include:</p>
+            <ul>
+                <li>Uneven sputtering from the exhaust</li>
+                <li>Banging sounds from the exhaust</li>
+                <li>Irregular cylinder explosions</li>
+                <li>Complete failure of cylinder firing</li>
+            </ul>
+        </section>
+
+        <section>
+            <title>Importance of Immediate Action</title>
+            <p>Continued misfiring can result in:</p>
+            <ul>
+                <li>Engine damage</li>
+                <li>Deterioration of the entire mechanical system</li>
+            </ul>
+        </section>
+
+        <section>
+            <title>Best Practices</title>
+            <p>For proper engine maintenance and operation:</p>
+            <ul>
+                <li>Listen for a soft, steady purr from the exhaust - this indicates proper
+                    operation</li>
+                <li>Address problems immediately when detected</li>
+                <li>Stop and repair issues when possible rather than continuing to drive</li>
+            </ul>
+        </section>
+    </conbody>
+</concept>

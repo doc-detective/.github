@@ -1,0 +1,313 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE troubleshooting PUBLIC "-//OASIS//DTD DITA Troubleshooting//EN" "troubleshooting.dtd">
+<troubleshooting id="troubleshooting-errors" xml:lang="en-us">
+  <title>Troubleshooting Common Test Failures</title>
+  
+  <shortdesc>Solutions for common errors and issues encountered during test execution.</shortdesc>
+  
+  <troublebody>
+    <!-- Problem 1: Timeout Errors -->
+    <condition>
+      <?doc-detective id="ts-timeout-condition" ?>
+      <title>Test times out waiting for element</title>
+      <p>Tests fail with error message:</p>
+      <msgblock>Error: Timeout waiting for element '[aria-label="Submit"]'
+Test failed after 30000ms</msgblock>
+    </condition>
+    
+    <troubleSolution>
+      <cause>
+        <title>Root Causes</title>
+        <ul>
+          <li>Element selector is incorrect or too specific</li>
+          <li>Page load time exceeds default timeout</li>
+          <li>Element is present but not visible or interactive</li>
+          <li>JavaScript errors prevent element from rendering</li>
+        </ul>
+      </cause>
+      
+      <remedy>
+        <title>Solution 1: Increase Timeout</title>
+        <responsibleParty>Test Engineer</responsibleParty>
+        
+        <steps>
+          <step>
+            <?doc-detective timeout="5000" ?>
+            <cmd>Open the test specification file in your editor</cmd>
+          </step>
+          
+          <step>
+            <cmd>Add a timeout parameter to the failing step:</cmd>
+            <stepxmp>
+              <codeblock outputclass="json">{
+  "action": "find",
+  "selector": "[aria-label='Submit']",
+  "timeout": 60000
+}</codeblock>
+            </stepxmp>
+          </step>
+          
+          <step>
+            <cmd>Run the test again:</cmd>
+            <info>
+              <codeblock outputclass="shell">doc-detective run tests/failing-test.spec.json</codeblock>
+            </info>
+            <stepresult>
+              <p>If the test passes, the issue was insufficient timeout.</p>
+            </stepresult>
+          </step>
+        </steps>
+      </remedy>
+      
+      <remedy>
+        <title>Solution 2: Fix Selector</title>
+        <responsibleParty>Test Engineer</responsibleParty>
+        
+        <steps>
+          <step>
+            <cmd>Navigate to the application page where the element should appear</cmd>
+          </step>
+          
+          <step>
+            <cmd>Open browser DevTools by pressing <shortcut>F12</shortcut></cmd>
+          </step>
+          
+          <step>
+            <cmd>Use the element inspector to verify the correct selector:</cmd>
+            <substeps>
+              <substep>
+                <cmd>Click the inspector icon or press <shortcut>Ctrl+Shift+C</shortcut></cmd>
+              </substep>
+              
+              <substep>
+                <cmd>Click on the target element in the page</cmd>
+              </substep>
+              
+              <substep>
+                <cmd>Copy the ARIA label, role, or text content from the <wintitle>Elements</wintitle> panel</cmd>
+              </substep>
+            </substeps>
+          </step>
+          
+          <step>
+            <cmd>Update the test with the correct selector</cmd>
+            <stepresult>
+              <p>The test should now locate the element correctly.</p>
+            </stepresult>
+          </step>
+        </steps>
+      </remedy>
+      
+      <remedy>
+        <title>Solution 3: Wait for Page Load</title>
+        
+        <steps>
+          <step>
+            <cmd>Add an explicit wait step before the failing action:</cmd>
+            <stepxmp>
+              <codeblock outputclass="json">{
+  "action": "wait",
+  "duration": 3000
+}</codeblock>
+            </stepxmp>
+          </step>
+          
+          <step>
+            <?doc-detective optional="true" ?>
+            <cmd>Or use a condition-based wait:</cmd>
+            <stepxmp>
+              <codeblock outputclass="json">{
+  "action": "find",
+  "selector": ".loading-spinner",
+  "matchCondition": {
+    "isDisplayed": false
+  }
+}</codeblock>
+            </stepxmp>
+          </step>
+        </steps>
+      </remedy>
+    </troubleSolution>
+    
+    <!-- Problem 2: Authentication Failures -->
+    <condition>
+      <title>API tests fail with 401 Unauthorized</title>
+      <p>HTTP request actions return:</p>
+      <msgblock>HTTP 401 Unauthorized
+{
+  "error": "INVALID_TOKEN",
+  "message": "Authentication token is invalid or expired"
+}</msgblock>
+    </condition>
+    
+    <troubleSolution>
+      <cause>
+        <title>Common Causes</title>
+        <ul>
+          <li>API token is not set in environment variables</li>
+          <li>Token has expired</li>
+          <li>Token lacks required permissions</li>
+          <li>Wrong token format or encoding</li>
+        </ul>
+      </cause>
+      
+      <remedy>
+        <title>Verify Environment Variables</title>
+        
+        <steps>
+          <step>
+            <cmd>Check that the <varname>API_TOKEN</varname> environment variable is set:</cmd>
+            <info>
+              <codeblock outputclass="shell">echo $API_TOKEN</codeblock>
+            </info>
+            <stepresult>
+              <p>If empty, set the variable:</p>
+              <codeblock outputclass="shell">export API_TOKEN="your_token_here"</codeblock>
+            </stepresult>
+          </step>
+          
+          <step>
+            <cmd>Verify the token is valid by testing directly:</cmd>
+            <info>
+              <codeblock outputclass="shell">curl -H "Authorization: Bearer $API_TOKEN" \
+  https://api.example.com/auth/verify</codeblock>
+            </info>
+            <stepresult>
+              <p>Should return:</p>
+              <codeblock outputclass="json">{"valid": true, "expiresAt": "2025-12-31T23:59:59Z"}</codeblock>
+            </stepresult>
+          </step>
+          
+          <step>
+            <cmd>If expired, generate a new token in the application dashboard</cmd>
+          </step>
+          
+          <step>
+            <cmd>Update your <filepath>.env</filepath> file with the new token</cmd>
+          </step>
+        </steps>
+      </remedy>
+    </troubleSolution>
+    
+    <!-- Problem 3: Element Not Interactive -->
+    <condition>
+      <title>Click action fails with element not clickable</title>
+      <p>Error message:</p>
+      <msgph>Element is not clickable at point (123, 456). Other element would receive the click.</msgph>
+    </condition>
+    
+    <troubleSolution>
+      <cause>
+        <ul>
+          <li>Element is obscured by modal, overlay, or other element</li>
+          <li>Element is outside viewport</li>
+          <li>Element is disabled or has pointer-events: none</li>
+        </ul>
+      </cause>
+      
+      <remedy>
+        <title>Handle Overlays</title>
+        
+        <steps>
+          <step>
+            <cmd>Check for and dismiss any blocking overlays first:</cmd>
+            <stepxmp>
+              <codeblock outputclass="json">[
+  {
+    "action": "find",
+    "selector": ".modal-overlay",
+    "matchCondition": {
+      "isDisplayed": true
+    }
+  },
+  {
+    "action": "click",
+    "selector": "button.close-modal"
+  },
+  {
+    "action": "wait",
+    "duration": 500
+  },
+  {
+    "action": "click",
+    "selector": "[aria-label='Submit']"
+  }
+]</codeblock>
+            </stepxmp>
+          </step>
+        </steps>
+      </remedy>
+      
+      <remedy>
+        <title>Scroll Element Into View</title>
+        
+        <steps>
+          <step>
+            <?doc-detective eval="window.scrollTo(0, document.body.scrollHeight)" ?>
+            <cmd>Add a find action with scrolling before clicking:</cmd>
+            <stepxmp>
+              <codeblock outputclass="json">{
+  "action": "find",
+  "selector": "[aria-label='Submit']",
+  "scrollIntoView": true
+}</codeblock>
+            </stepxmp>
+          </step>
+        </steps>
+      </remedy>
+    </troubleSolution>
+    
+    <!-- Problem 4: Browser Compatibility -->
+    <condition>
+      <title>Tests pass in Chrome but fail in Firefox/Safari</title>
+      <p>Browser-specific test failures with different rendering or behavior.</p>
+    </condition>
+    
+    <troubleSolution>
+      <cause>
+        <ul>
+          <li>Browser-specific CSS or JavaScript differences</li>
+          <li>Different default timeouts or behavior</li>
+          <li>Selector support variations</li>
+        </ul>
+      </cause>
+      
+      <remedy>
+        <title>Use Cross-Browser Selectors</title>
+        
+        <steps>
+          <step>
+            <cmd>Prefer ARIA attributes and semantic selectors over CSS classes:</cmd>
+            <info>
+              <p>Good: <codeph>[aria-label="Submit"]</codeph></p>
+              <p>Good: <codeph>button[type="submit"]</codeph></p>
+              <p>Avoid: <codeph>.btn-primary.submit-btn</codeph></p>
+            </info>
+          </step>
+          
+          <step>
+            <cmd>Test in multiple browsers using context configuration:</cmd>
+            <stepxmp>
+              <codeblock outputclass="json">{
+  "contexts": [
+    { "app": "chrome" },
+    { "app": "firefox" },
+    { "app": "safari" }
+  ]
+}</codeblock>
+            </stepxmp>
+          </step>
+        </steps>
+      </remedy>
+    </troubleSolution>
+  </troublebody>
+  
+  <related-links>
+    <link href="https://doc-detective.com/docs/troubleshooting" format="html" scope="external">
+      <linktext>Complete Troubleshooting Guide</linktext>
+    </link>
+    <link href="reference-api.dita" format="dita" scope="local">
+      <linktext>API Reference for Action Parameters</linktext>
+    </link>
+  </related-links>
+</troubleshooting>

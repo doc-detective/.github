@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE glossentry PUBLIC "-//OASIS//DTD DITA Glossary//EN" "glossary.dtd">
+<glossentry id="glossary_axle">
+    <glossterm>Axle</glossterm>
+    <glossdef>A load-bearing shaft in the <ph keyref="company_name"/>
+        <ph keyref="product_name"/> automobile (1908-1927) that serves as a central axis for one or
+        more rotating wheels. The <ph keyref="product_name"/> featured a front axle of forged
+        vanadium steel and a rear axle assembly housing the differential gears.</glossdef>
+    <glossBody>
+        <glossPartOfSpeech value="noun"/>
+        <glossProperty>Automotive drivetrain component</glossProperty>
+        <glossSurfaceForm>axle</glossSurfaceForm>
+        <glossUsage>The term is frequently used in automotive restoration contexts and when
+            discussing the <ph keyref="product_name"/>'s pioneering use of vanadium steel in its
+            construction.</glossUsage>
+        <glossAlt>
+            <glossSynonym>Ford Model T axle</glossSynonym>
+        </glossAlt>
+    </glossBody>
+</glossentry>

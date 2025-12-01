@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<concept id="lubrication_system">
+    <title>Splash Lubrication System</title> 
+
+    <shortdesc>The <ph keyref="company_name"/> lubrication system features a simplified design with
+        fewer oiling points, utilizing a central oil reservoir in the crank case to lubricate engine
+        and transmission components.</shortdesc>
+
+    <conbody>
+        <section>
+            <title>System Overview</title>
+            <p>The <ph keyref="company_name"/> splash system distinguishes itself through its
+                simplified design. The system utilizes a single large oil reservoir located in the
+                crank case, which services most engine and transmission components through splash
+                lubrication.</p>
+        </section>
+
+        <section>
+            <title>Lubrication Requirements</title>
+            <p>The system requires:</p>
+            <ul>
+                <li>Good light grade lubricating oil for all oil cups and engine components</li>
+                <li>Quality grease for dope cups</li>
+                <li>Regular oil maintenance for the commutator</li>
+            </ul>
+        </section>
+
+        <section>
+            <title>Maintenance Reference</title>
+            <p>The following Lubrication Chart provides a comprehensive lubrication chart
+                showing:</p>
+            <ul>
+                <li>Primary lubrication points</li>
+                <li>Mileage-based replenishment schedules</li>
+            </ul>
+        </section>
+        <section>
+            <title>Reference Figure</title>
+            <fig>
+                <title>Lubrication Chart</title>
+                <image keyref="lubrication_chart">
+                    <alt>Skeleton view of car from above showing all lubrication points.</alt>
+                </image>
+            </fig>
+            <note type="tip">Regular consultation of this maintenance chart is essential for proper
+                vehicle operation.</note>
+        </section>
+    </conbody>
+</concept>

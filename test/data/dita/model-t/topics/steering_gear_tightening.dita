@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<task id="steering_gear_tightening">
+    <title>Tightening the Steering Gear</title> 
+
+    <shortdesc>When steering becomes loose, with delayed response to wheel movement, several
+        components need adjustment or replacement.</shortdesc>
+
+    <taskbody>
+        <prereq>
+            <p>Before beginning maintenance, check for excessive play by grasping a front wheel by
+                the spokes and jerking the front axle back and forth.</p>
+        </prereq>
+        <context>
+            <p>Loose steering can be caused by wear in various components of the steering system.
+                Regular inspection and maintenance of these components ensures safe vehicle
+                operation.</p>
+        </context>
+        <steps>
+            <step>
+                <cmd>Disconnect the two halves of the ball sockets at the lower steering post
+                    end</cmd>
+            </step>
+            <step>
+                <cmd>Inspect the ball arm for wear</cmd>
+                <info>
+                    <note>If the ball is badly worn, replace it with a new one instead of continuing
+                        with adjustment.</note>
+                </info>
+            </step>
+            <step>
+                <cmd>File the socket surfaces until they fit snugly around the ball</cmd>
+            </step>
+            <step>
+                <cmd>Tighten the ball caps at the steering gear connecting rod end using the same
+                    procedure</cmd>
+            </step>
+            <step>
+                <cmd>Check the spindle arm bolts for looseness</cmd>
+            </step>
+            <step>
+                <cmd>Replace brass bushings if bolts are loose</cmd>
+            </step>
+            <step>
+                <cmd>Inspect the pinions for wear if vehicle is 2-3 years old</cmd>
+            </step>
+            <step>
+                <cmd>Check the brass internal gear beneath the steering wheel spider</cmd>
+            </step>
+            <step>
+                <cmd>Replace worn components as necessary</cmd>
+            </step>
+        </steps>
+        <result>
+            <p>Proper adjustment and replacement of worn components will restore responsive steering
+                control.</p>
+        </result>
+        <postreq>
+            <p>Regularly inspect the front spring and front spring perches for excessive vibration,
+                which may indicate the need for new bushings.</p>
+            <p>Refer to the Lubrication Chart for ongoing maintenance requirements.</p>
+        </postreq>
+    </taskbody>
+</task>

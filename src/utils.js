@@ -4,7 +4,6 @@ const crypto = require("crypto");
 const YAML = require("yaml");
 const axios = require("axios");
 const path = require("path");
-const uuid = require("uuid");
 const { spawn } = require("child_process");
 const {
   validate,
@@ -38,9 +37,84 @@ function isRelativeUrl(url) {
   }
 }
 
+// Parse XML-style attributes to an object
+// Example: 'wait=500' becomes { wait: 500 }
+// Example: 'testId="myTestId" detectSteps=false' becomes { testId: "myTestId", detectSteps: false }
+// Example: 'httpRequest.url="https://example.com" httpRequest.method="GET"' becomes { httpRequest: { url: "https://example.com", method: "GET" } }
+function parseXmlAttributes({ stringifiedObject }) {
+  if (typeof stringifiedObject !== "string") {
+    return null;
+  }
+  
+  // Trim the string
+  const str = stringifiedObject.trim();
+  
+  // Check if it looks like YAML (key: value pattern outside of quotes)
+  // This regex checks for word followed by colon and space/newline, not inside quotes
+  const yamlPattern = /^\w+:\s/;
+  if (yamlPattern.test(str)) {
+    return null;
+  }
+  
+  // Parse XML-style attributes
+  const result = {};
+  // Regex to match key=value or key="value" or key='value'
+  // Updated to handle dot notation in keys (e.g., httpRequest.url)
+  const attrRegex = /([\w.]+)=(?:"([^"]*)"|'([^']*)'|(\S+))/g;
+  let match;
+  let hasMatches = false;
+  
+  while ((match = attrRegex.exec(str)) !== null) {
+    hasMatches = true;
+    const keyPath = match[1];
+    // Value can be in group 2 (double quotes), 3 (single quotes), or 4 (unquoted)
+    let value = match[2] !== undefined ? match[2] : (match[3] !== undefined ? match[3] : match[4]);
+    
+    // Try to parse as boolean
+    if (value === 'true') {
+      value = true;
+    } else if (value === 'false') {
+      value = false;
+    } else if (!isNaN(value) && value !== '') {
+      // Try to parse as number
+      value = Number(value);
+    }
+    // else keep as string
+    
+    // Handle dot notation for nested objects
+    if (keyPath.includes('.')) {
+      const keys = keyPath.split('.');
+      let current = result;
+      
+      // Navigate/create the nested structure
+      for (let i = 0; i < keys.length - 1; i++) {
+        const key = keys[i];
+        if (!current[key] || typeof current[key] !== 'object') {
+          current[key] = {};
+        }
+        current = current[key];
+      }
+      
+      // Set the final value
+      current[keys[keys.length - 1]] = value;
+    } else {
+      // Simple key without dot notation
+      result[keyPath] = value;
+    }
+  }
+  
+  return hasMatches ? result : null;
+}
+
 // Parse a JSON or YAML object
 function parseObject({ stringifiedObject }) {
   if (typeof stringifiedObject === "string") {
+    // First, try to parse as XML attributes
+    const xmlAttrs = parseXmlAttributes({ stringifiedObject });
+    if (xmlAttrs !== null) {
+      return xmlAttrs;
+    }
+    
     // If string, try to parse as JSON or YAML
     try {
       const json = JSON.parse(stringifiedObject);
@@ -127,6 +201,17 @@ async function qualifyFiles({ config }) {
     let isFile = fs.statSync(source).isFile();
     let isDir = fs.statSync(source).isDirectory();
 
+    // If ditamap, process with `dita` to build files, then add output directory to dirs array
+    if (isFile && path.extname(source) === ".ditamap" && config.processDitaMap) {
+      const ditaOutput = await processDitaMap({config, source});
+      if (ditaOutput) {
+        // Add output directory to to sequence right after the ditamap file
+        const currentIndex = sequence.indexOf(source);
+        sequence.splice(currentIndex + 1, 0, ditaOutput);
+      }
+      continue;
+    }
+
     // Parse input
     if (isFile && (await isValidSourceFile({ config, files, source }))) {
       // Passes all checks
@@ -159,6 +244,35 @@ async function qualifyFiles({ config }) {
     }
   }
   return files;
+}
+
+// Process dita map into a set of files
+async function processDitaMap({config, source}) {
+  // Get MD5 hash of source path to create unique temp directory
+  const hash = crypto.createHash("md5").update(source).digest("hex");
+  const outputDir = `${os.tmpdir}/doc-detective/ditamap_${hash}`;
+  // If doc-detective temp directory doesn't exist, create it
+  if (!fs.existsSync(`${os.tmpdir}/doc-detective`)) {
+    log(config, "debug", `Creating temp directory: ${os.tmpdir}/doc-detective`);
+    fs.mkdirSync(`${os.tmpdir}/doc-detective`);
+  }
+  const ditaVersion = await spawnCommand("dita", ["--version"]);
+  if (ditaVersion.exitCode !== 0) {
+    log(
+      config,
+      "error",
+      `'dita' command not found. Make sure it's installed. Error: ${ditaVersion.stderr}`
+    );
+    return null;
+  }
+
+  log(config, "info", `Processing DITA map: ${source}`);
+  const ditaOutputDir = await spawnCommand("dita", ["-i", source, "-f", "dita", "-o", outputDir]);
+  if (ditaOutputDir.exitCode !== 0) {
+    log(config, "error", `Failed to process DITA map: ${ditaOutputDir.stderr}`);
+    return null;
+  }
+  return outputDir;
 }
 
 // Check if a source file is valid based on fileType definitions
@@ -417,7 +531,7 @@ async function parseContent({ config, content, filePath, fileType }) {
 
   // Process statements into tests and steps
   let tests = [];
-  let testId = `${uuid.v4()}`;
+  let testId = `${crypto.randomUUID()}`;
   let ignore = false;
   let currentIndex = 0;
 
@@ -466,7 +580,7 @@ async function parseContent({ config, content, filePath, fileType }) {
         break;
       case "testEnd":
         // Test end statement
-        testId = `${uuid.v4()}`;
+        testId = `${crypto.randomUUID()}`;
         ignore = false;
         break;
       case "ignoreStart":
@@ -680,7 +794,7 @@ async function parseTests({ config, files }) {
       specs.push(content);
     } else {
       // Process non-object
-      let id = `${uuid.v4()}`;
+      let id = `${crypto.randomUUID()}`;
       let spec = { specId: id, contentPath: file, tests: [] };
       const fileType = config.fileTypes.find((fileType) =>
         fileType.extensions.includes(extension)

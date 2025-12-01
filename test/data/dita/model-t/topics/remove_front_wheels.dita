@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<task id="remove_front_wheels">
+    <title>Removing Front Wheels</title>
+    <shortdesc>Step-by-step procedure for safely removing front wheels while maintaining proper
+        component organization.</shortdesc> 
+    <taskbody>
+        <steps>
+            <step>
+                <cmd>Remove the hub cap.</cmd>
+            </step>
+            <step>
+                <cmd>Remove the cotter pin.</cmd>
+            </step>
+            <step>
+                <cmd>Unscrew the castle nut and remove the spindle washer.</cmd>
+            </step>
+            <step>
+                <cmd>Remove the adjustable bearing cone.</cmd>
+            </step>
+            <step>
+                <cmd>Remove the wheel from the spindle.</cmd>
+            </step>
+        </steps>
+        <result>The front wheel will now be completely detached.</result>
+        <postreq>
+            <note type="important">When reassembling, ensure cones and lock nuts are replaced on
+                their original spindles to prevent thread damage. Left-hand threads are on the left
+                spindle and right-hand threads on the right spindle when facing the car.</note>
+        </postreq>
+    </taskbody>
+</task>

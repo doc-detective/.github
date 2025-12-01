@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE reference PUBLIC "-//OASIS//DTD DITA Reference//EN" "reference.dtd">
+<reference id="engine_start_failure_conditions">
+    <title>Engine Start Failure Conditions</title>
+    <shortdesc>Common conditions that can prevent the engine from starting properly.</shortdesc>
+    <refbody>
+        <section>
+            <title>Fuel System Issues</title>
+            <ul>
+                <li>Gas mixture too lean</li>
+                <li>Water in gasoline</li>
+                <li>Gasoline supply shut off</li>
+                <li>Carburetor frozen (in zero weather)</li>
+                <li>Water frozen in gasoline tank sediment bulb</li>
+            </ul>
+        </section>
+
+        <section>
+            <title>Electrical System Issues</title>
+            <ul>
+                <li>Vibrators adjusted too close</li>
+                <li>Water or congealed oil in commutator</li>
+                <li>Magneto contact point (in transmission cover) obstructed with foreign
+                    matter</li>
+                <li>Coil switch off</li>
+            </ul>
+        </section>
+
+        <section>
+            <title>Environmental Factors</title>
+            <note type="important">Several conditions are specifically related to cold weather
+                operation: <ul>
+                    <li>Carburetor freezing at zero temperatures</li>
+                    <li>Frozen water in the sediment bulb</li>
+                    <li>Congealed oil in the commutator</li>
+                </ul>
+            </note>
+        </section>
+    </refbody>
+</reference>

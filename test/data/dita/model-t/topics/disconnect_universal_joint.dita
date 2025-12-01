@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<task id="disconnect_universal_joint">
+    <title>Disconnecting the Universal Joint from the Drive Shaft</title>
+    <shortdesc>This task describes how to disconnect the universal joint from the drive shaft by
+        removing the connecting pin.</shortdesc>
+    <taskbody>
+        <steps>
+            <step>
+                <cmd>Remove the ball casting plugs</cmd>
+                <info>Take out both plugs from the top and bottom of the ball casting</info>
+            </step>
+            <step>
+                <cmd>Align the shaft</cmd>
+                <info>Turn the shaft until the pin is aligned with the access hole</info>
+            </step>
+            <step>
+                <cmd>Remove the connecting pin</cmd>
+                <info>Drive the pin out through the aligned hole</info>
+            </step>
+            <step>
+                <cmd>Separate the joint</cmd>
+                <info>Pull or force the joint away from the shaft and out of the housing</info>
+            </step>
+        </steps>
+    </taskbody>
+</task>

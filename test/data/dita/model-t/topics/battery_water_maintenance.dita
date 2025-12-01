@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE troubleshooting PUBLIC "-//OASIS//DTD DITA Troubleshooting//EN" "troubleshooting.dtd">
+<troubleshooting id="battery_water_maintenance">
+    <title>Battery Water Maintenance</title>
+    <shortdesc>Proper water maintenance is crucial for battery operation. Only add pure water to
+        maintain electrolyte levels and follow specific procedures for cold weather
+        conditions.</shortdesc>
+ 
+    <troublebody>
+        <condition>
+            <title>When to Add Water</title>
+            <p>Check if the electrolyte level has fallen below the bottom of the filling tube.</p>
+            <note type="warning">If acid needs to be added, take the battery to an authorized
+                Service Station.</note>
+        </condition>
+
+        <troubleSolution>
+            <cause>
+                <title>Water Requirements</title>
+                <ul>
+                    <li>Use only pure water sources: <ul>
+                            <li>Distilled water</li>
+                            <li>Melted artificial ice (not natural ice)</li>
+                            <li>Rain water (from clean slate or shingle-covered roof in open
+                                country)</li>
+                        </ul>
+                    </li>
+                </ul>
+            </cause>
+
+            <remedy>
+                <title>Water Addition Procedure</title>
+                <steps>
+                    <step>
+                        <cmd>Add water to maintain level with bottom of filling tube</cmd>
+                    </step>
+                    <step>
+                        <cmd>Ensure plates remain covered at all times</cmd>
+                        <info><note type="important">Store water in clean, covered vessels made of: <ul>
+                                    <li>Glass</li>
+                                    <li>China</li>
+                                    <li>Earthenware</li>
+                                    <li>Rubber</li>
+                                    <li>Lead</li>
+                                </ul>
+                            </note></info>
+                    </step>
+                </steps>
+            </remedy>
+        </troubleSolution>
+
+        <troubleSolution>
+            <cause>
+                <title>Cold Weather Conditions</title>
+                <p>When temperatures are below freezing:</p>
+            </cause>
+            <remedy>
+                <steps>
+                    <step>
+                        <cmd>Add water only immediately before running the engine</cmd>
+                        <info>This allows charging to mix water and electrolyte, preventing
+                            freezing</info>
+                    </step>
+                </steps>
+            </remedy>
+        </troubleSolution>
+    </troublebody>
+</troubleshooting>

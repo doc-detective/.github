@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<task id="adjust_rod_bearings">
+    <title>Adjusting Connecting Rod Bearings</title>
+    <shortdesc>Follow these steps to adjust connecting rod bearings without removing the engine.
+        This is a precision procedure that should ideally be performed by an expert <ph
+            keyref="company_name"/> mechanic.</shortdesc>
+    <taskbody> 
+        <prereq>
+            <note type="warning">Improper adjustment of connecting rod bearings can lead to rapid
+                bearing wear, crystallization of the crankshaft, and severe engine damage.</note>
+        </prereq>
+        <context>
+            <p>For professional rebabbitting services, connecting rods can be sent to the nearest
+                dealer or branch house for a fee of $1.00 each.</p>
+            <note type="important">Do not attempt to rebabbitt connecting rods or main bearings
+                without proper equipment, as satisfactory results require a special jig.</note>
+        </context>
+        <steps>
+            <step>
+                <cmd>Drain the oil from the engine</cmd>
+            </step>
+            <step>
+                <cmd>Remove the bottom plate from the crank case to expose the connecting rods</cmd>
+            </step>
+            <step>
+                <cmd>Adjust each connecting rod bearing</cmd>
+                <substeps>
+                    <substep>
+                        <cmd>Remove the first connecting rod cap</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Carefully draw-file the ends a small amount at a time</cmd>
+                        <info>
+                            <note type="tip">Ensure file marks correspond when reassembling</note>
+                        </info>
+                    </substep>
+                    <substep>
+                        <cmd>Replace the cap and tighten bolts until snug against shaft</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Test the bearing fit</cmd>
+                        <info>
+                            <p>Test using one of these methods:</p>
+                            <ul>
+                                <li>Turn engine over using the starting handle</li>
+                                <li>Experienced mechanics may test by lightly tapping each side of
+                                    cap with hammer</li>
+                            </ul>
+                        </info>
+                    </substep>
+                    <substep>
+                        <cmd>Loosen the bearing and repeat process for remaining bearings</cmd>
+                    </substep>
+                </substeps>
+            </step>
+            <step>
+                <cmd>Secure all bearings</cmd>
+                <substeps>
+                    <substep>
+                        <cmd>Verify proper fit of all bearings</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Tighten all cap bolts to final specification</cmd>
+                    </substep>
+                </substeps>
+            </step>
+        </steps>
+        <result>
+            <note type="caution">Bearings that are too tight can cause rapid babbitt wear.</note>
+        </result>
+        <postreq>
+            <p>Before road use:</p>
+            <ol>
+                <li>Jack up the rear wheels</li>
+                <li>Run the motor slowly for approximately two hours</li>
+                <li>Maintain proper water and oil levels during break-in</li>
+            </ol>
+        </postreq>
+    </taskbody>
+</task>

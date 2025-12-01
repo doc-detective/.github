@@ -1,26 +1,28 @@
 [
   {
-    "specId": "cleanup",
+    "specId": "42939c2d-3495-4fc1-81fb-f3d641af05de",
+    "contentPath": "/home/hawkeyexl/Workspaces/resolver/dev/doc-content.dita",
     "tests": [
       {
+        "testId": "doc-detective-docs",
+        "detectSteps": false,
         "steps": [
           {
-            "loadVariables": "/home/hawkeyexl/Workspaces/resolver/dev/env"
+            "checkLink": "https://doc-detective.com"
           },
           {
-            "runShell": {
-              "command": "echo",
-              "args": [
-                "cleanup"
-              ],
-              "maxVariation": 0
-            },
-            "variables": {}
+            "checkLink": "https://doc-detective.com/docs/get-started/intro"
+          },
+          {
+            "goTo": "https://doc-detective.com/docs/get-started/actions/type"
+          },
+          {
+            "find": "Special keys"
+          },
+          {
+            "screenshot": "reference.png"
           }
-        ],
-        "unsafe": false,
-        "detectSteps": true,
-        "testId": "f1255082-34d3-45e9-a77a-f0ef3c57f366"
+        ]
       }
     ]
   }

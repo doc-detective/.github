@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<task id="band_removal">
+    <title>Removing and Installing Transmission Bands</title>
+    <shortdesc>Complete procedure for removing and reinstalling transmission bands, including proper
+        positioning and alignment of components.</shortdesc>
+
+    <taskbody>
+        <prereq>
+            <p>Ensure vehicle is stationary and in a safe working position.</p>
+        </prereq>
+
+        <context>
+            <p>This procedure covers both the removal and reinstallation of transmission bands.
+                Proper positioning of components is critical for successful completion.</p>
+        </context>
+
+        <steps>
+            <stepsection>Preparation</stepsection>
+            <step>
+                <cmd>Remove the starting motor</cmd>
+            </step>
+            <step>
+                <cmd>Remove the door on top of transmission cover</cmd>
+            </step>
+            <step>
+                <cmd>Adjust the pedal shafts</cmd>
+                <substeps>
+                    <substep>
+                        <cmd>Turn the reverse adjustment nut to the extreme end of its shaft</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Turn the brake adjustment nut to the extreme end of its shaft</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Remove the slow speed adjusting screw</cmd>
+                    </substep>
+                </substeps>
+            </step>
+            <step>
+                <cmd>Remove the transmission cover assembly</cmd>
+                <substeps>
+                    <substep>
+                        <cmd>Remove bolts securing the transmission cover to crank case</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Lift off the cover assembly</cmd>
+                    </substep>
+                </substeps>
+            </step>
+
+            <stepsection>Band Removal</stepsection>
+            <step>
+                <cmd>Position the triple gears</cmd>
+                <info>Place one set approximately 10 degrees to the right of center at top</info>
+            </step>
+            <step>
+                <cmd>Remove each band</cmd>
+                <substeps>
+                    <substep>
+                        <cmd>Slip the band over the first of the triple gears</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Rotate the band so the opening faces downward</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Lift the band upward to remove</cmd>
+                    </substep>
+                </substeps>
+                <info>Begin with the band nearest the flywheel</info>
+            </step>
+
+            <stepsection>Band Installation</stepsection>
+            <step>
+                <cmd>Position the bands for installation</cmd>
+                <substeps>
+                    <substep>
+                        <cmd>Place bands in upright position on the drums</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Pass a cord around the ears of all three bands</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Center the bands using the cord</cmd>
+                    </substep>
+                </substeps>
+            </step>
+            <step>
+                <cmd>Install the transmission cover</cmd>
+                <substeps>
+                    <substep>
+                        <cmd>Ensure clutch release ring is in rear groove of clutch shift</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Place cover while maintaining band position with cord</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Verify pedal shafts align with band ear notches</cmd>
+                    </substep>
+                </substeps>
+            </step>
+            <step>
+                <cmd>Remove the positioning cord</cmd>
+            </step>
+        </steps>
+
+        <result>
+            <p>When properly completed, all bands should be correctly positioned with the
+                transmission cover securely installed.</p>
+            <note type="important">Each band must be pushed forward onto the triple gears during
+                removal, as this is the only point with sufficient clearance in the crank case to
+                turn the band ears downward.</note>
+        </result>
+    </taskbody>
+</task>

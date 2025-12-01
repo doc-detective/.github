@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<concept id="spring_clip_maintenance">
+    <title>Maintaining Spring Clip Tightness</title>
+
+    <shortdesc>Spring clips must be kept tight to prevent stress on the tie bolt and maintain proper
+        frame-body alignment.</shortdesc> 
+
+    <conbody>
+        <section>
+            <p>Loose spring clips can cause serious mechanical issues. When spring clips are not
+                properly tightened:</p>
+            <ul>
+                <li>The entire strain transfers to the central tie bolt</li>
+                <li>The tie bolt may shear off due to excessive stress</li>
+                <li>The frame and body can shift slightly to one side</li>
+            </ul>
+        </section>
+
+        <section>
+            <title>Recommended Maintenance</title>
+            <p>Regular inspection of the spring clips is essential for proper vehicle maintenance.
+                Perform frequent checks of all clips that secure the springs to the frame to ensure
+                they maintain proper tightness.</p>
+        </section>
+    </conbody>
+</concept>

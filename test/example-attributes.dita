@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "topic.dtd">
+<topic id="sample_topic_attributes">
+  <title>Sample DITA Topic with XML Attribute Format</title>
+  <?doc-detective test testId="sample-dita-attributes-test" detectSteps=false ?>
+  <body>
+    <p>This is a sample DITA topic demonstrating Doc Detective test detection with XML-style attributes.</p>
+    
+    <section>
+      <title>Test Steps with XML Attributes</title>
+      <p>The following processing instructions use XML-style attributes:</p>
+      
+      <?doc-detective step checkLink="https://doc-detective.com" ?>
+      
+      <p>You can also verify text on screen:</p>
+      
+      <?doc-detective step find="Sample DITA Topic" ?>
+      
+      <p>And wait for a specified duration (in milliseconds):</p>
+      
+      <?doc-detective step wait=1000 ?>
+    </section>
+  </body>
+  <?doc-detective test end?>
+</topic>

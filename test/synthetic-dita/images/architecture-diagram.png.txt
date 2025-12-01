@@ -1,0 +1,3 @@
+# Placeholder Image
+# This would be architecture-diagram.png
+# Replace with actual diagram showing documentation → parser → resolver → test execution flow

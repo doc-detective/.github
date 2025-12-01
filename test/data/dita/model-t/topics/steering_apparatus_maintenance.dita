@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<task id="steering_apparatus_maintenance">
+    <title>Maintaining the Steering Apparatus</title>
+
+    <shortdesc>The steering apparatus requires minimal maintenance beyond regular lubrication of the
+        post gears.</shortdesc>
+
+    <taskbody>
+        <context>
+            <p>The steering mechanism uses "sun and planet" post gears located at the top of the
+                post below the wheel hub. Regular inspection and lubrication will ensure proper
+                operation.</p>
+        </context>
+
+        <steps>
+            <stepsection>To inspect and lubricate the post gears:</stepsection>
+            <step>
+                <cmd>Remove the steering wheel:</cmd>
+                <substeps>
+                    <substep>
+                        <cmd>Unscrew the nut on top of the post</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Place a block of wood against the wheel</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Use a hammer to carefully drive the wheel off the shaft</cmd>
+                    </substep>
+                </substeps>
+            </step>
+            <step>
+                <cmd>Loosen the set screw</cmd>
+            </step>
+            <step>
+                <cmd>Unscrew the cap</cmd>
+            </step>
+            <step>
+                <cmd>Inspect the post gears</cmd>
+            </step>
+            <step>
+                <cmd>Replenish the grease as needed</cmd>
+            </step>
+            <step>
+                <cmd>Reassemble in reverse order</cmd>
+            </step>
+        </steps>
+
+        <result>
+            <p>The steering apparatus will maintain smooth operation with proper lubrication.</p>
+        </result>
+    </taskbody>
+</task>

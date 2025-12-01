@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<task id="worm_removal"> 
+    <title>Removing and Reassembling the Worm</title>
+    <shortdesc>Remove the worm assembly components in sequence and reassemble with proper pin
+        alignment.</shortdesc>
+    <taskbody>
+        <steps>
+            <step>
+                <cmd>Remove coupling pins</cmd>
+                <info>Drive out the pins connecting the coupling to worm and drive shaft</info>
+            </step>
+            <step>
+                <cmd>Remove bearing components</cmd>
+                <substeps>
+                    <substep>
+                        <cmd>Remove the felt washer</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Remove the roller bearing sleeve</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Remove the roller bearing</cmd>
+                    </substep>
+                </substeps>
+            </step>
+            <step>
+                <cmd>Separate drive components</cmd>
+                <substeps>
+                    <substep>
+                        <cmd>Drive the coupling off the drive shaft</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Force the worm from the coupling</cmd>
+                    </substep>
+                </substeps>
+            </step>
+            <step>
+                <cmd>Remove remaining components</cmd>
+                <substeps>
+                    <substep>
+                        <cmd>Remove the worm nut</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Remove the retaining washer</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Remove the thrust bearing</cmd>
+                    </substep>
+                    <substep>
+                        <cmd>Remove the rear worm roller bearing</cmd>
+                    </substep>
+                </substeps>
+            </step>
+        </steps>
+        <postreq>When reassembling, verify the retaining washer stationary pin is properly
+            positioned.</postreq>
+    </taskbody>
+</task>

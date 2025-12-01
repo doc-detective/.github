@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<task id="car_reversal_procedure">
+    <title>Reversing the Car</title>
+    <shortdesc>Safely reverse the car by following a precise sequence of clutch and pedal
+        operations.</shortdesc>
+    <taskbody>
+        <prereq>
+            <p>Ensure the car has come to a complete stop before attempting to reverse.</p>
+        </prereq>
+
+        <steps>
+            <step>
+                <cmd>Bring the car to a full stop.</cmd>
+            </step>
+            <step>
+                <cmd>Keep the engine running.</cmd>
+            </step>
+            <step>
+                <cmd>Disengage the clutch using the hand lever.</cmd>
+            </step>
+            <step>
+                <cmd>Press the reverse pedal forward with your left foot.</cmd>
+            </step>
+            <step>
+                <cmd>Keep your right foot free to use the brake pedal if necessary.</cmd>
+                <info><note type="warning">Do not pull the hand lever back too far, as this will
+                        engage the rear wheel brakes.</note></info>
+            </step>
+        </steps>
+
+        <result>
+            <p>The car is now in reverse and ready to move backward.</p>
+        </result>
+
+        <postreq>
+            <p>Experienced drivers may alternatively:</p>
+            <ul>
+                <li>Hold the clutch pedal in neutral with the left foot</li>
+                <li>Operate the reverse pedal with the right foot</li>
+            </ul>
+        </postreq>
+    </taskbody>
+</task>

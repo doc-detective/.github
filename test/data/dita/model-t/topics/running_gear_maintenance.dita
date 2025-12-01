@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE reference PUBLIC "-//OASIS//DTD DITA Reference//EN" "reference.dtd">
+<reference id="running_gear_maintenance">
+    <title>Running Gear Maintenance Requirements</title>
+    <shortdesc>Regular maintenance schedule and inspection points for the vehicle's running gear
+        components.</shortdesc> 
+    <refbody>
+        <section>
+            <title>30-Day Maintenance Schedule</title>
+            <table frame="all">
+                <title>Running Gear Inspection Points</title>
+                <tgroup cols="2">
+                    <colspec colname="component" colwidth="1*"/>
+                    <colspec colname="check" colwidth="2*"/>
+                    <thead>
+                        <row>
+                            <entry>Component</entry>
+                            <entry>Maintenance Check</entry>
+                        </row>
+                    </thead>
+                    <tbody>
+                        <row>
+                            <entry>Spring Connections</entry>
+                            <entry>Check bushing lubrication</entry>
+                        </row>
+                        <row>
+                            <entry>Spring Hangers</entry>
+                            <entry>Verify proper lubrication</entry>
+                        </row>
+                        <row>
+                            <entry>Steering Knuckles</entry>
+                            <entry>Ensure thorough lubrication</entry>
+                        </row>
+                        <row>
+                            <entry>Hub Bearings</entry>
+                            <entry>Confirm adequate lubrication</entry>
+                        </row>
+                        <row>
+                            <entry>All Connections</entry>
+                            <entry>Verify nuts are secure with cotter pins in place</entry>
+                        </row>
+                    </tbody>
+                </tgroup>
+            </table>
+        </section>
+        <section>
+            <title>Special Attention Items</title>
+            <ul>
+                <li>Front spring clips require frequent inspection where they attach to the
+                    frame</li>
+                <li>Refer to Lubrication chapter for proper lubricant specifications</li>
+            </ul>
+        </section>
+    </refbody>
+</reference>

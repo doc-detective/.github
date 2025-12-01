@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE reference PUBLIC "-//OASIS//DTD DITA Reference//EN" "reference.dtd">
+<reference id="engine_knocks">
+    <title>Distinguishing Engine Knock Types</title>
+    <shortdesc>Learn how to identify different types of engine knocks based on their distinctive
+        sounds and conditions under which they occur.</shortdesc>
+    <refbody>
+        <section>
+            <title>Engine Knock Characteristics</title>
+            <simpletable>
+                <sthead>
+                    <stentry>Knock Type</stentry>
+                    <stentry>Characteristics</stentry>
+                </sthead>
+                <strow>
+                    <stentry>Carbon Knock</stentry>
+                    <stentry>
+                        <ul>
+                            <li>Clear, hollow sound</li>
+                            <li>Most noticeable when climbing sharp grades</li>
+                            <li>More pronounced when engine is heated</li>
+                            <li>Sharp rap occurs immediately upon throttle advancement</li>
+                        </ul>
+                    </stentry>
+                </strow>
+                <strow>
+                    <stentry>Advanced Spark Knock</stentry>
+                    <stentry>
+                        <ul>
+                            <li>Characterized by a dull knock in the motor</li>
+                        </ul>
+                    </stentry>
+                </strow>
+                <strow>
+                    <stentry>Connecting Rod Knock</stentry>
+                    <stentry>
+                        <ul>
+                            <li>Sounds like distant tapping of steel with a small hammer</li>
+                            <li>Most noticeable when car idles down grade</li>
+                            <li>Distinctly heard when speeding to 25 mph then suddenly closing
+                                throttle</li>
+                        </ul>
+                    </stentry>
+                </strow>
+                <strow>
+                    <stentry>Crankshaft Main Bearing Knock</stentry>
+                    <stentry>
+                        <ul>
+                            <li>Produces a dull thud sound</li>
+                            <li>Most noticeable when car is going uphill</li>
+                        </ul>
+                    </stentry>
+                </strow>
+                <strow>
+                    <stentry>Loose Piston Knock</stentry>
+                    <stentry>
+                        <ul>
+                            <li>Produces a rattle-like sound</li>
+                            <li>Only heard when suddenly opening the throttle</li>
+                        </ul>
+                    </stentry>
+                </strow>
+            </simpletable>
+        </section>
+        <section>
+            <note type="tip">Remedies for these knocks are covered in their respective maintenance
+                sections.</note>
+        </section>
+    </refbody>
+</reference>

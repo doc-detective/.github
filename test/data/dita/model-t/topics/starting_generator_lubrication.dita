@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE reference PUBLIC "-//OASIS//DTD DITA Reference//EN" "reference.dtd">
+<reference id="starting_generator_lubrication">
+    <title>Starting Motor and Generator Lubrication</title>
+    <shortdesc>The starting motor and generator use both automatic splash lubrication and manual
+        oiling systems for maintenance.</shortdesc> 
+    <refbody>
+        <section>
+            <title>Starting Motor Lubrication</title>
+            <p>The starting motor uses the <ph keyref="company_name"/> splash system, which provides
+                lubrication through:</p>
+            <ul>
+                <li>The same splash system that lubricates the engine</li>
+                <li>The same splash system that lubricates the transmission</li>
+            </ul>
+        </section>
+        <section>
+            <title>Generator Lubrication</title>
+            <p>The generator receives lubrication through two methods:</p>
+            <ul>
+                <li>Primary lubrication from oil splash from the time gears</li>
+                <li>Supplementary lubrication via an oil cup located at the end of the generator
+                    housing, which requires occasional manual oil drops</li>
+            </ul>
+        </section>
+    </refbody>
+</reference>

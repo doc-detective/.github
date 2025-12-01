@@ -1,0 +1,3 @@
+# Placeholder Image
+# This would be user-list-with-testuser.png
+# Replace with actual screenshot showing testuser123 in the user list table

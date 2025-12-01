@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE glossentry PUBLIC "-//OASIS//DTD DITA Glossary//EN" "glossary.dtd">
+<glossentry id="glossary_differential">
+    <glossterm>Differential</glossterm>
+    <glossdef>A mechanical assembly in the <ph keyref="product_name"/>
+        <ph keyref="company_name"/>'s drivetrain that allows the rear wheels to rotate at different
+        speeds while cornering while still transmitting power from the drive shaft to both wheels.
+        The <ph keyref="product_name"/> uses a basic automotive differential design with a ring
+        gear, pinion gear, and spider gears housed within the rear axle assembly.</glossdef>
+    <glossBody>
+        <glossPartOfSpeech value="noun"/>
+        <glossSurfaceForm>differential</glossSurfaceForm>
+        <glossUsage>The term appears in <ph keyref="product_name"/> service documentation, repair
+            manuals, and technical literature. It is fundamental to understanding the vehicle's
+            power transmission system and rear axle maintenance.</glossUsage>
+        <glossAlt>
+            <glossSynonym>Model T rear axle differential</glossSynonym>
+        </glossAlt>
+    </glossBody>
+</glossentry>

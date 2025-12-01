@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE glossentry PUBLIC "-//OASIS//DTD DITA Glossary Entry//EN" "glossentry.dtd">
+<glossentry id="glossentry-api" xml:lang="en-us">
+  <glossterm>API (Application Programming Interface)</glossterm>
+  
+  <glossdef>
+    <p>A set of protocols, routines, and tools for building software applications. An API specifies how software components should interact and allows different systems to communicate with each other through defined endpoints and data formats.</p>
+    
+    <p>In the context of Doc Detective, APIs are tested using the <apiname>httpRequest</apiname> action to validate request/response behavior, status codes, and data integrity.</p>
+  </glossdef>
+  
+  <glossBody>
+    <glossPartOfSpeech value="noun"/>
+    
+    <glossUsage>
+      <p>Common in technical documentation when describing web services, REST APIs, GraphQL endpoints, or SDK methods.</p>
+    </glossUsage>
+    
+    <glossAlt>
+      <glossAcronym>API</glossAcronym>
+      <glossShortForm>application interface</glossShortForm>
+      <glossSynonym>web service</glossSynonym>
+      <glossSynonym>endpoint</glossSynonym>
+    </glossAlt>
+    
+    <glossAlt>
+      <glossUsage>
+        <p>Example usage: "The user management API provides CRUD operations for account administration."</p>
+      </glossUsage>
+    </glossAlt>
+  </glossBody>
+  
+  <related-links>
+    <link href="reference-api.dita" format="dita" scope="local">
+      <linktext>API Reference Documentation</linktext>
+    </link>
+    <link href="https://en.wikipedia.org/wiki/API" format="html" scope="external">
+      <linktext>Wikipedia: API</linktext>
+    </link>
+  </related-links>
+</glossentry>
