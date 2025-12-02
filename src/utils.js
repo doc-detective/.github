@@ -45,17 +45,27 @@ function parseXmlAttributes({ stringifiedObject }) {
   if (typeof stringifiedObject !== "string") {
     return null;
   }
-  
+
   // Trim the string
   const str = stringifiedObject.trim();
-  
+
+  // Check if it looks like JSON or YAML - if so, return null to let JSON/YAML parsers handle it
+  // JSON starts with { or [
+  if (str.startsWith("{") || str.startsWith("[")) {
+    return null;
+  }
+
   // Check if it looks like YAML (key: value pattern outside of quotes)
   // This regex checks for word followed by colon and space/newline, not inside quotes
   const yamlPattern = /^\w+:\s/;
   if (yamlPattern.test(str)) {
     return null;
   }
-  
+  // Check if it looks like a YAML array (starts with '-')
+  if (str.startsWith("-")) {
+    return null;
+  }
+
   // Parse XML-style attributes
   const result = {};
   // Regex to match key=value or key="value" or key='value'
@@ -63,38 +73,43 @@ function parseXmlAttributes({ stringifiedObject }) {
   const attrRegex = /([\w.]+)=(?:"([^"]*)"|'([^']*)'|(\S+))/g;
   let match;
   let hasMatches = false;
-  
+
   while ((match = attrRegex.exec(str)) !== null) {
     hasMatches = true;
     const keyPath = match[1];
     // Value can be in group 2 (double quotes), 3 (single quotes), or 4 (unquoted)
-    let value = match[2] !== undefined ? match[2] : (match[3] !== undefined ? match[3] : match[4]);
-    
+    let value =
+      match[2] !== undefined
+        ? match[2]
+        : match[3] !== undefined
+        ? match[3]
+        : match[4];
+
     // Try to parse as boolean
-    if (value === 'true') {
+    if (value === "true") {
       value = true;
-    } else if (value === 'false') {
+    } else if (value === "false") {
       value = false;
-    } else if (!isNaN(value) && value !== '') {
+    } else if (!isNaN(value) && value !== "") {
       // Try to parse as number
       value = Number(value);
     }
     // else keep as string
-    
+
     // Handle dot notation for nested objects
-    if (keyPath.includes('.')) {
-      const keys = keyPath.split('.');
+    if (keyPath.includes(".")) {
+      const keys = keyPath.split(".");
       let current = result;
-      
+
       // Navigate/create the nested structure
       for (let i = 0; i < keys.length - 1; i++) {
         const key = keys[i];
-        if (!current[key] || typeof current[key] !== 'object') {
+        if (!current[key] || typeof current[key] !== "object") {
           current[key] = {};
         }
         current = current[key];
       }
-      
+
       // Set the final value
       current[keys[keys.length - 1]] = value;
     } else {
@@ -102,7 +117,7 @@ function parseXmlAttributes({ stringifiedObject }) {
       result[keyPath] = value;
     }
   }
-  
+
   return hasMatches ? result : null;
 }
 
@@ -114,7 +129,7 @@ function parseObject({ stringifiedObject }) {
     if (xmlAttrs !== null) {
       return xmlAttrs;
     }
-    
+
     // If string, try to parse as JSON or YAML
     try {
       const json = JSON.parse(stringifiedObject);
@@ -202,8 +217,12 @@ async function qualifyFiles({ config }) {
     let isDir = fs.statSync(source).isDirectory();
 
     // If ditamap, process with `dita` to build files, then add output directory to dirs array
-    if (isFile && path.extname(source) === ".ditamap" && config.processDitaMap) {
-      const ditaOutput = await processDitaMap({config, source});
+    if (
+      isFile &&
+      path.extname(source) === ".ditamap" &&
+      config.processDitaMap
+    ) {
+      const ditaOutput = await processDitaMap({ config, source });
       if (ditaOutput) {
         // Add output directory to to sequence right after the ditamap file
         const currentIndex = sequence.indexOf(source);
@@ -247,7 +266,7 @@ async function qualifyFiles({ config }) {
 }
 
 // Process dita map into a set of files
-async function processDitaMap({config, source}) {
+async function processDitaMap({ config, source }) {
   // Get MD5 hash of source path to create unique temp directory
   const hash = crypto.createHash("md5").update(source).digest("hex");
   const outputDir = `${os.tmpdir}/doc-detective/ditamap_${hash}`;
@@ -267,7 +286,14 @@ async function processDitaMap({config, source}) {
   }
 
   log(config, "info", `Processing DITA map: ${source}`);
-  const ditaOutputDir = await spawnCommand("dita", ["-i", source, "-f", "dita", "-o", outputDir]);
+  const ditaOutputDir = await spawnCommand("dita", [
+    "-i",
+    source,
+    "-f",
+    "dita",
+    "-o",
+    outputDir,
+  ]);
   if (ditaOutputDir.exitCode !== 0) {
     log(config, "error", `Failed to process DITA map: ${ditaOutputDir.stderr}`);
     return null;
