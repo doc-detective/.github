@@ -1,9 +1,122 @@
+const { isWindowsContext, parseWindowsSelector } = require("./windowsElementStrategies");
+
 exports.findElementBySelectorAndText = findElementBySelectorAndText;
 exports.findElementByShorthand = findElementByShorthand;
 exports.findElementByCriteria = findElementByCriteria;
 
 // Set element outputs
 exports.setElementOutputs = setElementOutputs;
+
+/**
+ * Find element using Windows-specific locator strategies
+ * @param {Object} options
+ * @param {Object} options.driver - WebDriverIO driver
+ * @param {string} options.selector - Selector string
+ * @param {number} options.timeout - Timeout in ms
+ * @returns {Object} Element and foundBy
+ */
+async function findWindowsElement({ driver, selector, timeout = 5000 }) {
+  const parsed = parseWindowsSelector(selector);
+  
+  if (!parsed.strategy) {
+    return { element: null, foundBy: null, error: `Unable to parse selector: ${selector}` };
+  }
+
+  try {
+    // Use WebDriverIO's findElement with explicit Appium strategy
+    let element;
+    switch (parsed.strategy) {
+      case "accessibility id":
+        // For accessibility id, use the ~ prefix
+        element = await driver.$(`~${parsed.value}`);
+        break;
+      case "name":
+        // For name, use XPath with Name attribute
+        element = await driver.$(`//*[@Name="${parsed.value}"]`);
+        break;
+      case "class name":
+        // For class name in Windows, use xpath with LocalizedControlType
+        element = await driver.$(`//*[@LocalizedControlType="${parsed.value}"]`);
+        break;
+      case "xpath":
+        element = await driver.$(parsed.value);
+        break;
+      default:
+        // Fallback to using the value directly
+        element = await driver.$(parsed.value);
+    }
+    
+    await element.waitForExist({ timeout });
+    return { element, foundBy: `${parsed.strategy}: ${parsed.value}` };
+  } catch (error) {
+    return { element: null, foundBy: null, error: error.message };
+  }
+}
+
+/**
+ * Find element in Windows app using multiple strategies
+ * @param {Object} options
+ * @param {Object} options.driver - WebDriverIO driver
+ * @param {string} options.string - Search string
+ * @param {number} options.timeout - Timeout in ms
+ * @returns {Object} Element and foundBy
+ */
+async function findWindowsElementByShorthand({ driver, string, timeout = 5000 }) {
+  const parsed = parseWindowsSelector(string);
+  
+  // Try to find element using the parsed strategy
+  if (parsed.strategy) {
+    try {
+      let element;
+      
+      switch (parsed.strategy) {
+        case "accessibility id":
+          // For accessibility id, use the ~ prefix in WebDriverIO/Appium
+          element = await driver.$(`~${parsed.value}`);
+          break;
+        case "name":
+          // For name, use XPath
+          element = await driver.$(`//*[@Name="${parsed.value}"]`);
+          break;
+        case "class name":
+          // For class name, use XPath with LocalizedControlType
+          element = await driver.$(`//*[@LocalizedControlType="${parsed.value}"]`);
+          break;
+        case "xpath":
+          element = await driver.$(parsed.value);
+          break;
+        default:
+          element = await driver.$(parsed.value);
+      }
+      
+      await element.waitForExist({ timeout });
+      return { element, foundBy: `${parsed.strategy}` };
+    } catch {
+      // Fall through to try other strategies
+    }
+  }
+
+  // Try multiple Windows strategies in order using WebDriverIO $ with proper prefixes
+  const strategies = [
+    { name: "accessibility id", selector: `~${string}` },
+    { name: "name (xpath)", selector: `//*[@Name="${string}"]` },
+    { name: "contains name (xpath)", selector: `//*[contains(@Name, "${string}")]` },
+  ];
+
+  for (const strategy of strategies) {
+    try {
+      const element = await driver.$(strategy.selector);
+      await element.waitForExist({ timeout: Math.min(timeout, 2000) });
+      if (element) {
+        return { element, foundBy: strategy.name };
+      }
+    } catch {
+      // Continue to next strategy
+    }
+  }
+
+  return { element: null, foundBy: null };
+}
 
 async function setElementOutputs({ element }) {
   // Set element in outputs
@@ -118,7 +231,12 @@ async function findElementByTestIdRegex({ pattern, timeout, driver }) {
   return { element: null, foundBy: null };
 }
 
-async function findElementByShorthand({ string, timeout = 5000, driver }) {
+async function findElementByShorthand({ string, timeout = 5000, driver, context }) {
+  // For Windows apps, use Windows-specific element finding
+  if (isWindowsContext(context)) {
+    return findWindowsElementByShorthand({ driver, string, timeout });
+  }
+
   // Find an element based on a string that could be a selector, text, aria label, id, or test id
   // Uses parallel search with precedence: selector > elementText > elementAria > elementId > elementTestId
 
@@ -367,7 +485,35 @@ async function findElementByCriteria({
   elementAria,
   timeout = 5000,
   driver,
+  context,
 }) {
+  // For Windows apps, use simplified Windows-specific element finding
+  if (isWindowsContext(context)) {
+    // For Windows, we primarily support selector-based finding
+    if (selector) {
+      return findWindowsElement({ driver, selector, timeout });
+    }
+    // For other criteria, try to build a selector from them
+    if (elementId) {
+      return findWindowsElement({ driver, selector: `#${elementId}`, timeout });
+    }
+    if (elementText) {
+      // Search by Name property in Windows
+      try {
+        const element = await driver.custom$("name", elementText);
+        await element.waitForExist({ timeout });
+        return { element, foundBy: "name" };
+      } catch (error) {
+        return { element: null, foundBy: null, error: error.message };
+      }
+    }
+    return {
+      element: null,
+      foundBy: null,
+      error: "Windows apps require a selector, elementId, or elementText to find elements",
+    };
+  }
+
   // Validate at least one criterion is provided
   if (
     !selector &&

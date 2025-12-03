@@ -4,7 +4,7 @@ const { findElement } = require("./findElement");
 exports.clickElement = clickElement;
 
 // Click an element.
-async function clickElement({ config, step, driver }) {
+async function clickElement({ config, step, driver, context }) {
   const result = {
     status: "PASS",
     description: "Clicked element.",
@@ -41,6 +41,7 @@ async function clickElement({ config, step, driver }) {
     step: findStep,
     driver,
     click: true,
+    context,
   });
 
   result.outputs = findResult.outputs;

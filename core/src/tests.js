@@ -883,6 +883,7 @@ async function runStep({
       config: config,
       step: step,
       driver: driver,
+      context: context,
     });
   } else if (typeof step.dragAndDrop !== "undefined") {
     actionResult = await dragAndDropElement({
@@ -893,7 +894,7 @@ async function runStep({
   } else if (typeof step.checkLink !== "undefined") {
     actionResult = await checkLink({ config: config, step: step });
   } else if (typeof step.find !== "undefined") {
-    actionResult = await findElement({ config: config, step: step, driver });
+    actionResult = await findElement({ config: config, step: step, driver, context });
   } else if (typeof step.stopRecord !== "undefined") {
     actionResult = await stopRecording({ config: config, step: step, driver });
   } else if (typeof step.goTo !== "undefined") {

@@ -11,7 +11,7 @@ const { wait } = require("./wait");
 exports.findElement = findElement;
 
 // Find a single element
-async function findElement({ config, step, driver, click }) {
+async function findElement({ config, step, driver, click, context }) {
   let result = {
     status: "PASS",
     description: "Found an element matching selector.",
@@ -33,6 +33,7 @@ async function findElement({ config, step, driver, click }) {
     const { element, foundBy } = await findElementByShorthand({
       string: step.find,
       driver,
+      context,
     });
     if (element) {
       result.description += ` Found element by ${foundBy}.`;
@@ -78,6 +79,7 @@ async function findElement({ config, step, driver, click }) {
     elementAria: step.find.elementAria,
     timeout: step.find.timeout,
     driver,
+    context,
   });
 
   if (!foundElement) {
