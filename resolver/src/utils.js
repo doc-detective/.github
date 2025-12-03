@@ -192,6 +192,16 @@ async function qualifyFiles({ config }) {
   let sequence = [];
 
   // Determine source sequence
+  // Add Heretto output paths to the beginning of the sequence
+  if (config?.integrations?.heretto) {
+    for (const herettoConfig of config.integrations.heretto) {
+      if (herettoConfig.outputPath) {
+        log(config, "debug", `Adding Heretto output path: ${herettoConfig.outputPath}`);
+        sequence.unshift(herettoConfig.outputPath);
+      }
+    }
+  }
+
   const setup = config.beforeAny;
   if (setup) sequence = sequence.concat(setup);
   const input = config.input;
