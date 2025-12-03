@@ -33,17 +33,18 @@ function resolveContexts({ contexts, test, config }) {
   log(config, "debug", `Determining required contexts for test: ${test.testId}`);
   const resolvedContexts = [];
 
-  // Check if current test requires a browser
-  let browserRequired = false;
+  // Check if current test requires a driver (browser or app)
+  let driverRequired = false;
   test.steps.forEach((step) => {
     // Check if test includes actions that require a driver.
     driverActions.forEach((action) => {
-      if (typeof step[action] !== "undefined") browserRequired = true;
+      if (typeof step[action] !== "undefined") driverRequired = true;
     });
   });
 
   // Standardize context format
   contexts.forEach((context) => {
+    // Handle browsers
     if (context.browsers) {
       if (
         typeof context.browsers === "string" ||
@@ -61,6 +62,23 @@ function resolveContexts({ contexts, test, config }) {
         return browser;
       });
     }
+    // Handle apps (Windows desktop applications)
+    if (context.apps) {
+      if (
+        typeof context.apps === "string" ||
+        (typeof context.apps === "object" &&
+          !Array.isArray(context.apps))
+      ) {
+        // If apps is a string or an object, convert to array
+        context.apps = [context.apps];
+      }
+      context.apps = context.apps.map((app) => {
+        if (typeof app === "string") {
+          app = { name: app };
+        }
+        return app;
+      });
+    }
     if (context.platforms) {
       if (typeof context.platforms === "string") {
         context.platforms = [context.platforms];
@@ -68,20 +86,31 @@ function resolveContexts({ contexts, test, config }) {
     }
   });
 
-  // Resolve to final contexts. Each context should include a single platform and at most a single browser.
-  // If no browsers are required, filter down to platform-based contexts
-  // If browsers are required, create contexts for each specified combination of platform and browser
+  // Resolve to final contexts. Each context should include a single platform and at most a single browser or app.
+  // If no driver is required, filter down to platform-based contexts
+  // If driver is required, create contexts for each specified combination of platform and browser/app
   contexts.forEach((context) => {
     const staticContexts = [];
     context.platforms.forEach((platform) => {
-      if (!browserRequired) {
+      if (!driverRequired) {
         const staticContext = { platform };
         staticContexts.push(staticContext);
-      } else {
+      } else if (context.apps && context.apps.length > 0) {
+        // Windows app contexts - one context per app
+        context.apps.forEach((app) => {
+          const staticContext = { platform, app };
+          staticContexts.push(staticContext);
+        });
+      } else if (context.browsers && context.browsers.length > 0) {
+        // Browser contexts
         context.browsers.forEach((browser) => {
           const staticContext = { platform, browser };
           staticContexts.push(staticContext);
         });
+      } else {
+        // No specific browser or app, just platform
+        const staticContext = { platform };
+        staticContexts.push(staticContext);
       }
     });
     // For each static context, check if a matching object already exists in resolvedContexts. If not, push to resolvedContexts.
@@ -90,7 +119,9 @@ function resolveContexts({ contexts, test, config }) {
         return (
           resolvedContext.platform === staticContext.platform &&
           JSON.stringify(resolvedContext.browser) ===
-            JSON.stringify(staticContext.browser)
+            JSON.stringify(staticContext.browser) &&
+          JSON.stringify(resolvedContext.app) ===
+            JSON.stringify(staticContext.app)
         );
       });
       if (!existingContext) {
@@ -190,10 +221,14 @@ async function resolveSpec({ config, spec }) {
 async function resolveTest({ config, spec, test }) {
   const testId = test.testId || crypto.randomUUID();
   log(config, "debug", `RESOLVING TEST ID ${testId}:\n${JSON.stringify(test, null, 2)}`);
+  
+  // Use test.contexts if defined, otherwise fall back to runOn or spec.runOn
+  const testRunOn = test.contexts || test.runOn || spec.runOn;
+  
   const resolvedTest = {
     ...test,
     testId: testId,
-    runOn: test.runOn || spec.runOn,
+    runOn: testRunOn,
     openApi: await fetchOpenApiDocuments({
       config,
       documentArray: [...spec.openApi, ...(test.openApi || [])],
@@ -204,7 +239,7 @@ async function resolveTest({ config, spec, test }) {
 
   const testContexts = resolveContexts({
     test: test,
-    contexts: resolvedTest.runOn,
+    contexts: testRunOn,
     config: config,
   });
 

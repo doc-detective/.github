@@ -1,0 +1,41 @@
+{
+  "$schema": "https://raw.githubusercontent.com/doc-detective/common/refs/heads/main/dist/schemas/spec_v3.schema.json",
+  "description": "Windows Notepad integration test",
+  "tests": [
+    {
+      "testId": "notepad-basic-test",
+      "description": "Open Notepad, type text, and take a screenshot",
+      "contexts": [
+        {
+          "platforms": "windows",
+          "apps": {
+            "name": "notepad",
+            "options": {
+              "keepAppOpen": false,
+              "launchTimeout": 30000
+            }
+          }
+        }
+      ],
+      "steps": [
+        {
+          "description": "Wait for Notepad to load",
+          "wait": 2000
+        },
+        {
+          "description": "Type test text",
+          "type": {
+            "keys": ["Hello from Doc Detective Windows Integration Test!"]
+          }
+        },
+        {
+          "description": "Take a screenshot",
+          "screenshot": {
+            "path": "notepad-integration-test.png",
+            "directory": "test/artifacts"
+          }
+        }
+      ]
+    }
+  ]
+}

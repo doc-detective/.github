@@ -83,6 +83,7 @@
     "@img/sharp-win32-x64": "^0.34.5"
   },
   "devDependencies": {
+    "appium-novawindows-driver": "^1.2.0-preview.2",
     "depcheck": "^1.4.7",
     "express": "^5.2.1",
     "mocha": "^11.7.5",

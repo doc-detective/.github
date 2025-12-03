@@ -1,10 +1,31 @@
 const path = require("path");
 const browsers = require("@puppeteer/browsers");
 const geckodriver = require("geckodriver");
+const { spawn } = require("child_process");
 
 async function main() {
   await installBrowsers();
   // await installAppiumDepencencies();
+
+  // Check if on Windows and provide NovaWindows driver installation info
+  if (process.platform === "win32") {
+    console.log("");
+    console.log("=".repeat(70));
+    console.log("Windows Desktop Automation Support");
+    console.log("=".repeat(70));
+    console.log("");
+    console.log("To enable Windows desktop application testing, install the NovaWindows Driver:");
+    console.log("");
+    console.log("  npx appium driver install --source=npm appium-novawindows-driver");
+    console.log("");
+    console.log("Requirements:");
+    console.log("  - Windows 10 version 1809+ or Windows 11");
+    console.log("  - No Developer Mode required");
+    console.log("");
+    console.log("Documentation: https://github.com/AutomateThePlanet/appium-novawindows-driver");
+    console.log("=".repeat(70));
+    console.log("");
+  }
 }
 
 main();

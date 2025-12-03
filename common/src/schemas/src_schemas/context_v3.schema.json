@@ -56,6 +56,30 @@
           }
         }
       ]
+    },
+    "apps": {
+      "description": "Windows desktop applications to run tests on. Only supported on Windows platforms.",
+      "anyOf": [
+        {
+          "$ref": "app_v3.schema.json#/components/schemas/appName"
+        },
+        {
+          "$ref": "app_v3.schema.json#/components/schemas/appConfig"
+        },
+        {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "app_v3.schema.json#/components/schemas/appName"
+              },
+              {
+                "$ref": "app_v3.schema.json#/components/schemas/appConfig"
+              }
+            ]
+          }
+        }
+      ]
     }
   },
   "components": {
@@ -197,6 +221,30 @@
           }
         }
       ]
+    },
+    {
+      "platforms": "windows",
+      "apps": "notepad"
+    },
+    {
+      "platforms": "windows",
+      "apps": {
+        "name": "calculator",
+        "options": {
+          "smoothMouseMove": true
+        }
+      }
+    },
+    {
+      "platforms": "windows",
+      "apps": {
+        "name": "myapp",
+        "path": "C:\\Program Files\\MyApp\\myapp.exe",
+        "options": {
+          "launchTimeout": 60000,
+          "keepAppOpen": true
+        }
+      }
     }
   ]
 }

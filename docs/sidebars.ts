@@ -80,6 +80,7 @@ const sidebars: SidebarsConfig = {
             "get-started/tutorials/fill-fields",
             "get-started/tutorials/capture-screenshot",
             "get-started/tutorials/record-video",
+            "get-started/tutorials/windows-app-testing",
           ],
         },
 

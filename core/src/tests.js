@@ -26,6 +26,12 @@ const { randomUUID } = require("crypto");
 const { setAppiumHome } = require("./appium");
 const { resolveExpression } = require("./expressions");
 const { getEnvironment, getAvailableApps } = require("./config");
+const {
+  normalizeAppConfig,
+  getNovaWindowsCapabilities,
+  getNovaWindowsNotInstalledError,
+  getAppNotFoundError,
+} = require("./windowsApp");
 
 exports.runSpecs = runSpecs;
 exports.runViaApi = runViaApi;
@@ -49,9 +55,15 @@ const driverActions = [
 ];
 
 // Get Appium driver capabilities and apply options.
-function getDriverCapabilities({ runnerDetails, name, options }) {
+function getDriverCapabilities({ runnerDetails, name, options, app }) {
   let capabilities = {};
   let args = [];
+
+  // Handle Windows app context
+  if (app) {
+    const normalizedApp = normalizeAppConfig(app);
+    return getNovaWindowsCapabilities({ app: normalizedApp, runnerDetails });
+  }
 
   // Set Firefox capabilities
   switch (name) {
@@ -175,6 +187,17 @@ function isSupportedContext({ context, apps, platform }) {
   const isSupportedPlatform = context.platform === platform;
   if (context?.browser?.name)
     isSupportedApp = apps.find((app) => app.name === context.browser.name);
+
+  // Check Windows app support
+  if (context?.app) {
+    // Windows apps only supported on Windows
+    if (platform !== "windows") {
+      return false;
+    }
+    // Check if NovaWindows driver is available
+    isSupportedApp = apps.find((app) => app.name === "novawindows");
+  }
+
   // Return boolean
   if (isSupportedApp && isSupportedPlatform) {
     return true;
@@ -487,6 +510,7 @@ async function runSpecs({ resolvedTests }) {
           contextId: context.contextId || randomUUID(),
           platform: context.platform,
           browser: context.browser,
+          app: context.app,
           steps: [],
         };
         // Set meta values
@@ -525,16 +549,39 @@ async function runSpecs({ resolvedTests }) {
         const driverRequired = isDriverRequired({ test: context });
         if (driverRequired) {
           // Define driver capabilities
-          // TODO: Support custom apps
-          let caps = getDriverCapabilities({
-            runnerDetails: runnerDetails,
-            name: context.browser.name,
-            options: {
-              width: context.browser?.window?.width || 1200,
-              height: context.browser?.window?.height || 800,
-              headless: context.browser?.headless !== false,
-            },
-          });
+          let caps;
+          const isWindowsApp = !!context.app;
+
+          if (isWindowsApp) {
+            // Windows app context - use NovaWindows Driver
+            try {
+              caps = getDriverCapabilities({
+                runnerDetails: runnerDetails,
+                app: context.app,
+              });
+            } catch (error) {
+              log(config, "error", error.message);
+              contextReport = {
+                result: "SKIPPED",
+                resultDescription: error.message,
+                ...contextReport,
+              };
+              report.summary.contexts.skipped++;
+              testReport.contexts.push(contextReport);
+              continue;
+            }
+          } else {
+            // Browser context
+            caps = getDriverCapabilities({
+              runnerDetails: runnerDetails,
+              name: context.browser.name,
+              options: {
+                width: context.browser?.window?.width || 1200,
+                height: context.browser?.window?.height || 800,
+                headless: context.browser?.headless !== false,
+              },
+            });
+          }
           log(config, "debug", "CAPABILITIES:");
           log(config, "debug", caps);
 
@@ -542,6 +589,22 @@ async function runSpecs({ resolvedTests }) {
           try {
             driver = await driverStart(caps);
           } catch (error) {
+            if (isWindowsApp) {
+              // Windows app driver failed
+              let errorMessage = `Failed to start Windows app context '${context.app?.name || context.app}' on '${platform}'.`;
+              if (!availableApps.find((app) => app.name === "novawindows")) {
+                errorMessage = getNovaWindowsNotInstalledError();
+              }
+              log(config, "error", errorMessage);
+              contextReport = {
+                result: "SKIPPED",
+                resultDescription: errorMessage,
+                ...contextReport,
+              };
+              report.summary.contexts.skipped++;
+              testReport.contexts.push(contextReport);
+              continue;
+            }
             try {
               // If driver fails to start, try again as headless
               log(
@@ -551,7 +614,7 @@ async function runSpecs({ resolvedTests }) {
               );
               context.browser.headless = true;
               caps = getDriverCapabilities({
-                config: config,
+                runnerDetails: runnerDetails,
                 name: context.browser.name,
                 options: {
                   width: context.browser?.window?.width || 1200,
@@ -578,23 +641,26 @@ async function runSpecs({ resolvedTests }) {
             }
           }
 
-          if (
-            context.browser?.viewport?.width ||
-            context.browser?.viewport?.height
-          ) {
-            // Set driver viewport size
-            await setViewportSize(context, driver);
-          } else if (
-            context.browser?.window?.width ||
-            context.browser?.window?.height
-          ) {
-            // Get driver window size
-            const windowSize = await driver.getWindowSize();
-            // Resize window if necessary
-            await driver.setWindowSize(
-              context.browser?.window?.width || windowSize.width,
-              context.browser?.window?.height || windowSize.height
-            );
+          // Set window/viewport size for browser contexts only
+          if (!isWindowsApp) {
+            if (
+              context.browser?.viewport?.width ||
+              context.browser?.viewport?.height
+            ) {
+              // Set driver viewport size
+              await setViewportSize(context, driver);
+            } else if (
+              context.browser?.window?.width ||
+              context.browser?.window?.height
+            ) {
+              // Get driver window size
+              const windowSize = await driver.getWindowSize();
+              // Resize window if necessary
+              await driver.setWindowSize(
+                context.browser?.window?.width || windowSize.width,
+                context.browser?.window?.height || windowSize.height
+              );
+            }
           }
         }
 

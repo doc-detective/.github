@@ -1,0 +1,52 @@
+{
+  "$schema": "https://raw.githubusercontent.com/doc-detective/common/refs/heads/main/dist/schemas/spec_v3.schema.json",
+  "description": "Windows Notepad automation example - demonstrates text editing operations",
+  "tests": [
+    {
+      "testId": "notepad-type-and-save",
+      "description": "Type text in Notepad and verify content",
+      "contexts": [
+        {
+          "platforms": "windows",
+          "apps": {
+            "name": "notepad",
+            "options": {
+              "keepAppOpen": false
+            }
+          }
+        }
+      ],
+      "steps": [
+        {
+          "description": "Wait for Notepad to fully load",
+          "wait": 2000
+        },
+        {
+          "description": "Type a sample text",
+          "type": {
+            "keys": ["Hello from Doc Detective!", "$ENTER$", "Testing Windows automation."]
+          }
+        },
+        {
+          "description": "Take a screenshot of the text",
+          "screenshot": {
+            "path": "notepad-text.png",
+            "directory": "screenshots"
+          }
+        },
+        {
+          "description": "Select all text with Ctrl+A",
+          "type": {
+            "keys": ["$CONTROL$a"]
+          }
+        },
+        {
+          "description": "Verify text is selected by checking if text exists",
+          "find": {
+            "elementText": "Hello from Doc Detective!"
+          }
+        }
+      ]
+    }
+  ]
+}

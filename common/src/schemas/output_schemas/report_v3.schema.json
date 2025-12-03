@@ -248,6 +248,162 @@
                               }
                             }
                           ]
+                        },
+                        "apps": {
+                          "description": "Windows desktop applications to run tests on. Only supported on Windows platforms.",
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "description": "Name of the application. Use a common app name (e.g., 'notepad', 'calculator', 'paint') or provide a path in the full config.",
+                              "enum": [
+                                "notepad",
+                                "calculator",
+                                "paint",
+                                "wordpad"
+                              ]
+                            },
+                            {
+                              "type": "object",
+                              "description": "Detailed application configuration.",
+                              "required": [
+                                "name"
+                              ],
+                              "additionalProperties": false,
+                              "properties": {
+                                "name": {
+                                  "type": "string",
+                                  "description": "Application identifier. Can be a common app name (resolved automatically) or a descriptive name when using a custom path."
+                                },
+                                "path": {
+                                  "type": "string",
+                                  "description": "Full path to the .exe file or UWP package ID. If not specified, Doc Detective will attempt to resolve the path from the name."
+                                },
+                                "appType": {
+                                  "type": "string",
+                                  "description": "Type of Windows application.",
+                                  "enum": [
+                                    "desktop",
+                                    "uwp"
+                                  ],
+                                  "default": "desktop"
+                                },
+                                "options": {
+                                  "type": "object",
+                                  "description": "NovaWindows Driver options.",
+                                  "additionalProperties": false,
+                                  "properties": {
+                                    "launchTimeout": {
+                                      "type": "integer",
+                                      "description": "Maximum time in milliseconds to wait for the application to launch.",
+                                      "default": 30000,
+                                      "minimum": 0
+                                    },
+                                    "windowTitle": {
+                                      "type": "string",
+                                      "description": "Expected window title to match when finding the application window."
+                                    },
+                                    "keepAppOpen": {
+                                      "type": "boolean",
+                                      "description": "If true, the application is left open after the test completes. If false, the application is closed.",
+                                      "default": false
+                                    },
+                                    "clickDelay": {
+                                      "type": "integer",
+                                      "description": "Delay in milliseconds after each click action.",
+                                      "default": 0,
+                                      "minimum": 0
+                                    },
+                                    "smoothMouseMove": {
+                                      "type": "boolean",
+                                      "description": "If true, mouse movements are smooth and animated. If false, mouse movements are instant.",
+                                      "default": false
+                                    }
+                                  },
+                                  "title": "NovaWindows Options"
+                                }
+                              },
+                              "title": "App Config"
+                            },
+                            {
+                              "type": "array",
+                              "items": {
+                                "anyOf": [
+                                  {
+                                    "type": "string",
+                                    "description": "Name of the application. Use a common app name (e.g., 'notepad', 'calculator', 'paint') or provide a path in the full config.",
+                                    "enum": [
+                                      "notepad",
+                                      "calculator",
+                                      "paint",
+                                      "wordpad"
+                                    ]
+                                  },
+                                  {
+                                    "type": "object",
+                                    "description": "Detailed application configuration.",
+                                    "required": [
+                                      "name"
+                                    ],
+                                    "additionalProperties": false,
+                                    "properties": {
+                                      "name": {
+                                        "type": "string",
+                                        "description": "Application identifier. Can be a common app name (resolved automatically) or a descriptive name when using a custom path."
+                                      },
+                                      "path": {
+                                        "type": "string",
+                                        "description": "Full path to the .exe file or UWP package ID. If not specified, Doc Detective will attempt to resolve the path from the name."
+                                      },
+                                      "appType": {
+                                        "type": "string",
+                                        "description": "Type of Windows application.",
+                                        "enum": [
+                                          "desktop",
+                                          "uwp"
+                                        ],
+                                        "default": "desktop"
+                                      },
+                                      "options": {
+                                        "type": "object",
+                                        "description": "NovaWindows Driver options.",
+                                        "additionalProperties": false,
+                                        "properties": {
+                                          "launchTimeout": {
+                                            "type": "integer",
+                                            "description": "Maximum time in milliseconds to wait for the application to launch.",
+                                            "default": 30000,
+                                            "minimum": 0
+                                          },
+                                          "windowTitle": {
+                                            "type": "string",
+                                            "description": "Expected window title to match when finding the application window."
+                                          },
+                                          "keepAppOpen": {
+                                            "type": "boolean",
+                                            "description": "If true, the application is left open after the test completes. If false, the application is closed.",
+                                            "default": false
+                                          },
+                                          "clickDelay": {
+                                            "type": "integer",
+                                            "description": "Delay in milliseconds after each click action.",
+                                            "default": 0,
+                                            "minimum": 0
+                                          },
+                                          "smoothMouseMove": {
+                                            "type": "boolean",
+                                            "description": "If true, mouse movements are smooth and animated. If false, mouse movements are instant.",
+                                            "default": false
+                                          }
+                                        },
+                                        "title": "NovaWindows Options"
+                                      }
+                                    },
+                                    "title": "App Config"
+                                  }
+                                ]
+                              }
+                            }
+                          ]
                         }
                       },
                       "components": {
@@ -423,6 +579,30 @@
                               }
                             }
                           ]
+                        },
+                        {
+                          "platforms": "windows",
+                          "apps": "notepad"
+                        },
+                        {
+                          "platforms": "windows",
+                          "apps": {
+                            "name": "calculator",
+                            "options": {
+                              "smoothMouseMove": true
+                            }
+                          }
+                        },
+                        {
+                          "platforms": "windows",
+                          "apps": {
+                            "name": "myapp",
+                            "path": "C:\\Program Files\\MyApp\\myapp.exe",
+                            "options": {
+                              "launchTimeout": 60000,
+                              "keepAppOpen": true
+                            }
+                          }
                         }
                       ]
                     }
@@ -841,6 +1021,162 @@
                                         }
                                       }
                                     ]
+                                  },
+                                  "apps": {
+                                    "description": "Windows desktop applications to run tests on. Only supported on Windows platforms.",
+                                    "anyOf": [
+                                      {
+                                        "type": "string",
+                                        "description": "Name of the application. Use a common app name (e.g., 'notepad', 'calculator', 'paint') or provide a path in the full config.",
+                                        "enum": [
+                                          "notepad",
+                                          "calculator",
+                                          "paint",
+                                          "wordpad"
+                                        ]
+                                      },
+                                      {
+                                        "type": "object",
+                                        "description": "Detailed application configuration.",
+                                        "required": [
+                                          "name"
+                                        ],
+                                        "additionalProperties": false,
+                                        "properties": {
+                                          "name": {
+                                            "type": "string",
+                                            "description": "Application identifier. Can be a common app name (resolved automatically) or a descriptive name when using a custom path."
+                                          },
+                                          "path": {
+                                            "type": "string",
+                                            "description": "Full path to the .exe file or UWP package ID. If not specified, Doc Detective will attempt to resolve the path from the name."
+                                          },
+                                          "appType": {
+                                            "type": "string",
+                                            "description": "Type of Windows application.",
+                                            "enum": [
+                                              "desktop",
+                                              "uwp"
+                                            ],
+                                            "default": "desktop"
+                                          },
+                                          "options": {
+                                            "type": "object",
+                                            "description": "NovaWindows Driver options.",
+                                            "additionalProperties": false,
+                                            "properties": {
+                                              "launchTimeout": {
+                                                "type": "integer",
+                                                "description": "Maximum time in milliseconds to wait for the application to launch.",
+                                                "default": 30000,
+                                                "minimum": 0
+                                              },
+                                              "windowTitle": {
+                                                "type": "string",
+                                                "description": "Expected window title to match when finding the application window."
+                                              },
+                                              "keepAppOpen": {
+                                                "type": "boolean",
+                                                "description": "If true, the application is left open after the test completes. If false, the application is closed.",
+                                                "default": false
+                                              },
+                                              "clickDelay": {
+                                                "type": "integer",
+                                                "description": "Delay in milliseconds after each click action.",
+                                                "default": 0,
+                                                "minimum": 0
+                                              },
+                                              "smoothMouseMove": {
+                                                "type": "boolean",
+                                                "description": "If true, mouse movements are smooth and animated. If false, mouse movements are instant.",
+                                                "default": false
+                                              }
+                                            },
+                                            "title": "NovaWindows Options"
+                                          }
+                                        },
+                                        "title": "App Config"
+                                      },
+                                      {
+                                        "type": "array",
+                                        "items": {
+                                          "anyOf": [
+                                            {
+                                              "type": "string",
+                                              "description": "Name of the application. Use a common app name (e.g., 'notepad', 'calculator', 'paint') or provide a path in the full config.",
+                                              "enum": [
+                                                "notepad",
+                                                "calculator",
+                                                "paint",
+                                                "wordpad"
+                                              ]
+                                            },
+                                            {
+                                              "type": "object",
+                                              "description": "Detailed application configuration.",
+                                              "required": [
+                                                "name"
+                                              ],
+                                              "additionalProperties": false,
+                                              "properties": {
+                                                "name": {
+                                                  "type": "string",
+                                                  "description": "Application identifier. Can be a common app name (resolved automatically) or a descriptive name when using a custom path."
+                                                },
+                                                "path": {
+                                                  "type": "string",
+                                                  "description": "Full path to the .exe file or UWP package ID. If not specified, Doc Detective will attempt to resolve the path from the name."
+                                                },
+                                                "appType": {
+                                                  "type": "string",
+                                                  "description": "Type of Windows application.",
+                                                  "enum": [
+                                                    "desktop",
+                                                    "uwp"
+                                                  ],
+                                                  "default": "desktop"
+                                                },
+                                                "options": {
+                                                  "type": "object",
+                                                  "description": "NovaWindows Driver options.",
+                                                  "additionalProperties": false,
+                                                  "properties": {
+                                                    "launchTimeout": {
+                                                      "type": "integer",
+                                                      "description": "Maximum time in milliseconds to wait for the application to launch.",
+                                                      "default": 30000,
+                                                      "minimum": 0
+                                                    },
+                                                    "windowTitle": {
+                                                      "type": "string",
+                                                      "description": "Expected window title to match when finding the application window."
+                                                    },
+                                                    "keepAppOpen": {
+                                                      "type": "boolean",
+                                                      "description": "If true, the application is left open after the test completes. If false, the application is closed.",
+                                                      "default": false
+                                                    },
+                                                    "clickDelay": {
+                                                      "type": "integer",
+                                                      "description": "Delay in milliseconds after each click action.",
+                                                      "default": 0,
+                                                      "minimum": 0
+                                                    },
+                                                    "smoothMouseMove": {
+                                                      "type": "boolean",
+                                                      "description": "If true, mouse movements are smooth and animated. If false, mouse movements are instant.",
+                                                      "default": false
+                                                    }
+                                                  },
+                                                  "title": "NovaWindows Options"
+                                                }
+                                              },
+                                              "title": "App Config"
+                                            }
+                                          ]
+                                        }
+                                      }
+                                    ]
                                   }
                                 },
                                 "components": {
@@ -1016,6 +1352,30 @@
                                         }
                                       }
                                     ]
+                                  },
+                                  {
+                                    "platforms": "windows",
+                                    "apps": "notepad"
+                                  },
+                                  {
+                                    "platforms": "windows",
+                                    "apps": {
+                                      "name": "calculator",
+                                      "options": {
+                                        "smoothMouseMove": true
+                                      }
+                                    }
+                                  },
+                                  {
+                                    "platforms": "windows",
+                                    "apps": {
+                                      "name": "myapp",
+                                      "path": "C:\\Program Files\\MyApp\\myapp.exe",
+                                      "options": {
+                                        "launchTimeout": 60000,
+                                        "keepAppOpen": true
+                                      }
+                                    }
                                   }
                                 ]
                               }

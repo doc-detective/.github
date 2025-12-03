@@ -7,6 +7,7 @@ const fs = require("fs");
 const browsers = require("@puppeteer/browsers");
 const { setAppiumHome } = require("./appium");
 const { loadDescription } = require("./openapi");
+const { isNovaWindowsAvailable } = require("./windowsApp");
 
 exports.setConfig = setConfig;
 exports.getAvailableApps = getAvailableApps;
@@ -364,6 +365,14 @@ async function getAvailableApps({ config }) {
 
     if (safariVersion.exitCode === 0 && appiumSafari) {
       apps.push({ name: "safari", version: safariVersion, path: "" });
+    }
+  }
+
+  // Detect NovaWindows Driver for Windows desktop automation
+  if (config.environment.platform === "windows") {
+    const novaWindowsDriver = isNovaWindowsAvailable(installedAppiumDrivers);
+    if (novaWindowsDriver) {
+      apps.push(novaWindowsDriver);
     }
   }
 

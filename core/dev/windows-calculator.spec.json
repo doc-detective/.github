@@ -1,0 +1,93 @@
+{
+  "$schema": "https://raw.githubusercontent.com/doc-detective/common/refs/heads/main/dist/schemas/spec_v3.schema.json",
+  "description": "Windows Calculator automation example - demonstrates basic arithmetic operations",
+  "tests": [
+    {
+      "testId": "calculator-basic-addition",
+      "description": "Verify 7 + 3 = 10 using Windows Calculator",
+      "contexts": [
+        {
+          "platforms": "windows",
+          "apps": {
+            "name": "calculator",
+            "options": {
+              "smoothMouseMove": true,
+              "launchTimeout": 30000
+            }
+          }
+        }
+      ],
+      "steps": [
+        {
+          "description": "Click the number 7",
+          "click": "[id='num7Button']"
+        },
+        {
+          "description": "Click the plus button",
+          "click": "[id='plusButton']"
+        },
+        {
+          "description": "Click the number 3",
+          "click": "[id='num3Button']"
+        },
+        {
+          "description": "Click the equals button",
+          "click": "[id='equalButton']"
+        },
+        {
+          "description": "Verify the result shows 10",
+          "find": {
+            "selector": "[id='CalculatorResults']",
+            "elementText": "/Display is 10/"
+          }
+        },
+        {
+          "description": "Take a screenshot of the result",
+          "screenshot": {
+            "path": "calculator-result.png",
+            "directory": "screenshots"
+          }
+        }
+      ]
+    },
+    {
+      "testId": "calculator-clear-and-multiply",
+      "description": "Clear calculator and verify 8 x 4 = 32",
+      "contexts": [
+        {
+          "platforms": "windows",
+          "apps": "calculator"
+        }
+      ],
+      "steps": [
+        {
+          "description": "Click the clear button",
+          "click": "[id='clearButton']"
+        },
+        {
+          "description": "Click the number 8",
+          "click": "[id='num8Button']"
+        },
+        {
+          "description": "Click the multiply button",
+          "click": "[id='multiplyButton']"
+        },
+        {
+          "description": "Click the number 4",
+          "click": "[id='num4Button']"
+        },
+        {
+          "description": "Click the equals button",
+          "click": "[id='equalButton']"
+        },
+        {
+          "description": "Verify the result shows 32",
+          "find": {
+            "selector": "[id='CalculatorResults']",
+            "elementText": "/Display is 32/"
+          }
+        }
+      ]
+    }
+  ]
+}
