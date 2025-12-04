@@ -8,6 +8,32 @@ exports.findElementByCriteria = findElementByCriteria;
 exports.setElementOutputs = setElementOutputs;
 
 /**
+ * Escape a string for safe use in XPath expressions.
+ * Handles strings containing quotes by using concat() when necessary.
+ * @param {string} value - The string to escape
+ * @returns {string} - XPath-safe string expression
+ */
+function escapeXPathValue(value) {
+  if (value == null) return "''";
+  const str = String(value);
+  
+  // If no quotes, wrap in double quotes
+  if (!str.includes('"')) {
+    return `"${str}"`;
+  }
+  // If no single quotes, wrap in single quotes
+  if (!str.includes("'")) {
+    return `'${str}'`;
+  }
+  // Contains both types of quotes - use concat()
+  const parts = str.split('"').map((part, i) => {
+    if (i === 0) return part ? `"${part}"` : null;
+    return part ? `'"', "${part}"` : `'"'`;
+  }).filter(Boolean);
+  return `concat(${parts.join(", ")})`;
+}
+
+/**
  * Find element using Windows-specific locator strategies
  * @param {Object} options
  * @param {Object} options.driver - WebDriverIO driver
@@ -31,12 +57,12 @@ async function findWindowsElement({ driver, selector, timeout = 5000 }) {
         element = await driver.$(`~${parsed.value}`);
         break;
       case "name":
-        // For name, use XPath with Name attribute
-        element = await driver.$(`//*[@Name="${parsed.value}"]`);
+        // For name, use XPath with Name attribute (escaped to prevent XPath injection)
+        element = await driver.$(`//*[@Name=${escapeXPathValue(parsed.value)}]`);
         break;
       case "class name":
-        // For class name in Windows, use xpath with LocalizedControlType
-        element = await driver.$(`//*[@LocalizedControlType="${parsed.value}"]`);
+        // For class name in Windows, use xpath with LocalizedControlType (escaped)
+        element = await driver.$(`//*[@LocalizedControlType=${escapeXPathValue(parsed.value)}]`);
         break;
       case "xpath":
         element = await driver.$(parsed.value);
@@ -75,12 +101,12 @@ async function findWindowsElementByShorthand({ driver, string, timeout = 5000 })
           element = await driver.$(`~${parsed.value}`);
           break;
         case "name":
-          // For name, use XPath
-          element = await driver.$(`//*[@Name="${parsed.value}"]`);
+          // For name, use XPath (escaped to prevent XPath injection)
+          element = await driver.$(`//*[@Name=${escapeXPathValue(parsed.value)}]`);
           break;
         case "class name":
-          // For class name, use XPath with LocalizedControlType
-          element = await driver.$(`//*[@LocalizedControlType="${parsed.value}"]`);
+          // For class name, use XPath with LocalizedControlType (escaped)
+          element = await driver.$(`//*[@LocalizedControlType=${escapeXPathValue(parsed.value)}]`);
           break;
         case "xpath":
           element = await driver.$(parsed.value);
@@ -97,10 +123,11 @@ async function findWindowsElementByShorthand({ driver, string, timeout = 5000 })
   }
 
   // Try multiple Windows strategies in order using WebDriverIO $ with proper prefixes
+  // XPath selectors use escapeXPathValue to prevent injection attacks
   const strategies = [
     { name: "accessibility id", selector: `~${string}` },
-    { name: "name (xpath)", selector: `//*[@Name="${string}"]` },
-    { name: "contains name (xpath)", selector: `//*[contains(@Name, "${string}")]` },
+    { name: "name (xpath)", selector: `//*[@Name=${escapeXPathValue(string)}]` },
+    { name: "contains name (xpath)", selector: `//*[contains(@Name, ${escapeXPathValue(string)})]` },
   ];
 
   for (const strategy of strategies) {
