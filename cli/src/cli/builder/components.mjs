@@ -360,6 +360,7 @@ export const StatusBar = ({
       borderColor: 'gray',
       paddingX: 1,
       marginBottom: 1,
+      marginTop: 2,
     },
     React.createElement(
       Box,

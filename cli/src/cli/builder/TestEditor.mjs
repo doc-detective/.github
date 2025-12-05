@@ -10,6 +10,8 @@ import {
   getTestFields,
   validateTest,
   createDefaultStep,
+  getCommonStepProperties,
+  getStepTypes,
 } from './schemaUtils.mjs';
 import FieldEditor from './FieldEditor.mjs';
 import StepEditor from './StepEditor.mjs';
@@ -255,9 +257,9 @@ const TestEditor = ({
     .filter((f) => f.name !== 'steps' && f.name !== '$schema' && localTest[f.name] !== undefined)
     .forEach((f) => {
       const val = localTest[f.name];
-      const displayVal = typeof val === 'object' ? JSON.stringify(val).substring(0, 25) : String(val).substring(0, 25);
+      const displayVal = typeof val === 'object' ? JSON.stringify(val).substring(0, 50) : String(val).substring(0, 50);
       menuItems.push({
-        label: `   ✏️  ${f.name}: ${displayVal}${String(val).length > 25 ? '...' : ''}`,
+        label: `   ✏️  ${f.name}: ${displayVal}${String(val).length > 50 ? '...' : ''}`,
         value: `editMeta:${f.name}`,
       });
     });
@@ -280,14 +282,19 @@ const TestEditor = ({
     value: `none_${menuIndex++}`,
   });
 
+  // Get common step properties and valid step types once for reuse
+  const commonStepProps = Object.keys(getCommonStepProperties());
+  const validStepTypes = getStepTypes();
+
   steps.forEach((step, index) => {
-    // Determine step type
-    const stepType = Object.keys(step).find((k) => !['id', 'description', 'screenshot', 'softAssert', 'wait'].includes(k));
-    const stepValue = step[stepType];
-    const displayValue = typeof stepValue === 'string' ? stepValue.substring(0, 20) : '';
+    // Determine step type by finding a key that is a valid step type (not a common property)
+    const stepType = Object.keys(step).find((k) => validStepTypes.includes(k) && !commonStepProps.includes(k));
+    const stepValue = stepType ? step[stepType] : null;
+    const displayValue = typeof stepValue === 'string' ? stepValue.substring(0, 40) : '';
+    const displayType = stepType || '(unknown step type)';
 
     menuItems.push({
-      label: `   ${index + 1}. ${stepType}${displayValue ? ': ' + displayValue : ''}${displayValue.length >= 20 ? '...' : ''}`,
+      label: `   ${index + 1}. ${displayType}${displayValue ? ': ' + displayValue : ''}${displayValue.length >= 40 ? '...' : ''}`,
       value: `editStep:${index}`,
     });
   });

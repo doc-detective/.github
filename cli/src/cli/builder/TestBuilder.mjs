@@ -825,9 +825,9 @@ const TestBuilder = ({
     .filter((f) => f.name !== 'tests' && f.name !== '$schema' && spec[f.name] !== undefined)
     .forEach((f) => {
       const val = spec[f.name];
-      const displayVal = typeof val === 'object' ? JSON.stringify(val).substring(0, 25) : String(val).substring(0, 25);
+      const displayVal = typeof val === 'object' ? JSON.stringify(val).substring(0, 50) : String(val).substring(0, 50);
       menuItems.push({
-        label: `   ✏️  ${f.name}: ${displayVal}${String(val).length > 25 ? '...' : ''}`,
+        label: `   ✏️  ${f.name}: ${displayVal}${String(val).length > 50 ? '...' : ''}`,
         value: `editMeta:${f.name}`,
       });
     });
