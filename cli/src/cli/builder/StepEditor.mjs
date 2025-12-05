@@ -245,7 +245,8 @@ const StepEditor = ({
     
     // Safety check - if no variants, go back to menu
     if (typeVariants.length === 0) {
-      const newStep = { [type]: {} };
+      // Preserve sourceLocation when changing step type
+      const newStep = { [type]: {}, ...(localStep.sourceLocation && { sourceLocation: localStep.sourceLocation }) };
       setLocalStep(newStep);
       setPendingStepType(null);
       setView('menu');
@@ -258,7 +259,8 @@ const StepEditor = ({
       onSelect: (variantIndex, variant) => {
         // Safety check for variant
         if (!variant) {
-          const newStep = { [type]: '' };
+          // Preserve sourceLocation when changing step type
+          const newStep = { [type]: '', ...(localStep.sourceLocation && { sourceLocation: localStep.sourceLocation }) };
           setLocalStep(newStep);
           setPendingStepType(null);
           setView('menu');
@@ -300,7 +302,8 @@ const StepEditor = ({
           newValue = '';
         }
 
-        const newStep = { [type]: newValue };
+        // Preserve sourceLocation when changing step type
+        const newStep = { [type]: newValue, ...(localStep.sourceLocation && { sourceLocation: localStep.sourceLocation }) };
         setLocalStep(newStep);
         setPendingStepType(null);
         setView('menu');
@@ -335,12 +338,14 @@ const StepEditor = ({
           } else {
             defaultValue = {};
           }
-          const newStep = { [type]: defaultValue };
+          // Preserve sourceLocation when changing step type
+          const newStep = { [type]: defaultValue, ...(localStep.sourceLocation && { sourceLocation: localStep.sourceLocation }) };
           setLocalStep(newStep);
           setView('menu');
         } else {
           // No variants, default to empty object
-          const newStep = { [type]: {} };
+          // Preserve sourceLocation when changing step type
+          const newStep = { [type]: {}, ...(localStep.sourceLocation && { sourceLocation: localStep.sourceLocation }) };
           setLocalStep(newStep);
           setView('menu');
         }

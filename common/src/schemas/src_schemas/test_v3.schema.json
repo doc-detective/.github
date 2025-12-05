@@ -8,6 +8,10 @@
       "type": "string",
       "description": "Unique identifier for the test."
     },
+    "sourceLocation": {
+      "$ref": "sourceLocation_v3.schema.json#",
+      "description": "Source location information for inline tests. Read-only, populated during detection."
+    },
     "description": {
       "type": "string",
       "description": "Description of the test."

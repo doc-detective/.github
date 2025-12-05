@@ -21,6 +21,19 @@ import TestEditor from './TestEditor.mjs';
 import FieldEditor from './FieldEditor.mjs';
 import { StatusBar, JsonPreview, SimpleTextInput, LabeledTextInput, ConfirmPrompt, DescriptiveItem, NoIndicator, ScrollableSelect } from './components.mjs';
 
+// Import source file utilities for inline test handling
+const {
+  hasInlineSourceLocations,
+  getInlineSourceFiles,
+  hasSourceFileChanged,
+  getFileContentHash,
+  serializeStepToInline,
+  serializeTestToInline,
+  batchUpdateSourceContent,
+  prepareSourceUpdates,
+  hasAutoDetectedSteps,
+} = require('./sourceFileUtils.js');
+
 /**
  * Determine the output file path based on input file and extension
  * @param {string|null} inputFilePath - Original input file path
@@ -125,6 +138,33 @@ const TestBuilder = ({
   const [editingField, setEditingField] = useState(null);
   const [saveDir, setSaveDir] = useState(outputDir);
   const [showValidationWarning, setShowValidationWarning] = useState(!isValid && isEditing);
+
+  // Inline source tracking state
+  const [sourceFileHashes, setSourceFileHashes] = useState(() => {
+    // Compute initial hashes for all inline source files
+    const hashes = {};
+    if (initialSpec) {
+      const inlineFiles = getInlineSourceFiles(initialSpec);
+      for (const file of inlineFiles) {
+        const hash = getFileContentHash(file);
+        if (hash) {
+          hashes[file] = hash;
+        }
+      }
+    }
+    return hashes;
+  });
+  const [changedSourceFiles, setChangedSourceFiles] = useState([]);
+  const [inlineUpdateError, setInlineUpdateError] = useState(null);
+  
+  // Track original spec for detecting which steps were modified
+  const [originalSpec] = useState(() => initialSpec ? JSON.parse(JSON.stringify(initialSpec)) : null);
+
+  // Check if spec has inline source locations
+  const hasInlineSources = useMemo(() => hasInlineSourceLocations(spec), [spec]);
+  
+  // Check if spec has auto-detected steps
+  const hasAutoDetected = useMemo(() => hasAutoDetectedSteps(spec), [spec]);
 
   // Get spec fields
   const { fields: specFields } = useMemo(() => getSpecFields(), []);
@@ -443,6 +483,253 @@ const TestBuilder = ({
     );
   }
 
+  // Pre-save check for inline sources
+  if (phase === 'preSave') {
+    // Check if any inline source files have changed
+    const changed = [];
+    const inlineFiles = getInlineSourceFiles(spec);
+    for (const file of inlineFiles) {
+      const originalHash = sourceFileHashes[file];
+      if (originalHash && hasSourceFileChanged(file, originalHash)) {
+        changed.push(file);
+      }
+    }
+    
+    if (changed.length > 0) {
+      setChangedSourceFiles(changed);
+      setPhase('sourceChanged');
+    } else if (hasInlineSources) {
+      setPhase('inlineSaveChoice');
+    } else {
+      setPhase('save');
+    }
+    
+    return React.createElement(
+      Box,
+      { flexDirection: 'column', padding: 1 },
+      React.createElement(Text, { color: 'cyan' }, 'Checking source files...')
+    );
+  }
+
+  // Source files changed warning
+  if (phase === 'sourceChanged') {
+    return React.createElement(
+      Box,
+      { flexDirection: 'column', padding: 1 },
+      React.createElement(
+        Box,
+        { marginBottom: 1 },
+        React.createElement(Text, { bold: true, color: 'yellow' }, '⚠️  Source Files Changed')
+      ),
+      React.createElement(
+        Box,
+        { marginBottom: 1 },
+        React.createElement(Text, null, 'The following source files have been modified since they were loaded:')
+      ),
+      ...changedSourceFiles.map((file, i) => 
+        React.createElement(
+          Box,
+          { key: i, marginLeft: 2, marginBottom: 0 },
+          React.createElement(Text, { color: 'yellow' }, `• ${path.basename(file)}`)
+        )
+      ),
+      React.createElement(
+        Box,
+        { marginTop: 1, marginBottom: 1 },
+        React.createElement(Text, { color: 'gray' }, 'Updating inline sources may cause conflicts. You can save as a separate .spec.json file instead.')
+      ),
+      React.createElement(SelectInput, {
+        items: [
+          { label: '📁 Save as .spec.json (recommended)', value: 'saveAsSpec' },
+          { label: '⚠️  Update source files anyway', value: 'updateSources' },
+          { label: '← Cancel', value: 'cancel' },
+        ],
+        onSelect: (item) => {
+          if (item.value === 'saveAsSpec') {
+            setPhase('save');
+          } else if (item.value === 'updateSources') {
+            setPhase('inlineUpdate');
+          } else {
+            setPhase('menu');
+          }
+        },
+      })
+    );
+  }
+
+  // Choice between updating inline sources or saving as spec
+  if (phase === 'inlineSaveChoice') {
+    const inlineFiles = Array.from(getInlineSourceFiles(spec));
+    
+    return React.createElement(
+      Box,
+      { flexDirection: 'column', padding: 1 },
+      React.createElement(
+        Box,
+        { marginBottom: 1 },
+        React.createElement(Text, { bold: true, color: 'cyan' }, '📝 Inline Sources Detected')
+      ),
+      React.createElement(
+        Box,
+        { marginBottom: 1 },
+        React.createElement(Text, null, 'This spec contains inline tests from:')
+      ),
+      ...inlineFiles.map((file, i) => 
+        React.createElement(
+          Box,
+          { key: i, marginLeft: 2, marginBottom: 0 },
+          React.createElement(Text, { color: 'gray' }, `• ${path.basename(file)}`)
+        )
+      ),
+      // Show note about auto-detected steps if present
+      hasAutoDetected && React.createElement(
+        Box,
+        { marginTop: 1 },
+        React.createElement(
+          Text,
+          { color: 'yellow' },
+          '⚠️  Some steps were auto-detected from markup. If edited, explicit comments will be added after the original content.'
+        )
+      ),
+      React.createElement(
+        Box,
+        { marginTop: 1, marginBottom: 1 },
+        React.createElement(Text, { color: 'gray' }, 'How would you like to save changes?')
+      ),
+      React.createElement(SelectInput, {
+        items: [
+          { label: '✏️  Update source files (preserve inline tests)', value: 'updateSources' },
+          { label: '📁 Save as .spec.json (separate file)', value: 'saveAsSpec' },
+          { label: '← Cancel', value: 'cancel' },
+        ],
+        onSelect: (item) => {
+          if (item.value === 'updateSources') {
+            setPhase('inlineUpdate');
+          } else if (item.value === 'saveAsSpec') {
+            setPhase('save');
+          } else {
+            setPhase('menu');
+          }
+        },
+      })
+    );
+  }
+
+  // Update inline sources
+  if (phase === 'inlineUpdate') {
+    // Use prepareSourceUpdates to handle both explicit inline steps and auto-detected steps
+    // Auto-detected steps will have new explicit comments inserted after the original content
+    const updatesByFile = prepareSourceUpdates({ spec, originalSpec });
+    
+    // Apply updates to each file
+    const errors = [];
+    for (const [file, updates] of updatesByFile) {
+      const result = batchUpdateSourceContent({ filePath: file, updates });
+      if (!result.success) {
+        errors.push(`${path.basename(file)}: ${result.error || 'Unknown error'}`);
+      }
+    }
+    
+    if (errors.length > 0) {
+      setInlineUpdateError(errors.join('\n'));
+      setPhase('inlineUpdateError');
+    } else {
+      // Update hashes for modified files
+      const newHashes = { ...sourceFileHashes };
+      for (const file of updatesByFile.keys()) {
+        const hash = getFileContentHash(file);
+        if (hash) {
+          newHashes[file] = hash;
+        }
+      }
+      setSourceFileHashes(newHashes);
+      setPhase('inlineUpdateSuccess');
+    }
+    
+    return React.createElement(
+      Box,
+      { flexDirection: 'column', padding: 1 },
+      React.createElement(Text, { color: 'cyan' }, 'Updating source files...')
+    );
+  }
+
+  // Inline update error
+  if (phase === 'inlineUpdateError') {
+    return React.createElement(
+      Box,
+      { flexDirection: 'column', padding: 1 },
+      React.createElement(
+        Box,
+        { marginBottom: 1 },
+        React.createElement(Text, { bold: true, color: 'red' }, '❌ Error Updating Source Files')
+      ),
+      React.createElement(
+        Box,
+        { marginBottom: 1 },
+        React.createElement(Text, { color: 'red' }, inlineUpdateError)
+      ),
+      React.createElement(
+        Box,
+        { marginBottom: 1 },
+        React.createElement(Text, { color: 'gray' }, 'You can still save as a separate .spec.json file.')
+      ),
+      React.createElement(SelectInput, {
+        items: [
+          { label: '📁 Save as .spec.json instead', value: 'saveAsSpec' },
+          { label: '← Back to menu', value: 'menu' },
+        ],
+        onSelect: (item) => {
+          setInlineUpdateError(null);
+          if (item.value === 'saveAsSpec') {
+            setPhase('save');
+          } else {
+            setPhase('menu');
+          }
+        },
+      })
+    );
+  }
+
+  // Inline update success
+  if (phase === 'inlineUpdateSuccess') {
+    const updatedFiles = Array.from(getInlineSourceFiles(spec));
+    
+    return React.createElement(
+      Box,
+      { flexDirection: 'column', padding: 1 },
+      React.createElement(
+        Box,
+        { marginBottom: 1 },
+        React.createElement(Text, { color: 'green', bold: true }, '✅ Source files updated successfully!')
+      ),
+      React.createElement(
+        Box,
+        { marginBottom: 1 },
+        React.createElement(Text, null, 'Updated files:')
+      ),
+      ...updatedFiles.map((file, i) => 
+        React.createElement(
+          Box,
+          { key: i, marginLeft: 2, marginBottom: 0 },
+          React.createElement(Text, { color: 'green' }, `✓ ${path.basename(file)}`)
+        )
+      ),
+      React.createElement(SelectInput, {
+        items: [
+          { label: 'Continue editing', value: 'continue' },
+          { label: 'Exit', value: 'exit' },
+        ],
+        onSelect: (item) => {
+          if (item.value === 'exit') {
+            exit();
+          } else {
+            setPhase('menu');
+          }
+        },
+      })
+    );
+  }
+
   // Save confirmation
   if (phase === 'save') {
     const isOverwrite = inputFilePath && (inputFileExtension === '.json' || inputFileExtension === '.yaml' || inputFileExtension === '.yml');
@@ -667,7 +954,8 @@ const TestBuilder = ({
             setPhase('preview');
             break;
           case 'save':
-            setPhase('save');
+            // Use preSave to check for inline sources before saving
+            setPhase('preSave');
             break;
           case 'back':
             if (onBack) onBack();

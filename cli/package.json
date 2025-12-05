@@ -36,6 +36,7 @@
     "axios": "^1.13.2",
     "doc-detective-common": "^3.5.1",
     "doc-detective-core": "^3.5.1",
+    "doc-detective-resolver": "^3.6.1",
     "ink": "^6.5.1",
     "ink-select-input": "^6.2.0",
     "ink-spinner": "^5.0.0",
