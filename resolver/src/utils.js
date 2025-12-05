@@ -130,11 +130,35 @@ function parseObject({ stringifiedObject }) {
       return xmlAttrs;
     }
 
-    // If string, try to parse as JSON or YAML
+    // Try to parse as JSON first (handles valid JSON including those with escaped quotes in string values)
     try {
       const json = JSON.parse(stringifiedObject);
       return json;
     } catch (jsonError) {
+      // JSON parsing failed - check if this looks like escaped/double-encoded JSON
+      const trimmedString = stringifiedObject.trim();
+      const looksLikeEscapedJson =
+        (trimmedString.startsWith("{") || trimmedString.startsWith("[")) &&
+        trimmedString.includes('\\"');
+
+      if (looksLikeEscapedJson) {
+        let stringToParse;
+        try {
+          // Attempt to parse as double-encoded JSON
+          stringToParse = JSON.parse('"' + stringifiedObject + '"');
+        } catch {
+          // Fallback to simple quote replacement for basic cases
+          stringToParse = stringifiedObject.replace(/\\"/g, '"');
+        }
+        try {
+          const json = JSON.parse(stringToParse);
+          return json;
+        } catch {
+          // Fall through to YAML parsing
+        }
+      }
+
+      // Try YAML as final fallback
       try {
         const yaml = YAML.parse(stringifiedObject);
         return yaml;
@@ -598,8 +622,14 @@ async function parseContent({ config, content, filePath, fileType }) {
           // If the testId doesn't exist, set it
           test.testId = `${testId}`;
         }
+        // Normalize detectSteps field
+        if (test.detectSteps === "false") {
+          test.detectSteps = false;
+        } else if (test.detectSteps === "true") {
+          test.detectSteps = true;
+        }
+        // If the test doesn't have steps, add an empty array
         if (!test.steps) {
-          // If the test doesn't have steps, add an empty array
           test.steps = [];
         }
         tests.push(test);

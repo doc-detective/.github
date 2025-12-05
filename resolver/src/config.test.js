@@ -81,7 +81,7 @@ describe("envMerge", function () {
     
     // Should continue normally without applying overrides
     expect(validStub.calledOnce).to.be.true;
-    expect(logStub.calledWith(sinon.match.any, "warn", sinon.match.string)).to.be.true;
+    expect(logStub.calledWith(sinon.match.any, "warning", sinon.match.string)).to.be.true;
   });
 
   it("should handle DOC_DETECTIVE environment variable without config property", async function () {
