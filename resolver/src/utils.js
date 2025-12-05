@@ -11,6 +11,8 @@ const {
   transformToSchemaKey,
   readFile,
 } = require("doc-detective-common");
+const { getOrParse } = require("./ast/cache");
+const { matchNodes, getNodeContent } = require("./ast/matcher");
 
 exports.qualifyFiles = qualifyFiles;
 exports.parseTests = parseTests;
@@ -521,32 +523,142 @@ async function parseContent({ config, content, filePath, fileType }) {
   });
 
   if (config.detectSteps && fileType.markup) {
+    // Determine format for AST parsing based on fileType name or extensions
+    const format = fileType.name || 
+      (fileType.extensions && fileType.extensions.length > 0 ? fileType.extensions[0] : null);
+    let ast = null;
+    let astParseFailed = false;
+
+    // Parse AST once for all markup definitions that need it
+    const hasAstMarkup = fileType.markup.some(markup => markup.ast);
+    if (hasAstMarkup && format) {
+      ast = getOrParse(content, format, filePath);
+      if (!ast) {
+        astParseFailed = true;
+      }
+    }
+
     fileType.markup.forEach((markup) => {
-      markup.regex.forEach((pattern) => {
-        const regex = new RegExp(pattern, "g");
-        const matches = [...content.matchAll(regex)];
-        if (matches.length > 0 && markup.batchMatches) {
-          // Combine all matches into a single match
-          const combinedMatch = {
-            1: matches.map((match) => match[1] || match[0]).join(os.EOL),
-            type: "detectedStep",
-            markup: markup,
-            sortIndex: Math.min(...matches.map((match) => match.index)),
-          };
-          statements.push(combinedMatch);
-        } else if (matches.length > 0) {
-          matches.forEach((match) => {
-            // Add 'type' property to each match
-            match.type = "detectedStep";
-            match.markup = markup;
-            // Add 'sortIndex' property to each match
-            match.sortIndex = match[1]
-              ? match.index + match[1].length
-              : match.index;
-          });
-          statements.push(...matches);
+      // Handle AST-based matching
+      if (markup.ast) {
+        // If AST parsing failed, skip this markup definition
+        if (astParseFailed || !ast) {
+          return;
         }
-      });
+
+        // Match nodes in the AST
+        const astMatches = matchNodes(ast, markup.ast);
+        
+        if (astMatches.length > 0) {
+          // If regex is also specified, filter AST matches by regex (AND operation)
+          if (markup.regex && markup.regex.length > 0) {
+            // Pre-compile regex patterns for performance
+            const regexPatterns = (Array.isArray(markup.regex) ? markup.regex : [markup.regex])
+              .map(pattern => new RegExp(pattern));
+            
+            astMatches.forEach((astMatch) => {
+              const nodeContent = getNodeContent(astMatch.node);
+              let regexMatched = false;
+              let regexCaptures = {};
+
+              for (const regex of regexPatterns) {
+                const regexMatch = nodeContent.match(regex);
+                if (regexMatch) {
+                  regexMatched = true;
+                  // Merge regex captures with AST extracted values
+                  for (let i = 1; i < regexMatch.length; i++) {
+                    if (regexMatch[i] !== undefined) {
+                      regexCaptures[i] = regexMatch[i];
+                    }
+                  }
+                  break;
+                }
+              }
+
+              if (regexMatched) {
+                // Merge AST extracted values with regex captures (regex takes precedence)
+                const mergedCaptures = { ...astMatch.extracted, ...regexCaptures };
+                const statement = {
+                  type: "detectedStep",
+                  markup: markup,
+                  sortIndex: astMatch.sortIndex,
+                };
+                // Add captured values to the statement
+                for (const [key, value] of Object.entries(mergedCaptures)) {
+                  statement[key] = value;
+                }
+                statements.push(statement);
+              }
+            });
+          } else {
+            // AST-only: use extracted values directly
+            if (markup.batchMatches) {
+              // Combine all matches into a single match
+              const combinedContent = astMatches
+                .map(m => getNodeContent(m.node))
+                .join(os.EOL);
+              const combinedMatch = {
+                1: combinedContent,
+                type: "detectedStep",
+                markup: markup,
+                sortIndex: Math.min(...astMatches.map(m => m.sortIndex)),
+              };
+              // Add extracted values from first match
+              if (astMatches[0] && astMatches[0].extracted) {
+                for (const [key, value] of Object.entries(astMatches[0].extracted)) {
+                  combinedMatch[key] = value;
+                }
+              }
+              statements.push(combinedMatch);
+            } else {
+              astMatches.forEach((astMatch) => {
+                const statement = {
+                  type: "detectedStep",
+                  markup: markup,
+                  sortIndex: astMatch.sortIndex,
+                };
+                // Add extracted values
+                for (const [key, value] of Object.entries(astMatch.extracted)) {
+                  statement[key] = value;
+                }
+                // If no $1 extracted, use node content
+                if (statement[1] === undefined) {
+                  statement[1] = getNodeContent(astMatch.node);
+                }
+                statements.push(statement);
+              });
+            }
+          }
+        }
+      } else if (markup.regex) {
+        // Regex-only matching (original behavior)
+        const regexPatterns = Array.isArray(markup.regex) ? markup.regex : [markup.regex];
+        regexPatterns.forEach((pattern) => {
+          const regex = new RegExp(pattern, "g");
+          const matches = [...content.matchAll(regex)];
+          if (matches.length > 0 && markup.batchMatches) {
+            // Combine all matches into a single match
+            const combinedMatch = {
+              1: matches.map((match) => match[1] || match[0]).join(os.EOL),
+              type: "detectedStep",
+              markup: markup,
+              sortIndex: Math.min(...matches.map((match) => match.index)),
+            };
+            statements.push(combinedMatch);
+          } else if (matches.length > 0) {
+            matches.forEach((match) => {
+              // Add 'type' property to each match
+              match.type = "detectedStep";
+              match.markup = markup;
+              // Add 'sortIndex' property to each match
+              match.sortIndex = match[1]
+                ? match.index + match[1].length
+                : match.index;
+            });
+            statements.push(...matches);
+          }
+        });
+      }
     });
   }
 

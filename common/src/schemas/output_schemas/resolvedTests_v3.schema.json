@@ -720,10 +720,106 @@
                         "minItems": 1,
                         "items": {
                           "type": "object",
+                          "anyOf": [
+                            {
+                              "required": [
+                                "ast"
+                              ]
+                            },
+                            {
+                              "required": [
+                                "regex"
+                              ]
+                            }
+                          ],
                           "properties": {
                             "name": {
                               "description": "Name of the markup definition",
                               "type": "string"
+                            },
+                            "ast": {
+                              "description": "AST node matching configuration. When specified with regex, AST identifies candidate nodes first, then regex filters matched node content (AND operation).",
+                              "type": "object",
+                              "properties": {
+                                "nodeType": {
+                                  "description": "The type of AST node to match (e.g., 'code', 'element', 'listing'). Can be a string or array of strings.",
+                                  "anyOf": [
+                                    {
+                                      "type": "string"
+                                    },
+                                    {
+                                      "type": "array",
+                                      "items": {
+                                        "type": "string"
+                                      }
+                                    }
+                                  ]
+                                },
+                                "attributes": {
+                                  "description": "Attribute matchers. Values can be: exact string, regex pattern (/pattern/), array of options (any-of), or boolean (true=exists, false=not exists).",
+                                  "type": "object",
+                                  "additionalProperties": {
+                                    "anyOf": [
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "boolean"
+                                      },
+                                      {
+                                        "type": "array",
+                                        "items": {
+                                          "type": "string"
+                                        }
+                                      }
+                                    ]
+                                  }
+                                },
+                                "content": {
+                                  "description": "Pattern to match against the node's text content. Can be exact string or regex pattern.",
+                                  "anyOf": [
+                                    {
+                                      "type": "string"
+                                    },
+                                    {
+                                      "type": "boolean"
+                                    }
+                                  ]
+                                },
+                                "children": {
+                                  "description": "Nested matchers for child nodes. All child matchers must match at least one child.",
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object",
+                                    "description": "Configuration for matching AST nodes. Supports node type, attribute, content, and child matching.",
+                                    "properties": {
+                                      "nodeType": {},
+                                      "attributes": {},
+                                      "content": {},
+                                      "children": {},
+                                      "extract": {}
+                                    },
+                                    "title": "AST node match configuration"
+                                  }
+                                },
+                                "extract": {
+                                  "description": "Maps capture group variables ($1, $2, etc.) to node paths for value extraction.",
+                                  "type": "object",
+                                  "additionalProperties": {
+                                    "type": "string"
+                                  },
+                                  "examples": [
+                                    {
+                                      "$1": "attributes.lang",
+                                      "$2": "value"
+                                    },
+                                    {
+                                      "$1": "content"
+                                    }
+                                  ]
+                                }
+                              },
+                              "title": "AST node match configuration"
                             },
                             "regex": {
                               "description": "Regular expressions to match the markup type.",
@@ -8628,10 +8724,106 @@
           },
           "markupDefinition": {
             "type": "object",
+            "anyOf": [
+              {
+                "required": [
+                  "ast"
+                ]
+              },
+              {
+                "required": [
+                  "regex"
+                ]
+              }
+            ],
             "properties": {
               "name": {
                 "description": "Name of the markup definition",
                 "type": "string"
+              },
+              "ast": {
+                "description": "AST node matching configuration. When specified with regex, AST identifies candidate nodes first, then regex filters matched node content (AND operation).",
+                "type": "object",
+                "properties": {
+                  "nodeType": {
+                    "description": "The type of AST node to match (e.g., 'code', 'element', 'listing'). Can be a string or array of strings.",
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      }
+                    ]
+                  },
+                  "attributes": {
+                    "description": "Attribute matchers. Values can be: exact string, regex pattern (/pattern/), array of options (any-of), or boolean (true=exists, false=not exists).",
+                    "type": "object",
+                    "additionalProperties": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "boolean"
+                        },
+                        {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  "content": {
+                    "description": "Pattern to match against the node's text content. Can be exact string or regex pattern.",
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "boolean"
+                      }
+                    ]
+                  },
+                  "children": {
+                    "description": "Nested matchers for child nodes. All child matchers must match at least one child.",
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "description": "Configuration for matching AST nodes. Supports node type, attribute, content, and child matching.",
+                      "properties": {
+                        "nodeType": {},
+                        "attributes": {},
+                        "content": {},
+                        "children": {},
+                        "extract": {}
+                      },
+                      "title": "AST node match configuration"
+                    }
+                  },
+                  "extract": {
+                    "description": "Maps capture group variables ($1, $2, etc.) to node paths for value extraction.",
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "string"
+                    },
+                    "examples": [
+                      {
+                        "$1": "attributes.lang",
+                        "$2": "value"
+                      },
+                      {
+                        "$1": "content"
+                      }
+                    ]
+                  }
+                },
+                "title": "AST node match configuration"
               },
               "regex": {
                 "description": "Regular expressions to match the markup type.",
@@ -15931,6 +16123,84 @@
             },
             "title": "Markup definition"
           },
+          "astNodeMatch": {
+            "type": "object",
+            "description": "Configuration for matching AST nodes. Supports node type, attribute, content, and child matching.",
+            "properties": {
+              "nodeType": {
+                "description": "The type of AST node to match (e.g., 'code', 'element', 'listing'). Can be a string or array of strings.",
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                ]
+              },
+              "attributes": {
+                "description": "Attribute matchers. Values can be: exact string, regex pattern (/pattern/), array of options (any-of), or boolean (true=exists, false=not exists).",
+                "type": "object",
+                "additionalProperties": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  ]
+                }
+              },
+              "content": {
+                "description": "Pattern to match against the node's text content. Can be exact string or regex pattern.",
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "boolean"
+                  }
+                ]
+              },
+              "children": {
+                "description": "Nested matchers for child nodes. All child matchers must match at least one child.",
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "description": "Configuration for matching AST nodes. Supports node type, attribute, content, and child matching.",
+                  "properties": {},
+                  "title": "AST node match configuration"
+                }
+              },
+              "extract": {
+                "description": "Maps capture group variables ($1, $2, etc.) to node paths for value extraction.",
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "examples": [
+                  {
+                    "$1": "attributes.lang",
+                    "$2": "value"
+                  },
+                  {
+                    "$1": "content"
+                  }
+                ]
+              }
+            },
+            "title": "AST node match configuration"
+          },
           "markupActionString": {
             "type": "string",
             "enum": [
@@ -16172,6 +16442,79 @@
         },
         {
           "crawl": true
+        },
+        {
+          "fileTypes": [
+            {
+              "extends": "markdown",
+              "extensions": [
+                "md"
+              ],
+              "markup": [
+                {
+                  "name": "bashCodeBlock",
+                  "ast": {
+                    "nodeType": "code",
+                    "attributes": {
+                      "lang": [
+                        "bash",
+                        "sh"
+                      ]
+                    },
+                    "extract": {
+                      "$1": "attributes.lang",
+                      "$2": "value"
+                    }
+                  },
+                  "actions": [
+                    {
+                      "runCode": {
+                        "language": "$1",
+                        "code": "$2"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "fileTypes": [
+            {
+              "extends": "dita",
+              "extensions": [
+                "dita",
+                "xml"
+              ],
+              "markup": [
+                {
+                  "name": "ditaCodeblock",
+                  "ast": {
+                    "nodeType": "element",
+                    "attributes": {
+                      "tagName": "codeblock",
+                      "outputclass": [
+                        "bash",
+                        "shell"
+                      ]
+                    },
+                    "extract": {
+                      "$1": "attributes.outputclass",
+                      "$2": "content"
+                    }
+                  },
+                  "actions": [
+                    {
+                      "runShell": {
+                        "command": "$2"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
         }
       ]
     },
