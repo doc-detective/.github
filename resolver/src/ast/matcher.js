@@ -26,27 +26,33 @@ function matchesPattern(value, pattern) {
   }
 
   // Regex pattern (string starting and ending with /)
-  if (typeof pattern === "string" && pattern.startsWith("/") && pattern.endsWith("/")) {
+  // Requires at least one character between delimiters (e.g., /a/ is valid, but // is not)
+  if (typeof pattern === "string" && pattern.length >= 3 && pattern.startsWith("/") && pattern.endsWith("/")) {
     const regexStr = pattern.slice(1, -1);
-    try {
-      const regex = new RegExp(regexStr);
-      return regex.test(String(value || ""));
-    } catch (e) {
-      return false;
+    if (regexStr.length > 0) {
+      try {
+        const regex = new RegExp(regexStr);
+        return regex.test(String(value || ""));
+      } catch (e) {
+        return false;
+      }
     }
   }
 
   // Regex pattern with flags (e.g., /pattern/i)
-  if (typeof pattern === "string" && pattern.startsWith("/")) {
+  // Requires at least pattern between delimiters and valid flags
+  if (typeof pattern === "string" && pattern.length >= 3 && pattern.startsWith("/")) {
     const lastSlash = pattern.lastIndexOf("/");
-    if (lastSlash > 0) {
+    if (lastSlash > 1) {
       const regexStr = pattern.slice(1, lastSlash);
       const flags = pattern.slice(lastSlash + 1);
-      try {
-        const regex = new RegExp(regexStr, flags);
-        return regex.test(String(value || ""));
-      } catch (e) {
-        return false;
+      if (regexStr.length > 0) {
+        try {
+          const regex = new RegExp(regexStr, flags);
+          return regex.test(String(value || ""));
+        } catch (e) {
+          return false;
+        }
       }
     }
   }

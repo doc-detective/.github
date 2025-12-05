@@ -524,7 +524,8 @@ async function parseContent({ config, content, filePath, fileType }) {
 
   if (config.detectSteps && fileType.markup) {
     // Determine format for AST parsing based on fileType name or extensions
-    const format = fileType.name || (fileType.extensions && fileType.extensions[0]) || null;
+    const format = fileType.name || 
+      (fileType.extensions && fileType.extensions.length > 0 ? fileType.extensions[0] : null);
     let ast = null;
     let astParseFailed = false;
 
