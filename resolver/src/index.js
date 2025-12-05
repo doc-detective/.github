@@ -34,7 +34,7 @@ async function detectAndResolveTests({ config }) {
   // Detect tests
   const detectedTests = await detectTests({ config });
   if (!detectedTests || detectedTests.length === 0) {
-    log(config, "warn", "No tests detected.");
+    log(config, "warning", "No tests detected.");
     return null;
   }
   // Resolve tests
