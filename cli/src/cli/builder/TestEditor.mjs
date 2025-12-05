@@ -28,10 +28,18 @@ const TestEditor = ({
   onCancel,
   onDelete,
 }) => {
-  const [view, setView] = useState('menu'); // 'menu', 'editMeta', 'editStep', 'addStep', 'preview'
+  const [view, setView] = useState('menu'); // 'menu', 'editMeta', 'editStep', 'addStep', 'preview', 'confirmCancel'
   const [editingField, setEditingField] = useState(null);
   const [editingStepIndex, setEditingStepIndex] = useState(null);
   const [localTest, setLocalTest] = useState(test);
+
+  // Track original test for detecting changes
+  const [originalTest] = useState(() => JSON.parse(JSON.stringify(test)));
+
+  // Track if there are unsaved changes
+  const hasUnsavedChanges = useMemo(() => {
+    return JSON.stringify(localTest) !== JSON.stringify(originalTest);
+  }, [localTest, originalTest]);
 
   // Get test fields
   const { fields: testFields } = useMemo(() => getTestFields(), []);
@@ -43,7 +51,13 @@ const TestEditor = ({
   useInput((input, key) => {
     if (key.escape) {
       if (view === 'menu') {
-        onCancel();
+        if (hasUnsavedChanges) {
+          setView('confirmCancel');
+        } else {
+          onCancel();
+        }
+      } else if (view === 'confirmCancel') {
+        setView('menu');
       } else {
         setView('menu');
         setEditingField(null);
@@ -321,6 +335,40 @@ const TestEditor = ({
   menuItems.push({ label: '🗑️  Delete test', value: 'delete' });
   menuItems.push({ label: '← Back (discard changes)', value: 'cancel' });
 
+  // Confirm cancel with unsaved changes
+  if (view === 'confirmCancel') {
+    return React.createElement(
+      Box,
+      { flexDirection: 'column' },
+      React.createElement(StatusBar, {
+        location: ['Test ' + (testIndex + 1), 'Confirm'],
+      }),
+      React.createElement(
+        Box,
+        { marginBottom: 1 },
+        React.createElement(Text, { bold: true, color: 'yellow' }, '⚠️  Unsaved Changes')
+      ),
+      React.createElement(
+        Box,
+        { marginBottom: 1 },
+        React.createElement(Text, null, 'You have unsaved changes to this test. Are you sure you want to go back?')
+      ),
+      React.createElement(SelectInput, {
+        items: [
+          { label: '← Discard changes and go back', value: 'discard' },
+          { label: 'Continue editing', value: 'continue' },
+        ],
+        onSelect: (item) => {
+          if (item.value === 'discard') {
+            onCancel();
+          } else {
+            setView('menu');
+          }
+        },
+      })
+    );
+  }
+
   return React.createElement(
     Box,
     { flexDirection: 'column' },
@@ -387,7 +435,11 @@ const TestEditor = ({
             onDelete();
             break;
           case 'cancel':
-            onCancel();
+            if (hasUnsavedChanges) {
+              setView('confirmCancel');
+            } else {
+              onCancel();
+            }
             break;
           // Ignore 'none_*' values
         }

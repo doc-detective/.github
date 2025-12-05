@@ -160,6 +160,13 @@ const TestBuilder = ({
   // Track original spec for detecting which steps were modified
   const [originalSpec] = useState(() => initialSpec ? JSON.parse(JSON.stringify(initialSpec)) : null);
 
+  // Track if there are unsaved changes
+  const hasUnsavedChanges = useMemo(() => {
+    const currentJson = JSON.stringify(spec);
+    const originalJson = originalSpec ? JSON.stringify(originalSpec) : JSON.stringify(createDefaultSpec());
+    return currentJson !== originalJson;
+  }, [spec, originalSpec]);
+
   // Check if spec has inline source locations
   const hasInlineSources = useMemo(() => hasInlineSourceLocations(spec), [spec]);
   
@@ -811,6 +818,29 @@ const TestBuilder = ({
     );
   }
 
+  // Confirm exit with unsaved changes
+  if (phase === 'confirmExit') {
+    return React.createElement(
+      Box,
+      { flexDirection: 'column', padding: 1 },
+      React.createElement(
+        Box,
+        { marginBottom: 1 },
+        React.createElement(Text, { bold: true, color: 'yellow' }, '⚠️  Unsaved Changes')
+      ),
+      React.createElement(
+        Box,
+        { marginBottom: 1 },
+        React.createElement(Text, null, 'You have unsaved changes. Are you sure you want to exit?')
+      ),
+      React.createElement(ConfirmPrompt, {
+        message: 'Discard changes and exit?',
+        onConfirm: () => exit(),
+        onCancel: () => setPhase('menu'),
+      })
+    );
+  }
+
   // Main menu view
   const menuItems = [];
   let menuIndex = 0;
@@ -961,7 +991,11 @@ const TestBuilder = ({
             if (onBack) onBack();
             break;
           case 'exit':
-            exit();
+            if (hasUnsavedChanges) {
+              setPhase('confirmExit');
+            } else {
+              exit();
+            }
             break;
           // Ignore 'none_*' values
         }
