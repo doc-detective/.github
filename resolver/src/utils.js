@@ -209,6 +209,11 @@ async function qualifyFiles({ config }) {
   const cleanup = config.afterAll;
   if (cleanup) sequence = sequence.concat(cleanup);
 
+  if (sequence.length === 0) {
+    log(config, "warning", "No input sources specified.");
+    return [];
+  }
+
   for (let source of sequence) {
     log(config, "debug", `source: ${source}`);
     // Check if source is a URL

@@ -701,21 +701,12 @@ async function loadHerettoConfigs(config) {
         const outputPath = await loadHerettoContent(herettoConfig, log, config);
         if (outputPath) {
           herettoConfig.outputPath = outputPath;
-        } else {
-          // Remove the failed Heretto configuration
-          config.integrations.heretto = config.integrations.heretto.filter(
-            (item) => item !== herettoConfig
-          );
         }
       } catch (error) {
         log(
           config,
           "warning",
           `Failed to load Heretto content from "${herettoConfig.name}": ${error.message}`
-        );
-        // Remove the failed Heretto configuration
-        config.integrations.heretto = config.integrations.heretto.filter(
-          (item) => item !== herettoConfig
         );
       }
     }

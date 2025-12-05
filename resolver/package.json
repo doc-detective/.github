@@ -28,7 +28,7 @@
     "adm-zip": "^0.5.16",
     "ajv": "^8.17.1",
     "axios": "^1.13.2",
-    "doc-detective-common": "^3.6.0",
+    "doc-detective-common": "file:../common",
     "dotenv": "^17.2.3",
     "json-schema-faker": "^0.5.9",
     "posthog-node": "^5.15.0"

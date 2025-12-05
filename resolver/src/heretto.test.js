@@ -73,7 +73,7 @@ describe("Heretto Integration", function () {
     });
   });
 
-  describe("findOrCreateScenario", function () {
+  describe("findScenario", function () {
     const mockLog = sinon.stub();
     const mockConfig = { logLevel: "info" };
 
@@ -91,7 +91,7 @@ describe("Heretto Integration", function () {
         data: { content: [existingScenario, { id: "other", name: "Other" }] },
       });
 
-      const result = await heretto.findOrCreateScenario(mockClient, mockLog, mockConfig);
+      const result = await heretto.findScenario(mockClient, mockLog, mockConfig);
 
       expect(result).to.deep.equal(existingScenario);
       expect(mockClient.get.calledOnce).to.be.true;
@@ -109,7 +109,7 @@ describe("Heretto Integration", function () {
       });
       mockClient.post.resolves({ data: newScenario });
 
-      const result = await heretto.findOrCreateScenario(mockClient, mockLog, mockConfig);
+      const result = await heretto.findScenario(mockClient, mockLog, mockConfig);
 
       expect(result).to.deep.equal(newScenario);
       expect(mockClient.get.calledOnce).to.be.true;
@@ -119,7 +119,7 @@ describe("Heretto Integration", function () {
     it("should return null if scenario fetch fails", async function () {
       mockClient.get.rejects(new Error("Network error"));
 
-      const result = await heretto.findOrCreateScenario(mockClient, mockLog, mockConfig);
+      const result = await heretto.findScenario(mockClient, mockLog, mockConfig);
 
       expect(result).to.be.null;
     });
@@ -128,7 +128,7 @@ describe("Heretto Integration", function () {
       mockClient.get.resolves({ data: { content: [] } });
       mockClient.post.rejects(new Error("Permission denied"));
 
-      const result = await heretto.findOrCreateScenario(mockClient, mockLog, mockConfig);
+      const result = await heretto.findScenario(mockClient, mockLog, mockConfig);
 
       expect(result).to.be.null;
     });
