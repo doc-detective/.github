@@ -15,12 +15,12 @@ async function main() {
     }],
     integrations: {
       docDetectiveApi: {
-        apiKey: process.env.KEY
+        apiKey: process.env.KEY || ""
       }
     }
   };
   // console.log(json);
-  result = await runTests(json);
+  const result = await runTests(json);
   console.log(JSON.stringify(result, null, 2));
 }
 

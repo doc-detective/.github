@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/doc-detective/doc-detective-core.git"
+    "url": "git+https://github.com/doc-detective/resolver.git"
   },
   "keywords": [
     "documentation",

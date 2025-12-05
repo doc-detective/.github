@@ -84,13 +84,14 @@ function resolveContexts({ contexts, test, config }) {
         context.platforms = [context.platforms];
       }
     } else {
-      // Default to empty array if platforms is not specified
+      // Warn about missing platforms and default to empty array to prevent TypeError
+      log(config, "warning", `Context for test '${test.testId}' is missing 'platforms' property. This context will be skipped. Add a 'platforms' array (e.g., ["linux", "mac", "windows"]) to specify target platforms.`);
       context.platforms = [];
     }
 
     // Validate that both apps and browsers are not specified together
     if (context.apps && context.apps.length > 0 && context.browsers && context.browsers.length > 0) {
-      log(config, "error", `Context specifies both 'apps' and 'browsers', which is ambiguous. Only 'apps' will be used. Remove one to resolve ambiguity.`);
+      log(config, "warning", `Context for test '${test.testId}' specifies both 'apps' and 'browsers', which is ambiguous. Only 'apps' will be used. Remove one to resolve ambiguity.`);
     }
   });
 
@@ -100,9 +101,8 @@ function resolveContexts({ contexts, test, config }) {
   contexts.forEach((context) => {
     const staticContexts = [];
 
-    // Skip contexts with no platforms
+    // Skip contexts with no platforms (already warned during normalization)
     if (!context.platforms || context.platforms.length === 0) {
-      log(config, "debug", `Skipping context with no platforms specified.`);
       return;
     }
 
