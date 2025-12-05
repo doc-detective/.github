@@ -43,6 +43,7 @@ function createApiClient(herettoConfig) {
   );
   return axios.create({
     baseURL: getBaseUrl(herettoConfig.organizationId),
+    timeout: 30000, // 30 second timeout for individual requests
     headers: {
       Authorization: `Basic ${authHeader}`,
       "Content-Type": "application/json",
@@ -131,7 +132,7 @@ async function findScenario(client, log, config) {
       return null;
     }
     
-    // Make sure that senarioParameters.content has an object with name="tool-kit-name" and value="default/dita-ot-3.6.1"
+    // Make sure that scenarioParameters.content has an object with name="tool-kit-name" and value="default/dita-ot-3.6.1"
     const toolKitParam = scenarioParameters.content.find(
       (param) => param.name === "tool-kit-name"
     );
@@ -413,7 +414,7 @@ async function loadHerettoContent(herettoConfig, log, config) {
     log(
       config,
       "warning",
-      `Failed to load Heretto "${herettoConfig.name}": ${error}`
+      `Failed to load Heretto "${herettoConfig.name}": ${error.message}`
     );
     return null;
   }

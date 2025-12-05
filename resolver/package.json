@@ -31,7 +31,7 @@
     "doc-detective-common": "file:../common",
     "dotenv": "^17.2.3",
     "json-schema-faker": "^0.5.9",
-    "posthog-node": "^5.15.0"
+    "posthog-node": "^5.17.2"
   },
   "devDependencies": {
     "body-parser": "^2.2.1",
