@@ -91,20 +91,8 @@ function serializeTestToInline({ test, commentFormat, fileExtension }) {
   if (test.before) testToSerialize.before = test.before;
   if (test.after) testToSerialize.after = test.after;
   
-  // Check if we need the full object or can use simple attributes
-  const needsFullObject = test.runOn || test.before || test.after;
-  
-  let testContent;
-  if (needsFullObject) {
-    testContent = JSON.stringify(testToSerialize);
-  } else {
-    // Use XML-style attributes for simple cases
-    const attrs = [];
-    if (testToSerialize.testId) attrs.push(`testId="${testToSerialize.testId}"`);
-    if (testToSerialize.description) attrs.push(`description="${testToSerialize.description}"`);
-    if (testToSerialize.detectSteps !== undefined) attrs.push(`detectSteps=${testToSerialize.detectSteps}`);
-    testContent = attrs.join(' ');
-  }
+  // Always use JSON syntax for consistency with step serialization
+  const testContent = JSON.stringify(testToSerialize);
   
   switch (format) {
     case 'jsxComment':
@@ -131,6 +119,27 @@ function getDefaultCommentFormat(fileExtension) {
   
   // All other files (including .md, .html) use HTML comments
   return 'htmlComment';
+}
+
+/**
+ * Check if a test has metadata worth saving (testId, description, detectSteps, runOn, etc.).
+ * This is used to determine if a new test declaration should be inserted.
+ * 
+ * @param {Object} test - The test object
+ * @returns {boolean} True if the test has saveable metadata
+ */
+function hasTestMetadata(test) {
+  if (!test) return false;
+  
+  // Check for any test-level properties that should be persisted
+  return !!(
+    test.testId ||
+    test.description ||
+    test.detectSteps !== undefined ||
+    test.runOn ||
+    test.before ||
+    test.after
+  );
 }
 
 /**
@@ -185,6 +194,60 @@ function getFileContentHash(filePath) {
   } catch (error) {
     return null;
   }
+}
+
+/**
+ * Find the start of the line containing the given offset.
+ * 
+ * @param {string} content - The file content
+ * @param {number} offset - The offset within the content
+ * @returns {number} The offset of the start of the line
+ */
+function findLineStart(content, offset) {
+  // Search backwards for newline
+  let pos = offset - 1;
+  while (pos >= 0 && content[pos] !== '\n') {
+    pos--;
+  }
+  // Return position after the newline (or 0 if at start of file)
+  return pos + 1;
+}
+
+/**
+ * Find the end of the line containing the given offset (including the newline if present).
+ * 
+ * @param {string} content - The file content
+ * @param {number} offset - The offset within the content
+ * @returns {number} The offset after the end of the line (after newline if present)
+ */
+function findLineEnd(content, offset) {
+  // Search forwards for newline
+  let pos = offset;
+  while (pos < content.length && content[pos] !== '\n') {
+    pos++;
+  }
+  // Include the newline character if present
+  if (pos < content.length && content[pos] === '\n') {
+    pos++;
+  }
+  return pos;
+}
+
+/**
+ * Get the indentation of a line (leading whitespace).
+ * 
+ * @param {string} content - The file content
+ * @param {number} lineStart - The offset of the start of the line
+ * @returns {string} The indentation string (spaces/tabs)
+ */
+function getLineIndentation(content, lineStart) {
+  let indent = '';
+  let pos = lineStart;
+  while (pos < content.length && (content[pos] === ' ' || content[pos] === '\t')) {
+    indent += content[pos];
+    pos++;
+  }
+  return indent;
 }
 
 /**
@@ -277,6 +340,11 @@ function insertSourceContent({ filePath, offset, content, insertBefore = false }
  * Apply multiple source location updates to a file.
  * Updates are applied in reverse order (from end to start) to maintain offset validity.
  * 
+ * Supports line-based operations:
+ * - replaceEntireLine: Replace the entire line containing the offset range
+ * - insertLineBefore: Insert new content as a new line before the target line
+ * - insertLineAfter: Insert new content as a new line after the target line
+ * 
  * @param {Object} options - Options for batch updates
  * @param {string} options.filePath - Path to the file
  * @param {Array} options.updates - Array of update objects with startOffset, endOffset, newContent
@@ -296,7 +364,45 @@ function batchUpdateSourceContent({ filePath, updates }) {
     const results = [];
     
     for (const update of sortedUpdates) {
-      const { startOffset, endOffset, newContent } = update;
+      let { startOffset, endOffset, newContent } = update;
+      
+      // Handle line-based operations
+      if (update.replaceEntireLine) {
+        // Find the start and end of the line containing this range
+        const lineStart = findLineStart(content, startOffset);
+        const lineEnd = findLineEnd(content, endOffset);
+        
+        // Get the original indentation
+        const indent = getLineIndentation(content, lineStart);
+        
+        // Replace entire line with indented new content + newline
+        startOffset = lineStart;
+        endOffset = lineEnd;
+        newContent = indent + newContent + '\n';
+      } else if (update.insertLineBefore) {
+        // Insert as a new line before the line containing startOffset
+        const lineStart = findLineStart(content, startOffset);
+        
+        // Get the indentation of the target line
+        const indent = getLineIndentation(content, lineStart);
+        
+        // Insert before the line start
+        startOffset = lineStart;
+        endOffset = lineStart;
+        newContent = indent + newContent + '\n';
+      } else if (update.insertLineAfter) {
+        // Insert as a new line after the line containing endOffset
+        const lineEnd = findLineEnd(content, endOffset);
+        
+        // Get the indentation of the original line
+        const lineStart = findLineStart(content, startOffset);
+        const indent = getLineIndentation(content, lineStart);
+        
+        // Insert after the line end
+        startOffset = lineEnd;
+        endOffset = lineEnd;
+        newContent = indent + newContent + '\n';
+      }
       
       // Validate offsets
       if (startOffset < 0 || endOffset > content.length || startOffset > endOffset) {
@@ -401,15 +507,15 @@ function isAutoDetectedStep(step) {
 }
 
 /**
- * Prepare updates for saving inline steps to source files.
- * Handles both explicit inline steps (update in place) and auto-detected steps
+ * Prepare updates for saving inline tests and steps to source files.
+ * Handles both explicit inline tests/steps (update in place) and auto-detected steps
  * (insert new explicit comment after the original content).
  * 
  * @param {Object} options - Options for preparing updates
  * @param {Object} options.spec - The spec object containing tests and steps
  * @param {Object} options.originalSpec - The original spec before editing (for comparison)
  * @returns {Map<string, Array>} Map of file paths to arrays of update operations
- */
+*/
 function prepareSourceUpdates({ spec, originalSpec }) {
   const updatesByFile = new Map();
   
@@ -419,6 +525,71 @@ function prepareSourceUpdates({ spec, originalSpec }) {
     const test = spec.tests[testIndex];
     const originalTest = originalSpec?.tests?.[testIndex];
     
+    // Handle test-level sourceLocation (inline test declarations)
+    const testLoc = test.sourceLocation;
+    if (testLoc?.isInline && testLoc.file) {
+      // Check if test metadata was modified by comparing with original (excluding steps and sourceLocation)
+      const testMetadata = JSON.stringify(test, (key, value) => 
+        key === 'sourceLocation' || key === 'steps' ? undefined : value
+      );
+      const originalMetadata = originalTest ? JSON.stringify(originalTest, (key, value) => 
+        key === 'sourceLocation' || key === 'steps' ? undefined : value
+      ) : null;
+      
+      const wasModified = testMetadata !== originalMetadata;
+      
+      if (wasModified) {
+        const fileUpdates = updatesByFile.get(testLoc.file) || [];
+        
+        // Serialize the test declaration (without steps)
+        const newContent = serializeTestToInline({
+          test,
+          commentFormat: testLoc.commentFormat || 'htmlComment',
+          fileExtension: path.extname(testLoc.file),
+        });
+        
+        // Replace the ENTIRE LINE containing the test declaration
+        fileUpdates.push({
+          startOffset: testLoc.startOffset,
+          endOffset: testLoc.endOffset,
+          newContent,
+          replaceEntireLine: true,
+          isTestDeclaration: true,
+        });
+        
+        updatesByFile.set(testLoc.file, fileUpdates);
+      }
+    } else if (!testLoc && hasTestMetadata(test)) {
+      // No test-level sourceLocation, but test has metadata that should be saved.
+      // Find the first inline step to determine where to insert the test declaration.
+      const firstInlineStep = (test.steps || []).find(s => s.sourceLocation?.isInline && s.sourceLocation.file);
+      
+      if (firstInlineStep) {
+        const stepLoc = firstInlineStep.sourceLocation;
+        const fileUpdates = updatesByFile.get(stepLoc.file) || [];
+        
+        // Serialize the test declaration
+        const newContent = serializeTestToInline({
+          test,
+          commentFormat: stepLoc.commentFormat || 'htmlComment',
+          fileExtension: path.extname(stepLoc.file),
+        });
+        
+        // Insert on the LINE BEFORE the first step
+        fileUpdates.push({
+          startOffset: stepLoc.startOffset,
+          endOffset: stepLoc.startOffset,
+          newContent,
+          insertLineBefore: true,
+          isTestDeclaration: true,
+          isNewTestDeclaration: true,
+        });
+        
+        updatesByFile.set(stepLoc.file, fileUpdates);
+      }
+    }
+    
+    // Handle step-level sourceLocations
     for (let stepIndex = 0; stepIndex < (test.steps || []).length; stepIndex++) {
       const step = test.steps[stepIndex];
       const originalStep = originalTest?.steps?.[stepIndex];
@@ -443,7 +614,7 @@ function prepareSourceUpdates({ spec, originalSpec }) {
       const fileUpdates = updatesByFile.get(loc.file) || [];
       
       if (loc.isAutoDetected) {
-        // Auto-detected step: insert new explicit comment AFTER the original content
+        // Auto-detected step: insert new explicit comment on the LINE AFTER the original content
         // The original markup (code block, link, etc.) remains intact
         const newContent = serializeStepToInline({
           step,
@@ -451,17 +622,16 @@ function prepareSourceUpdates({ spec, originalSpec }) {
           fileExtension: path.extname(loc.file),
         });
         
-        // Insert after the original content (at endOffset)
-        // Add a newline before the comment for readability
+        // Insert on the line after the original content
         fileUpdates.push({
-          startOffset: loc.endOffset,
+          startOffset: loc.startOffset,
           endOffset: loc.endOffset,
-          newContent: '\n' + newContent,
-          isInsertion: true,
+          newContent,
+          insertLineAfter: true,
           isAutoDetectedConversion: true,
         });
       } else {
-        // Explicit inline step: update in place
+        // Explicit inline step: replace the ENTIRE LINE
         const newContent = serializeStepToInline({
           step,
           commentFormat: loc.commentFormat,
@@ -472,7 +642,7 @@ function prepareSourceUpdates({ spec, originalSpec }) {
           startOffset: loc.startOffset,
           endOffset: loc.endOffset,
           newContent,
-          isInsertion: false,
+          replaceEntireLine: true,
         });
       }
       
@@ -508,7 +678,11 @@ module.exports = {
   serializeTestToInline,
   getDefaultCommentFormat,
   canSerializeAsSimple,
+  hasTestMetadata,
   getFileContentHash,
+  findLineStart,
+  findLineEnd,
+  getLineIndentation,
   hasSourceFileChanged,
   updateSourceContent,
   insertSourceContent,
