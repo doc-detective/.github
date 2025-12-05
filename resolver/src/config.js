@@ -2,7 +2,6 @@ const os = require("os");
 const { validate } = require("doc-detective-common");
 const { log, loadEnvs, replaceEnvs } = require("./utils");
 const { loadDescription } = require("./openapi");
-const { loadHerettoContent } = require("./heretto");
 
 exports.setConfig = setConfig;
 exports.resolveConcurrentRunners = resolveConcurrentRunners;
@@ -641,9 +640,6 @@ async function setConfig({ config }) {
   
   // TODO: Revise loadDescriptions() so it doesn't mutate the input but instead returns an updated object
   await loadDescriptions(config);
-  
-  // Load Heretto content from configured integrations
-  await loadHerettoConfigs(config);
 
   return config;
 }
@@ -676,37 +672,6 @@ async function loadDescriptions(config) {
         // Remove the failed OpenAPI configuration
         config.integrations.openApi = config.integrations.openApi.filter(
           (item) => item !== openApiConfig
-        );
-      }
-    }
-  }
-}
-
-/**
- * Loads content from all configured Heretto CMS integrations.
- *
- * @async
- * @param {Object} config - The configuration object.
- * @returns {Promise<void>} - A promise that resolves when all Heretto content is loaded.
- *
- * @remarks
- * This function modifies the input config object by:
- * 1. Adding an 'outputPath' property to each Heretto configuration with the local path to downloaded content.
- * 2. Removing any Heretto configurations where the content failed to load.
- */
-async function loadHerettoConfigs(config) {
-  if (config?.integrations?.heretto) {
-    for (const herettoConfig of config.integrations.heretto) {
-      try {
-        const outputPath = await loadHerettoContent(herettoConfig, log, config);
-        if (outputPath) {
-          herettoConfig.outputPath = outputPath;
-        }
-      } catch (error) {
-        log(
-          config,
-          "warning",
-          `Failed to load Heretto content from "${herettoConfig.name}": ${error.message}`
         );
       }
     }

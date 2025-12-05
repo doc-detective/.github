@@ -11,6 +11,7 @@ const {
   transformToSchemaKey,
   readFile,
 } = require("doc-detective-common");
+const { loadHerettoContent } = require("./heretto");
 
 exports.qualifyFiles = qualifyFiles;
 exports.parseTests = parseTests;
@@ -192,16 +193,6 @@ async function qualifyFiles({ config }) {
   let sequence = [];
 
   // Determine source sequence
-  // Add Heretto output paths to the beginning of the sequence
-  if (config?.integrations?.heretto) {
-    for (const herettoConfig of config.integrations.heretto) {
-      if (herettoConfig.outputPath) {
-        log(config, "debug", `Adding Heretto output path: ${herettoConfig.outputPath}`);
-        sequence.unshift(herettoConfig.outputPath);
-      }
-    }
-  }
-
   const setup = config.beforeAny;
   if (setup) sequence = sequence.concat(setup);
   const input = config.input;
@@ -216,6 +207,57 @@ async function qualifyFiles({ config }) {
 
   for (let source of sequence) {
     log(config, "debug", `source: ${source}`);
+    
+    // Check if source is a heretto:<name> reference
+    if (source.startsWith("heretto:")) {
+      const herettoName = source.substring(8); // Remove "heretto:" prefix
+      const herettoConfig = config?.integrations?.heretto?.find(
+        (h) => h.name === herettoName
+      );
+      
+      if (!herettoConfig) {
+        log(
+          config,
+          "warning",
+          `Heretto integration "${herettoName}" not found in config. Skipping.`
+        );
+        continue;
+      }
+      
+      // Load Heretto content if not already loaded
+      if (!herettoConfig.outputPath) {
+        try {
+          const outputPath = await loadHerettoContent(herettoConfig, log, config);
+          if (outputPath) {
+            herettoConfig.outputPath = outputPath;
+            log(config, "debug", `Adding Heretto output path: ${outputPath}`);
+            // Insert the output path into the sequence for processing
+            const currentIndex = sequence.indexOf(source);
+            sequence.splice(currentIndex + 1, 0, outputPath);
+          } else {
+            log(
+              config,
+              "warning",
+              `Failed to load Heretto content for "${herettoName}". Skipping.`
+            );
+          }
+        } catch (error) {
+          log(
+            config,
+            "warning",
+            `Failed to load Heretto content from "${herettoName}": ${error.message}`
+          );
+        }
+      } else {
+        // Already loaded, add to sequence if not already there
+        if (!sequence.includes(herettoConfig.outputPath)) {
+          const currentIndex = sequence.indexOf(source);
+          sequence.splice(currentIndex + 1, 0, herettoConfig.outputPath);
+        }
+      }
+      continue;
+    }
+    
     // Check if source is a URL
     let isURL = source.startsWith("http://") || source.startsWith("https://");
     // If URL, fetch file and place in temp directory
