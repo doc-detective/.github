@@ -254,7 +254,7 @@ async function saveScreenshot({ config, step, driver }) {
     // Create a new PNG object with the dimensions of the cropped area
     const croppedPath = path.join(dir, "cropped.png");
     try {
-      sharp(filePath)
+      await sharp(filePath)
         .extract({
           left: rect.x,
           top: rect.y,
@@ -262,17 +262,6 @@ async function saveScreenshot({ config, step, driver }) {
           height: rect.height,
         })
         .toFile(croppedPath);
-
-      // Wait for the file to be written
-      let retryLimit = 50;
-      while (!fs.existsSync(croppedPath)) {
-        if (--retryLimit === 0) {
-          result.status = "FAIL";
-          result.description = `Couldn't write cropped image to file.`;
-          return result;
-        }
-        await new Promise((resolve) => setTimeout(resolve, 500));
-      }
 
       // Replace the original file with the cropped file
       fs.renameSync(croppedPath, filePath);
