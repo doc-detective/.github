@@ -81,8 +81,31 @@ async function main(argv) {
         
         if (detectedSpecs && detectedSpecs.length > 0) {
           // Convert detected specs to the format expected by the builder
-          for (const detectedSpec of detectedSpecs) {
-            const filePath = detectedSpec.contentPath || null;
+          // For JSON/YAML files, the resolver doesn't set contentPath, so we need to
+          // map specs back to their source files using the input paths.
+          
+          // If there's a 1:1 mapping between input JSON/YAML files and detected specs,
+          // we can associate them directly
+          const jsonYamlInputs = inputPaths.filter(p => {
+            const ext = path.extname(p).toLowerCase();
+            return ext === '.json' || ext === '.yaml' || ext === '.yml';
+          });
+          
+          for (let i = 0; i < detectedSpecs.length; i++) {
+            const detectedSpec = detectedSpecs[i];
+            
+            // Use contentPath if available (e.g., for markdown files)
+            // Otherwise, try to match with JSON/YAML input files
+            let filePath = detectedSpec.contentPath || null;
+            
+            if (!filePath && jsonYamlInputs.length === detectedSpecs.length) {
+              // 1:1 mapping - use the corresponding input file
+              filePath = jsonYamlInputs[i];
+            } else if (!filePath && jsonYamlInputs.length === 1 && detectedSpecs.length === 1) {
+              // Single input file, single spec - use the input file
+              filePath = jsonYamlInputs[0];
+            }
+            
             const ext = filePath ? path.extname(filePath).toLowerCase() : '.json';
             
             // detectedSpec is already a valid spec_v3 object from detectTests
