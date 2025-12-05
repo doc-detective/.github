@@ -1,13 +1,14 @@
 {
   "tests": [
     {
+      "testId": "temp-screenshot-regression-test",
       "steps": [
         {
           "goTo": "http://localhost:8092/drag-drop-test.html"
         },
         {
           "screenshot": {
-            "path": "C:\\Users\\hawkeyexl\\Documents\\Workspaces\\.github\\core\\test\\temp-regression-screenshot.png",
+            "path": "test\\temp-regression-screenshot.png",
             "maxVariation": 0.05,
             "overwrite": "aboveVariation"
           }
