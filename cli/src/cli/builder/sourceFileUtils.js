@@ -5,11 +5,135 @@
  * - Serialize steps to inline comment format
  * - Update/insert content at specific positions in source files
  * - Handle different comment formats (HTML, JSX, link reference)
+ * - Detect and preserve syntax formats (JSON, YAML, XML)
  */
 
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
+
+/**
+ * Detect the syntax format used in an inline statement's original text.
+ * 
+ * @param {string} originalText - The original inline statement text
+ * @returns {'json'|'yaml'|'xml'|null} The detected syntax format, or null if unknown
+ */
+function detectSyntaxFormat(originalText) {
+  if (!originalText) return null;
+  
+  // Remove comment wrappers to get the content
+  let content = originalText.trim();
+  
+  // Remove HTML comment wrapper: <!-- test/step ... -->
+  const htmlMatch = content.match(/<!--\s*(?:test|step)\s+([\s\S]*?)\s*-->/);
+  if (htmlMatch) {
+    content = htmlMatch[1].trim();
+  }
+  
+  // Remove JSX comment wrapper: {/* test/step ... */}
+  const jsxMatch = content.match(/\{\s*\/\*\s*(?:test|step)\s+([\s\S]*?)\s*\*\/\s*\}/);
+  if (jsxMatch) {
+    content = jsxMatch[1].trim();
+  }
+  
+  // Remove link reference wrapper: [comment]: # (test/step ...)
+  const linkMatch = content.match(/\[comment\]:\s*#\s*\((?:test|step)\s+([\s\S]*?)\s*\)/);
+  if (linkMatch) {
+    content = linkMatch[1].trim();
+  }
+  
+  // Now detect the syntax format of the content
+  
+  // JSON: starts with { or contains "key": pattern
+  if (content.startsWith('{') || /^"?\w+"?\s*:\s*[{\["']/.test(content)) {
+    return 'json';
+  }
+  
+  // XML-style attributes: key="value" or key=value patterns without JSON structure
+  if (/^\w+\s*=\s*["']?[^{]/.test(content) || /^\w+\s*=\s*(?:true|false|\d+)/.test(content)) {
+    return 'xml';
+  }
+  
+  // YAML: contains key: value patterns with newlines or indentation
+  if (/^\w+:\s*\n/.test(content) || /\n\s+\w+:/.test(content)) {
+    return 'yaml';
+  }
+  
+  // YAML: simple key: value without JSON braces
+  if (/^\w+:\s+[^{]/.test(content) && !content.includes('{')) {
+    return 'yaml';
+  }
+  
+  // Default to JSON if we can't detect
+  return 'json';
+}
+
+/**
+ * Serialize content to the specified syntax format.
+ * 
+ * @param {Object} obj - The object to serialize
+ * @param {'json'|'yaml'|'xml'} syntaxFormat - The syntax format to use
+ * @param {'test'|'step'} type - Whether this is a test or step
+ * @returns {string} The serialized content (without comment wrappers)
+ */
+function serializeToSyntax(obj, syntaxFormat, type) {
+  switch (syntaxFormat) {
+    case 'xml':
+      // XML-style attributes: key="value" key=boolean
+      const attrs = [];
+      for (const [key, value] of Object.entries(obj)) {
+        if (typeof value === 'string') {
+          attrs.push(`${key}="${value}"`);
+        } else if (typeof value === 'boolean' || typeof value === 'number') {
+          attrs.push(`${key}=${value}`);
+        } else {
+          // Complex values fall back to JSON
+          attrs.push(`${key}=${JSON.stringify(value)}`);
+        }
+      }
+      return attrs.join(' ');
+    
+    case 'yaml':
+      // Multiline YAML format
+      const yamlLines = [];
+      for (const [key, value] of Object.entries(obj)) {
+        if (typeof value === 'string') {
+          // Quote strings that contain special characters
+          if (/[:#\[\]{}|>!&*?'"]/.test(value) || value.includes('\n')) {
+            yamlLines.push(`${key}: "${value.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`);
+          } else {
+            yamlLines.push(`${key}: ${value}`);
+          }
+        } else if (typeof value === 'boolean' || typeof value === 'number') {
+          yamlLines.push(`${key}: ${value}`);
+        } else if (Array.isArray(value)) {
+          // Arrays use YAML flow style
+          yamlLines.push(`${key}: ${JSON.stringify(value)}`);
+        } else if (typeof value === 'object' && value !== null) {
+          // Nested objects use indented YAML
+          yamlLines.push(`${key}:`);
+          for (const [subKey, subValue] of Object.entries(value)) {
+            if (typeof subValue === 'string') {
+              if (/[:#\[\]{}|>!&*?'"]/.test(subValue) || subValue.includes('\n')) {
+                yamlLines.push(`  ${subKey}: "${subValue.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`);
+              } else {
+                yamlLines.push(`  ${subKey}: ${subValue}`);
+              }
+            } else {
+              yamlLines.push(`  ${subKey}: ${JSON.stringify(subValue)}`);
+            }
+          }
+        } else {
+          yamlLines.push(`${key}: ${JSON.stringify(value)}`);
+        }
+      }
+      return yamlLines.join('\n');
+    
+    case 'json':
+    default:
+      return JSON.stringify(obj);
+  }
+}
 
 /**
  * Serialize a step to inline comment format based on the detected or default comment format.
@@ -18,11 +142,16 @@ const crypto = require('crypto');
  * @param {Object} options.step - The step object to serialize
  * @param {string} options.commentFormat - Comment format: 'htmlComment', 'jsxComment', or 'linkReference'
  * @param {string} options.fileExtension - File extension (e.g., '.md', '.jsx') for fallback format detection
+ * @param {string} options.originalText - Original text of the inline statement (for syntax detection)
+ * @param {'json'|'yaml'|'xml'} options.syntaxFormat - Explicit syntax format override
  * @returns {string} The serialized inline step comment
  */
-function serializeStepToInline({ step, commentFormat, fileExtension }) {
+function serializeStepToInline({ step, commentFormat, fileExtension, originalText, syntaxFormat }) {
   // Determine the comment format to use
   const format = commentFormat || getDefaultCommentFormat(fileExtension);
+  
+  // Detect or use provided syntax format
+  const syntax = syntaxFormat || detectSyntaxFormat(originalText) || 'json';
   
   // Clone step and remove sourceLocation (it's read-only metadata, not serializable content)
   const stepToSerialize = { ...step };
@@ -52,20 +181,31 @@ function serializeStepToInline({ step, commentFormat, fileExtension }) {
       stepContent = `${actionKey}: ${JSON.stringify(actionValue)}`;
     }
   } else {
-    // Full format: JSON object
-    stepContent = JSON.stringify(stepToSerialize);
+    // Full format: use detected/specified syntax
+    stepContent = serializeToSyntax(stepToSerialize, syntax, 'step');
   }
+  
+  // Check if content is multiline
+  const isMultiline = stepContent.includes('\n');
   
   // Wrap in appropriate comment format
   switch (format) {
     case 'jsxComment':
+      if (isMultiline) {
+        return `{/* step\n${stepContent}\n*/}`;
+      }
       return `{/* step ${stepContent} */}`;
     case 'linkReference':
-      // Link reference format doesn't support arbitrary step content
-      // Fall back to HTML comment
-      return `<!-- step ${stepContent} -->`;
+      // Link reference format doesn't support multiline well, fall back to JSON
+      if (isMultiline) {
+        return `[comment]: # (step ${JSON.stringify(stepToSerialize)})`;
+      }
+      return `[comment]: # (step ${stepContent})`;
     case 'htmlComment':
     default:
+      if (isMultiline) {
+        return `<!-- step\n${stepContent}\n-->`;
+      }
       return `<!-- step ${stepContent} -->`;
   }
 }
@@ -77,10 +217,15 @@ function serializeStepToInline({ step, commentFormat, fileExtension }) {
  * @param {Object} options.test - The test object to serialize (only metadata, not steps)
  * @param {string} options.commentFormat - Comment format to use
  * @param {string} options.fileExtension - File extension for fallback format detection
+ * @param {string} options.originalText - Original text of the inline statement (for syntax detection)
+ * @param {'json'|'yaml'|'xml'} options.syntaxFormat - Explicit syntax format override
  * @returns {string} The serialized inline test comment
  */
-function serializeTestToInline({ test, commentFormat, fileExtension }) {
+function serializeTestToInline({ test, commentFormat, fileExtension, originalText, syntaxFormat }) {
   const format = commentFormat || getDefaultCommentFormat(fileExtension);
+  
+  // Detect or use provided syntax format
+  const syntax = syntaxFormat || detectSyntaxFormat(originalText) || 'json';
   
   // Clone test and remove non-serializable properties
   const testToSerialize = {};
@@ -91,14 +236,23 @@ function serializeTestToInline({ test, commentFormat, fileExtension }) {
   if (test.before) testToSerialize.before = test.before;
   if (test.after) testToSerialize.after = test.after;
   
-  // Always use JSON syntax for consistency with step serialization
-  const testContent = JSON.stringify(testToSerialize);
+  // Use detected/specified syntax format
+  const testContent = serializeToSyntax(testToSerialize, syntax, 'test');
+  
+  // Check if content is multiline
+  const isMultiline = testContent.includes('\n');
   
   switch (format) {
     case 'jsxComment':
+      if (isMultiline) {
+        return `{/* test\n${testContent}\n*/}`;
+      }
       return `{/* test ${testContent} */}`;
     case 'htmlComment':
     default:
+      if (isMultiline) {
+        return `<!-- test\n${testContent}\n-->`;
+      }
       return `<!-- test ${testContent} -->`;
   }
 }
@@ -541,11 +695,12 @@ function prepareSourceUpdates({ spec, originalSpec }) {
       if (wasModified) {
         const fileUpdates = updatesByFile.get(testLoc.file) || [];
         
-        // Serialize the test declaration (without steps)
+        // Serialize the test declaration (without steps), preserving original syntax format
         const newContent = serializeTestToInline({
           test,
           commentFormat: testLoc.commentFormat || 'htmlComment',
           fileExtension: path.extname(testLoc.file),
+          originalText: testLoc.originalText,
         });
         
         // Replace the ENTIRE LINE containing the test declaration
@@ -568,11 +723,12 @@ function prepareSourceUpdates({ spec, originalSpec }) {
         const stepLoc = firstInlineStep.sourceLocation;
         const fileUpdates = updatesByFile.get(stepLoc.file) || [];
         
-        // Serialize the test declaration
+        // Serialize the test declaration, using the first step's syntax format as a hint
         const newContent = serializeTestToInline({
           test,
           commentFormat: stepLoc.commentFormat || 'htmlComment',
           fileExtension: path.extname(stepLoc.file),
+          originalText: stepLoc.originalText,  // Use first step's format as hint
         });
         
         // Insert on the LINE BEFORE the first step
@@ -620,6 +776,7 @@ function prepareSourceUpdates({ spec, originalSpec }) {
           step,
           commentFormat: loc.commentFormat || 'htmlComment',
           fileExtension: path.extname(loc.file),
+          // No originalText for auto-detected - use default JSON format
         });
         
         // Insert on the line after the original content
@@ -631,11 +788,12 @@ function prepareSourceUpdates({ spec, originalSpec }) {
           isAutoDetectedConversion: true,
         });
       } else {
-        // Explicit inline step: replace the ENTIRE LINE
+        // Explicit inline step: replace the ENTIRE LINE, preserving original syntax format
         const newContent = serializeStepToInline({
           step,
           commentFormat: loc.commentFormat,
           fileExtension: path.extname(loc.file),
+          originalText: loc.originalText,
         });
         
         fileUpdates.push({
@@ -676,6 +834,8 @@ function hasAutoDetectedSteps(spec) {
 module.exports = {
   serializeStepToInline,
   serializeTestToInline,
+  detectSyntaxFormat,
+  serializeToSyntax,
   getDefaultCommentFormat,
   canSerializeAsSimple,
   hasTestMetadata,
