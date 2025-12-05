@@ -17,6 +17,7 @@ const {
   buildWindowsXPath,
   isWindowsContext,
   convertToWindowsSelector,
+  escapeXPathValue,
 } = require("../src/tests/windowsElementStrategies");
 
 describe("Windows Desktop Automation", function () {
@@ -253,6 +254,12 @@ describe("Windows Element Finding Strategies", function () {
       assert.equal(result.value, "SaveButton");
     });
 
+    it("should parse WebDriverIO accessibility id shorthand", function () {
+      const result = parseWindowsSelector("~SaveButton");
+      assert.equal(result.strategy, "accessibility id");
+      assert.equal(result.value, "SaveButton");
+    });
+
     it("should parse CSS-style class selectors", function () {
       const result = parseWindowsSelector(".Button");
       assert.equal(result.strategy, "class name");
@@ -329,6 +336,42 @@ describe("Windows Element Finding Strategies", function () {
       const result = convertToWindowsSelector('[name="Save"]');
       assert.equal(result.using, "name");
       assert.equal(result.value, "Save");
+    });
+  });
+
+  describe("escapeXPathValue", function () {
+    it("should wrap simple strings in single quotes", function () {
+      assert.equal(escapeXPathValue("hello"), "'hello'");
+      assert.equal(escapeXPathValue("SaveButton"), "'SaveButton'");
+    });
+
+    it("should use double quotes when string contains single quotes", function () {
+      assert.equal(escapeXPathValue("it's"), '"it\'s"');
+      assert.equal(escapeXPathValue("O'Reilly"), '"O\'Reilly"');
+    });
+
+    it("should use single quotes when string contains double quotes", function () {
+      assert.equal(escapeXPathValue('say "hello"'), "'say \"hello\"'");
+    });
+
+    it("should use concat() when string contains both quote types", function () {
+      const result = escapeXPathValue("it's a \"test\"");
+      assert.ok(result.startsWith("concat("));
+      assert.ok(result.includes("it"));
+      assert.ok(result.includes("test"));
+    });
+
+    it("should handle null and undefined", function () {
+      assert.equal(escapeXPathValue(null), "''");
+      assert.equal(escapeXPathValue(undefined), "''");
+    });
+
+    it("should convert numbers to strings", function () {
+      assert.equal(escapeXPathValue(123), "'123'");
+    });
+
+    it("should handle empty strings", function () {
+      assert.equal(escapeXPathValue(""), "''");
     });
   });
 });

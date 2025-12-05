@@ -522,7 +522,8 @@ async function findElementByCriteria({
     }
     // For other criteria, try to build a selector from them
     if (elementId) {
-      return findWindowsElement({ driver, selector: `#${elementId}`, timeout });
+      // Use [id="..."] selector format which parseWindowsSelector converts to accessibility id
+      return findWindowsElement({ driver, selector: `[id="${elementId}"]`, timeout });
     }
     if (elementText) {
       // Search by Name property in Windows

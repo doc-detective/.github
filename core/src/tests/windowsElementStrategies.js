@@ -5,16 +5,75 @@
  * using Windows UI Automation properties via the NovaWindows Driver.
  *
  * Supported locator strategies:
- * - Accessibility ID: [id="SaveButton"]
+ * - Accessibility ID: [id="SaveButton"], #SaveButton, ~SaveButton
  * - Name: [name="Save"]
  * - XPath: //Button[@Name="Save"]
- * - Class Name: [class="Button"]
+ * - Class Name: [class="Button"], .Button
  * - AutomationId: [automationid="SaveButton"]
  */
 
 exports.parseWindowsSelector = parseWindowsSelector;
 exports.isWindowsContext = isWindowsContext;
 exports.buildWindowsXPath = buildWindowsXPath;
+exports.escapeXPathValue = escapeXPathValue;
+
+/**
+ * Escapes a string value for safe use in XPath expressions.
+ * Handles strings containing single quotes, double quotes, or both.
+ *
+ * @param {string} value - The value to escape
+ * @returns {string} A safe XPath literal (quoted string or concat() expression)
+ */
+function escapeXPathValue(value) {
+  if (value === null || value === undefined) {
+    return "''";
+  }
+
+  const str = String(value);
+
+  if (!str.includes("'")) {
+    return `'${str}'`;
+  }
+
+  if (!str.includes('"')) {
+    return `"${str}"`;
+  }
+
+  // String contains both single and double quotes - use concat()
+  const parts = [];
+  let remaining = str;
+
+  while (remaining.length > 0) {
+    const singleQuoteIndex = remaining.indexOf("'");
+    const doubleQuoteIndex = remaining.indexOf('"');
+
+    if (singleQuoteIndex === -1) {
+      parts.push(`'${remaining}'`);
+      break;
+    }
+
+    if (doubleQuoteIndex === -1) {
+      parts.push(`"${remaining}"`);
+      break;
+    }
+
+    if (singleQuoteIndex < doubleQuoteIndex) {
+      if (singleQuoteIndex > 0) {
+        parts.push(`'${remaining.substring(0, singleQuoteIndex)}'`);
+      }
+      parts.push(`"'"`);  // Single quote wrapped in double quotes
+      remaining = remaining.substring(singleQuoteIndex + 1);
+    } else {
+      if (doubleQuoteIndex > 0) {
+        parts.push(`"${remaining.substring(0, doubleQuoteIndex)}"`);
+      }
+      parts.push(`'"'`);  // Double quote wrapped in single quotes
+      remaining = remaining.substring(doubleQuoteIndex + 1);
+    }
+  }
+
+  return `concat(${parts.join(", ")})`;
+}
 
 /**
  * Checks if the current context is a Windows app context.
@@ -31,6 +90,9 @@ function isWindowsContext(context) {
  *
  * Supported formats:
  * - CSS-like selectors: [id="value"], [name="value"], [class="value"]
+ * - CSS ID selector: #id (maps to accessibility id)
+ * - CSS class selector: .classname (maps to class name)
+ * - WebDriverIO accessibility id shorthand: ~id (maps to accessibility id)
  * - XPath: //Element[@Property="value"]
  * - Simple text: Will be treated as Name or Text search
  *
@@ -85,7 +147,7 @@ function parseWindowsSelector(selector) {
         // Generic attribute - use XPath
         return {
           strategy: "xpath",
-          value: `//*[@${attribute}="${value}"]`,
+          value: `//*[@${attribute}=${escapeXPathValue(value)}]`,
           original: selector,
         };
     }
@@ -98,7 +160,7 @@ function parseWindowsSelector(selector) {
     // Build an XPath with multiple conditions
     const conditions = compounds.map(([, attr, val]) => {
       const normalizedAttr = mapAttributeToUIA(attr);
-      return `@${normalizedAttr}="${val}"`;
+      return `@${normalizedAttr}=${escapeXPathValue(val)}`;
     });
     return {
       strategy: "xpath",
@@ -118,6 +180,15 @@ function parseWindowsSelector(selector) {
 
   // CSS ID selector: #id
   if (selector.startsWith("#")) {
+    return {
+      strategy: "accessibility id",
+      value: selector.slice(1),
+      original: selector,
+    };
+  }
+
+  // WebDriverIO accessibility id shorthand: ~value
+  if (selector.startsWith("~")) {
     return {
       strategy: "accessibility id",
       value: selector.slice(1),
@@ -227,16 +298,16 @@ function buildWindowsXPath(criteria) {
       // Return the XPath directly
       return parsed.value;
     } else if (parsed.strategy && parsed.value) {
-      conditions.push(`@${mapAttributeToUIA(parsed.strategy.replace(" ", ""))}="${parsed.value}"`);
+      conditions.push(`@${mapAttributeToUIA(parsed.strategy.replace(" ", ""))}=${escapeXPathValue(parsed.value)}`);
     }
   }
 
   if (criteria.elementId) {
-    conditions.push(`@AutomationId="${criteria.elementId}"`);
+    conditions.push(`@AutomationId=${escapeXPathValue(criteria.elementId)}`);
   }
 
   if (criteria.elementText) {
-    conditions.push(`@Name="${criteria.elementText}"`);
+    conditions.push(`@Name=${escapeXPathValue(criteria.elementText)}`);
   }
 
   if (criteria.elementClass) {
@@ -244,23 +315,19 @@ function buildWindowsXPath(criteria) {
       ? criteria.elementClass
       : [criteria.elementClass];
     classes.forEach((cls) => {
-      conditions.push(`contains(@ClassName, "${cls}")`);
+      conditions.push(`contains(@ClassName, ${escapeXPathValue(cls)})`);
     });
   }
 
   if (criteria.elementAria) {
     // In Windows, accessible name is often the Name property
-    conditions.push(`@Name="${criteria.elementAria}"`);
+    conditions.push(`@Name=${escapeXPathValue(criteria.elementAria)}`);
   }
 
   if (criteria.elementAttribute) {
     for (const [attr, value] of Object.entries(criteria.elementAttribute)) {
       const uiaAttr = mapAttributeToUIA(attr);
-      if (typeof value === "boolean") {
-        conditions.push(`@${uiaAttr}="${value}"`);
-      } else {
-        conditions.push(`@${uiaAttr}="${value}"`);
-      }
+      conditions.push(`@${uiaAttr}=${escapeXPathValue(String(value))}`);
     }
   }
 
