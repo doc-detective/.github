@@ -112,23 +112,54 @@ async function dereferenceSchemas() {
       let schema = fs.readFileSync(filePath).toString();
       schema = JSON.parse(schema);
 
-      // Check if this is config_v3 which has recursive schemas (astNodeMatch)
-      // For recursive schemas, use bundle instead of dereference to preserve $refs
-      const hasRecursiveSchemas = file.includes('config_v3');
+      // Check if this schema has recursive references
+      // config_v3 has astNodeMatch.children which is recursive
+      // resolvedTests_v3 references config_v3, so also needs special handling
+      const schemasWithRecursion = ['config_v3', 'resolvedTests_v3'];
+      const hasRecursiveSchemas = schemasWithRecursion.some(s => file.includes(s));
       
-      if (hasRecursiveSchemas) {
-        // Bundle keeps $refs for recursive schemas while resolving others
-        schema = await parser.bundle(schema);
-      } else {
-        // Dereference fully resolves all $refs
-        schema = await parser.dereference(schema);
-      }
-      
+      // Always dereference fully - but handle circular refs in the output
+      schema = await parser.dereference(schema);
       // Delete $id attributes
       schema = deleteDollarIds(schema);
-
-      // Write to file
-      fs.writeFileSync(outputFilePath, JSON.stringify(schema, null, 2));
+      
+      if (hasRecursiveSchemas) {
+        // Deep clone that breaks circular references by tracking visited objects
+        // When a circular ref is encountered, it creates a fresh copy with primitive values only
+        const breakCircularRefs = (obj, ancestors = new Set()) => {
+          if (obj === null || typeof obj !== 'object') return obj;
+          
+          // If we've seen this object in the current path, it's circular
+          if (ancestors.has(obj)) {
+            // Create a shallow copy with only non-object properties
+            // This breaks the cycle while preserving structure
+            const shallowCopy = Array.isArray(obj) ? [] : {};
+            for (const [k, v] of Object.entries(obj)) {
+              if (v === null || typeof v !== 'object') {
+                shallowCopy[k] = v;
+              } else if (Array.isArray(v)) {
+                shallowCopy[k] = [];
+              } else {
+                shallowCopy[k] = {};
+              }
+            }
+            return shallowCopy;
+          }
+          
+          ancestors.add(obj);
+          const result = Array.isArray(obj) ? [] : {};
+          for (const [k, v] of Object.entries(obj)) {
+            result[k] = breakCircularRefs(v, ancestors);
+          }
+          ancestors.delete(obj);
+          return result;
+        };
+        
+        const cleanSchema = breakCircularRefs(schema);
+        fs.writeFileSync(outputFilePath, JSON.stringify(cleanSchema, null, 2));
+      } else {
+        fs.writeFileSync(outputFilePath, JSON.stringify(schema, null, 2));
+      }
     } catch (err) {
       console.error(`Error processing ${file}:`, err);
     }
