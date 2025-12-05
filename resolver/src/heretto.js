@@ -294,9 +294,12 @@ async function downloadAndExtractOutput(
       `Downloading publishing job output for ${herettoName}...`
     );
     const response = await client.get(
-      `/files/${fileId}/publishing-jobs/${jobId}/output`,
+      `/files/${fileId}/publishes/${jobId}/assets-all`,
       {
         responseType: "arraybuffer",
+        headers: {
+          Accept: "application/octet-stream",
+        },
       }
     );
 
