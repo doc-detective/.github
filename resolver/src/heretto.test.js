@@ -12,7 +12,6 @@ before(async function () {
 
 describe("Heretto Integration", function () {
   let heretto;
-  let axiosStub;
   let axiosCreateStub;
   let mockClient;
 
@@ -81,39 +80,43 @@ describe("Heretto Integration", function () {
       mockLog.reset();
     });
 
-    it("should return existing scenario if found", async function () {
+    it("should return scenarioId and fileId when valid scenario is found", async function () {
       const existingScenario = {
         id: "scenario-123",
         name: "Doc Detective",
       };
 
-      mockClient.get.resolves({
-        data: { content: [existingScenario, { id: "other", name: "Other" }] },
-      });
+      const scenarioParameters = {
+        content: [
+          { name: "transtype", options: [{ value: "dita" }] },
+          { name: "tool-kit-name", value: "default/dita-ot-3.6.1" },
+          { type: "file_uuid_picker", value: "file-uuid-456" },
+        ],
+      };
+
+      mockClient.get
+        .onFirstCall().resolves({
+          data: { content: [existingScenario, { id: "other", name: "Other" }] },
+        })
+        .onSecondCall().resolves({ data: scenarioParameters });
 
       const result = await heretto.findScenario(mockClient, mockLog, mockConfig);
 
-      expect(result).to.deep.equal(existingScenario);
-      expect(mockClient.get.calledOnce).to.be.true;
+      expect(result).to.deep.equal({ scenarioId: "scenario-123", fileId: "file-uuid-456" });
+      expect(mockClient.get.calledTwice).to.be.true;
       expect(mockClient.post.called).to.be.false;
     });
 
-    it("should create scenario if not found", async function () {
-      const newScenario = {
-        id: "new-scenario-123",
-        name: "Doc Detective",
-      };
-
+    it("should return null if scenario is not found", async function () {
       mockClient.get.resolves({
         data: { content: [{ id: "other", name: "Other Scenario" }] },
       });
-      mockClient.post.resolves({ data: newScenario });
 
       const result = await heretto.findScenario(mockClient, mockLog, mockConfig);
 
-      expect(result).to.deep.equal(newScenario);
+      expect(result).to.be.null;
       expect(mockClient.get.calledOnce).to.be.true;
-      expect(mockClient.post.calledOnce).to.be.true;
+      expect(mockClient.post.called).to.be.false;
     });
 
     it("should return null if scenario fetch fails", async function () {
@@ -124,9 +127,74 @@ describe("Heretto Integration", function () {
       expect(result).to.be.null;
     });
 
-    it("should return null if scenario creation fails", async function () {
-      mockClient.get.resolves({ data: { content: [] } });
-      mockClient.post.rejects(new Error("Permission denied"));
+    it("should return null if transtype parameter is incorrect", async function () {
+      const existingScenario = {
+        id: "scenario-123",
+        name: "Doc Detective",
+      };
+
+      const scenarioParameters = {
+        content: [
+          { name: "transtype", options: [{ value: "html5" }] },
+          { name: "tool-kit-name", value: "default/dita-ot-3.6.1" },
+          { type: "file_uuid_picker", value: "file-uuid-456" },
+        ],
+      };
+
+      mockClient.get
+        .onFirstCall().resolves({
+          data: { content: [existingScenario] },
+        })
+        .onSecondCall().resolves({ data: scenarioParameters });
+
+      const result = await heretto.findScenario(mockClient, mockLog, mockConfig);
+
+      expect(result).to.be.null;
+    });
+
+    it("should return null if tool-kit-name parameter is incorrect", async function () {
+      const existingScenario = {
+        id: "scenario-123",
+        name: "Doc Detective",
+      };
+
+      const scenarioParameters = {
+        content: [
+          { name: "transtype", options: [{ value: "dita" }] },
+          { name: "tool-kit-name", value: "default/dita-ot-4.0.0" },
+          { type: "file_uuid_picker", value: "file-uuid-456" },
+        ],
+      };
+
+      mockClient.get
+        .onFirstCall().resolves({
+          data: { content: [existingScenario] },
+        })
+        .onSecondCall().resolves({ data: scenarioParameters });
+
+      const result = await heretto.findScenario(mockClient, mockLog, mockConfig);
+
+      expect(result).to.be.null;
+    });
+
+    it("should return null if file_uuid_picker parameter is missing", async function () {
+      const existingScenario = {
+        id: "scenario-123",
+        name: "Doc Detective",
+      };
+
+      const scenarioParameters = {
+        content: [
+          { name: "transtype", options: [{ value: "dita" }] },
+          { name: "tool-kit-name", value: "default/dita-ot-3.6.1" },
+        ],
+      };
+
+      mockClient.get
+        .onFirstCall().resolves({
+          data: { content: [existingScenario] },
+        })
+        .onSecondCall().resolves({ data: scenarioParameters });
 
       const result = await heretto.findScenario(mockClient, mockLog, mockConfig);
 
@@ -137,7 +205,7 @@ describe("Heretto Integration", function () {
   describe("triggerPublishingJob", function () {
     it("should trigger a publishing job", async function () {
       const expectedJob = {
-        id: "job-123",
+        jobId: "job-123",
         status: "PENDING",
       };
 
@@ -147,8 +215,8 @@ describe("Heretto Integration", function () {
 
       expect(result).to.deep.equal(expectedJob);
       expect(mockClient.post.calledOnce).to.be.true;
-      expect(mockClient.post.firstCall.args[0]).to.equal("/files/file-uuid/publishing-jobs");
-      expect(mockClient.post.firstCall.args[1]).to.deep.equal({ scenarioId: "scenario-id" });
+      expect(mockClient.post.firstCall.args[0]).to.equal("/files/file-uuid/publishes");
+      expect(mockClient.post.firstCall.args[1]).to.deep.equal({ scenario: "scenario-id", parameters: [] });
     });
   });
 
@@ -160,10 +228,10 @@ describe("Heretto Integration", function () {
       mockLog.reset();
     });
 
-    it("should return completed job", async function () {
+    it("should return completed job when status.result is SUCCESS", async function () {
       const completedJob = {
         id: "job-123",
-        status: "COMPLETED",
+        status: { status: "COMPLETED", result: "SUCCESS" },
       };
 
       mockClient.get.resolves({ data: completedJob });
@@ -173,11 +241,10 @@ describe("Heretto Integration", function () {
       expect(result).to.deep.equal(completedJob);
     });
 
-    it("should return null for failed job", async function () {
+    it("should return null when status.result is FAIL", async function () {
       const failedJob = {
         id: "job-123",
-        status: "FAILED",
-        errorMessage: "Build failed",
+        status: { status: "FAILED", result: "FAIL" },
       };
 
       mockClient.get.resolves({ data: failedJob });
@@ -192,9 +259,9 @@ describe("Heretto Integration", function () {
       const clock = sinon.useFakeTimers();
 
       mockClient.get
-        .onFirstCall().resolves({ data: { id: "job-123", status: "PENDING" } })
-        .onSecondCall().resolves({ data: { id: "job-123", status: "PROCESSING" } })
-        .onThirdCall().resolves({ data: { id: "job-123", status: "COMPLETED" } });
+        .onFirstCall().resolves({ data: { id: "job-123", status: { status: "PENDING", result: null } } })
+        .onSecondCall().resolves({ data: { id: "job-123", status: { status: "PROCESSING", result: null } } })
+        .onThirdCall().resolves({ data: { id: "job-123", status: { status: "COMPLETED", result: "SUCCESS" } } });
 
       const pollPromise = heretto.pollJobStatus(mockClient, "file-uuid", "job-123", mockLog, mockConfig);
 
@@ -205,7 +272,7 @@ describe("Heretto Integration", function () {
 
       const result = await pollPromise;
 
-      expect(result.status).to.equal("COMPLETED");
+      expect(result.status.result).to.equal("SUCCESS");
       expect(mockClient.get.callCount).to.equal(3);
 
       clock.restore();
@@ -220,13 +287,12 @@ describe("Heretto Integration", function () {
       mockLog.reset();
     });
 
-    it("should return null if scenario creation fails", async function () {
+    it("should return null if scenario lookup fails", async function () {
       const herettoConfig = {
         name: "test-heretto",
         organizationId: "test-org",
         username: "user@example.com",
         apiToken: "token123",
-        fileId: "file-uuid",
       };
 
       // Scenario fetch fails
@@ -237,19 +303,28 @@ describe("Heretto Integration", function () {
       expect(result).to.be.null;
     });
 
-    it("should return null if publishing job fails", async function () {
+    it("should return null if publishing job creation fails", async function () {
       const herettoConfig = {
         name: "test-heretto",
         organizationId: "test-org",
         username: "user@example.com",
         apiToken: "token123",
-        fileId: "file-uuid",
       };
 
-      // Scenario exists
-      mockClient.get.onFirstCall().resolves({
-        data: { content: [{ id: "scenario-123", name: "Doc Detective" }] },
-      });
+      const scenarioParameters = {
+        content: [
+          { name: "transtype", options: [{ value: "dita" }] },
+          { name: "tool-kit-name", value: "default/dita-ot-3.6.1" },
+          { type: "file_uuid_picker", value: "file-uuid-456" },
+        ],
+      };
+
+      // Scenario exists with valid parameters
+      mockClient.get
+        .onFirstCall().resolves({
+          data: { content: [{ id: "scenario-123", name: "Doc Detective" }] },
+        })
+        .onSecondCall().resolves({ data: scenarioParameters });
 
       // Job creation fails
       mockClient.post.rejects(new Error("Job creation failed"));
