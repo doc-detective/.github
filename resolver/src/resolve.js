@@ -83,6 +83,14 @@ function resolveContexts({ contexts, test, config }) {
       if (typeof context.platforms === "string") {
         context.platforms = [context.platforms];
       }
+    } else {
+      // Default to empty array if platforms is not specified
+      context.platforms = [];
+    }
+
+    // Validate that both apps and browsers are not specified together
+    if (context.apps && context.apps.length > 0 && context.browsers && context.browsers.length > 0) {
+      log(config, "error", `Context specifies both 'apps' and 'browsers', which is ambiguous. Only 'apps' will be used. Remove one to resolve ambiguity.`);
     }
   });
 
@@ -91,12 +99,19 @@ function resolveContexts({ contexts, test, config }) {
   // If driver is required, create contexts for each specified combination of platform and browser/app
   contexts.forEach((context) => {
     const staticContexts = [];
+
+    // Skip contexts with no platforms
+    if (!context.platforms || context.platforms.length === 0) {
+      log(config, "debug", `Skipping context with no platforms specified.`);
+      return;
+    }
+
     context.platforms.forEach((platform) => {
       if (!driverRequired) {
         const staticContext = { platform };
         staticContexts.push(staticContext);
       } else if (context.apps && context.apps.length > 0) {
-        // Windows app contexts - one context per app
+        // Windows app contexts - one context per app (takes precedence over browsers)
         context.apps.forEach((app) => {
           const staticContext = { platform, app };
           staticContexts.push(staticContext);
