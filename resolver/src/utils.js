@@ -552,13 +552,16 @@ async function parseContent({ config, content, filePath, fileType }) {
         if (astMatches.length > 0) {
           // If regex is also specified, filter AST matches by regex (AND operation)
           if (markup.regex && markup.regex.length > 0) {
+            // Pre-compile regex patterns for performance
+            const regexPatterns = (Array.isArray(markup.regex) ? markup.regex : [markup.regex])
+              .map(pattern => new RegExp(pattern));
+            
             astMatches.forEach((astMatch) => {
               const nodeContent = getNodeContent(astMatch.node);
               let regexMatched = false;
               let regexCaptures = {};
 
-              for (const pattern of (Array.isArray(markup.regex) ? markup.regex : [markup.regex])) {
-                const regex = new RegExp(pattern);
+              for (const regex of regexPatterns) {
                 const regexMatch = nodeContent.match(regex);
                 if (regexMatch) {
                   regexMatched = true;
