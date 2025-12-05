@@ -526,11 +526,31 @@ async function findElementByCriteria({
       return findWindowsElement({ driver, selector: `[id="${elementId}"]`, timeout });
     }
     if (elementText) {
-      // Search by Name property in Windows
+      // Search by Name property in Windows using XPath
       try {
-        const element = await driver.custom$("name", elementText);
-        await element.waitForExist({ timeout });
-        return { element, foundBy: "name" };
+        // Check if it's a regex pattern
+        if (isRegexPattern(elementText)) {
+          // For regex, we need to get all elements and check their Name property
+          const pattern = new RegExp(elementText.slice(1, -1));
+          const elements = await driver.$$("//*[@Name]");
+          for (const el of elements) {
+            try {
+              const name = await el.getAttribute("Name");
+              if (name && pattern.test(name)) {
+                await el.waitForExist({ timeout: Math.min(timeout, 1000) });
+                return { element: el, foundBy: "elementText (regex)" };
+              }
+            } catch {
+              continue;
+            }
+          }
+          return { element: null, foundBy: null, error: `No element found matching text pattern: ${elementText}` };
+        } else {
+          // For exact match, use XPath with Name attribute (escaped to prevent XPath injection)
+          const element = await driver.$(`//*[@Name=${escapeXPathValue(elementText)}]`);
+          await element.waitForExist({ timeout });
+          return { element, foundBy: "elementText" };
+        }
       } catch (error) {
         return { element: null, foundBy: null, error: error.message };
       }

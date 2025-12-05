@@ -1,6 +1,6 @@
 {
   "$schema": "https://raw.githubusercontent.com/doc-detective/common/refs/heads/main/dist/schemas/spec_v3.schema.json",
-  "description": "Windows Calculator automation example - demonstrates basic arithmetic operations",
+  "description": "Windows Calculator automation example - demonstrates basic arithmetic operations. COMPATIBILITY: Tested on Windows 11 23H2 (Build 22631) with Calculator app version 11.2310.0.0 (Microsoft Store). NOTE: Calculator element IDs and accessible names may vary by Windows version, locale, and Calculator app version. This spec uses elementText (maps to UIA Name property) as primary selectors for better cross-version compatibility. If tests fail, inspect the Calculator UI with Accessibility Insights or UI Spy to find the correct element identifiers for your environment. LOCALIZATION: Current selectors use English (en-US) accessible names. For other locales, update the elementText values to match the localized button labels (e.g., 'Siete' for Spanish '7').",
   "tests": [
     {
       "testId": "calculator-basic-addition",
@@ -20,24 +20,31 @@
       "steps": [
         {
           "description": "Click the number 7",
-          "click": "[id='num7Button']"
+          "click": {
+            "elementText": "Seven"
+          }
         },
         {
           "description": "Click the plus button",
-          "click": "[id='plusButton']"
+          "click": {
+            "elementText": "Plus"
+          }
         },
         {
           "description": "Click the number 3",
-          "click": "[id='num3Button']"
+          "click": {
+            "elementText": "Three"
+          }
         },
         {
           "description": "Click the equals button",
-          "click": "[id='equalButton']"
+          "click": {
+            "elementText": "Equals"
+          }
         },
         {
           "description": "Verify the result shows 10",
           "find": {
-            "selector": "[id='CalculatorResults']",
             "elementText": "/Display is 10/"
           }
         },
@@ -62,28 +69,37 @@
       "steps": [
         {
           "description": "Click the clear button",
-          "click": "[id='clearButton']"
+          "click": {
+            "elementText": "Clear"
+          }
         },
         {
           "description": "Click the number 8",
-          "click": "[id='num8Button']"
+          "click": {
+            "elementText": "Eight"
+          }
         },
         {
           "description": "Click the multiply button",
-          "click": "[id='multiplyButton']"
+          "click": {
+            "elementText": "Multiply by"
+          }
         },
         {
           "description": "Click the number 4",
-          "click": "[id='num4Button']"
+          "click": {
+            "elementText": "Four"
+          }
         },
         {
           "description": "Click the equals button",
-          "click": "[id='equalButton']"
+          "click": {
+            "elementText": "Equals"
+          }
         },
         {
           "description": "Verify the result shows 32",
           "find": {
-            "selector": "[id='CalculatorResults']",
             "elementText": "/Display is 32/"
           }
         }

@@ -4,6 +4,7 @@ const {
   findElementByCriteria,
   setElementOutputs,
 } = require("./findStrategies");
+const { isWindowsContext } = require("./windowsElementStrategies");
 const { typeKeys } = require("./typeKeys");
 const { moveTo } = require("./moveTo");
 const { wait } = require("./wait");
@@ -119,9 +120,15 @@ async function findElement({ config, step, driver, click, context }) {
   // Click element
   if (step.find.click || click) {
     try {
-      await element.click({
-        button: step.find.click?.button || "left",
-      });
+      // For Windows apps, use simple click without options as NovaWindows
+      // doesn't support pointer actions with button options
+      if (isWindowsContext(context)) {
+        await element.click();
+      } else {
+        await element.click({
+          button: step.find.click?.button || "left",
+        });
+      }
       result.description += " Clicked element.";
     } catch (error) {
       result.status = "FAIL";

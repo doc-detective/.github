@@ -5,13 +5,12 @@ const { runTests } = require("../src");
  */
 async function main() {
   const json = {
-    input: "test/artifacts/find_extendedFinding.spec.json",
+    input: "dev/windows-calculator.spec.json",
     logLevel: "debug",
     runOn:[{
-      platforms: ["linux","windows","mac"],
-      browsers: [{
-        name: "firefox",
-        headless: true
+      platforms: ["windows"],
+      apps: [{
+        name: "calculator"
       }]
     }],
     integrations: {
