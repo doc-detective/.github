@@ -112,8 +112,18 @@ async function dereferenceSchemas() {
       let schema = fs.readFileSync(filePath).toString();
       schema = JSON.parse(schema);
 
-      // Dereference schema
-      schema = await parser.dereference(schema);
+      // Check if this is config_v3 which has recursive schemas (astNodeMatch)
+      // For recursive schemas, use bundle instead of dereference to preserve $refs
+      const hasRecursiveSchemas = file.includes('config_v3');
+      
+      if (hasRecursiveSchemas) {
+        // Bundle keeps $refs for recursive schemas while resolving others
+        schema = await parser.bundle(schema);
+      } else {
+        // Dereference fully resolves all $refs
+        schema = await parser.dereference(schema);
+      }
+      
       // Delete $id attributes
       schema = deleteDollarIds(schema);
 
@@ -189,13 +199,16 @@ function updateRefPaths(schema) {
  * Recursively removes all `$id` properties from a JSON schema object.
  *
  * @param {object} schema - The JSON schema object to process.
+ * @param {WeakSet} seen - Set of already visited objects to handle circular references.
  * @returns {object} The schema object with all `$id` properties deleted.
  */
-function deleteDollarIds(schema) {
+function deleteDollarIds(schema, seen = new WeakSet()) {
   if (schema === null || typeof schema !== "object") return schema;
+  if (seen.has(schema)) return schema;
+  seen.add(schema);
   for (let [key, value] of Object.entries(schema)) {
     if (typeof value === "object") {
-      deleteDollarIds(value);
+      deleteDollarIds(value, seen);
     }
     if (key === "$id") {
       delete schema[key];
