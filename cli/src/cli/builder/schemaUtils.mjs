@@ -503,6 +503,36 @@ export function createDefaultSpec(specId = '') {
   };
 }
 
+/**
+ * Get the list of action types that require a browser
+ * These actions need a goTo step before they can execute
+ * @returns {string[]} Array of browser-requiring action types
+ */
+export function getBrowserActions() {
+  return ['type', 'find', 'click', 'dragAndDrop', 'screenshot', 'record'];
+}
+
+/**
+ * Get the action type from a step object
+ * @param {Object} step - The step object
+ * @returns {string|null} The action type or null if not found
+ */
+export function getStepActionType(step) {
+  const commonProps = Object.keys(getCommonStepProperties());
+  const stepTypes = getStepTypes();
+  return Object.keys(step).find((k) => stepTypes.includes(k) && !commonProps.includes(k)) || null;
+}
+
+/**
+ * Check if a step requires a browser to execute
+ * @param {Object} step - The step object
+ * @returns {boolean} True if the step requires a browser
+ */
+export function stepRequiresBrowser(step) {
+  const actionType = getStepActionType(step);
+  return getBrowserActions().includes(actionType);
+}
+
 export default {
   getStepTypes,
   getStepTypeSchema,
@@ -523,4 +553,7 @@ export default {
   createDefaultStep,
   createDefaultTest,
   createDefaultSpec,
+  getBrowserActions,
+  getStepActionType,
+  stepRequiresBrowser,
 };

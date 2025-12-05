@@ -19,6 +19,7 @@ import {
 } from './schemaUtils.mjs';
 import TestEditor from './TestEditor.mjs';
 import FieldEditor from './FieldEditor.mjs';
+import DebugRunner from './DebugRunner.mjs';
 import { StatusBar, JsonPreview, SimpleTextInput, LabeledTextInput, ConfirmPrompt, DescriptiveItem, NoIndicator, ScrollableSelect } from './components.mjs';
 
 // Import source file utilities for inline test handling
@@ -136,6 +137,7 @@ const TestBuilder = ({
   const [spec, setSpec] = useState(initialSpec || createDefaultSpec());
   const [editingTestIndex, setEditingTestIndex] = useState(null);
   const [editingField, setEditingField] = useState(null);
+  const [debugTestIndex, setDebugTestIndex] = useState(null);
   const [saveDir, setSaveDir] = useState(outputDir);
   const [showValidationWarning, setShowValidationWarning] = useState(!isValid && isEditing);
 
@@ -349,6 +351,85 @@ const TestBuilder = ({
       },
       onCancel: () => setPhase('menu'),
       onDelete: () => setPhase('menu'),
+    });
+  }
+
+  // Select test to debug
+  if (phase === 'selectDebugTest') {
+    const runnableTests = (spec.tests || [])
+      .map((test, index) => ({ test, index }))
+      .filter(({ test }) => (test.steps || []).length > 0);
+
+    const items = runnableTests.map(({ test, index }) => {
+      const description = test.description || `Test ${index + 1}`;
+      const stepCount = (test.steps || []).length;
+      return {
+        label: `${index + 1}. ${description.substring(0, 40)}${description.length > 40 ? '...' : ''} (${stepCount} steps)`,
+        value: index,
+      };
+    });
+
+    items.push({ label: '← Back', value: 'back' });
+
+    return React.createElement(
+      Box,
+      { flexDirection: 'column', padding: 1 },
+      React.createElement(StatusBar, {
+        location: [specName, 'Select Test to Debug'],
+      }),
+      React.createElement(
+        Box,
+        { marginBottom: 1 },
+        React.createElement(Text, { bold: true, color: 'cyan' }, '🚀 Select Test to Debug')
+      ),
+      React.createElement(
+        Box,
+        { marginBottom: 1 },
+        React.createElement(
+          Text,
+          { color: 'gray' },
+          'Choose a test to run step-by-step with a visible browser:'
+        )
+      ),
+      React.createElement(SelectInput, {
+        items,
+        onSelect: (item) => {
+          if (item.value === 'back') {
+            setPhase('menu');
+          } else {
+            setDebugTestIndex(item.value);
+            setPhase('debugRun');
+          }
+        },
+      })
+    );
+  }
+
+  // Debug run phase
+  if (phase === 'debugRun' && debugTestIndex !== null) {
+    const testToDebug = spec.tests?.[debugTestIndex];
+
+    if (!testToDebug) {
+      setPhase('menu');
+      setDebugTestIndex(null);
+      return null;
+    }
+
+    return React.createElement(DebugRunner, {
+      test: testToDebug,
+      testIndex: debugTestIndex,
+      onComplete: (updatedTest) => {
+        // Update the test with any changes made during debugging
+        const newTests = [...(spec.tests || [])];
+        newTests[debugTestIndex] = updatedTest;
+        setSpec({ ...spec, tests: newTests });
+        setDebugTestIndex(null);
+        setPhase('menu');
+      },
+      onCancel: () => {
+        setDebugTestIndex(null);
+        setPhase('menu');
+      },
     });
   }
 
@@ -894,6 +975,16 @@ const TestBuilder = ({
     value: 'addTest',
   });
 
+  // Debug/run option - only show if there are tests with steps
+  const hasRunnableTests = tests.some((t) => (t.steps || []).length > 0);
+  if (hasRunnableTests) {
+    menuItems.push({ label: '─────── Debug ──────────', value: `none_${menuIndex++}` });
+    menuItems.push({
+      label: '🚀 Run and debug test',
+      value: 'debugTest',
+    });
+  }
+
   menuItems.push({ label: '─────── Save/Exit ──────', value: `none_${menuIndex++}` });
 
   // Actions
@@ -979,6 +1070,17 @@ const TestBuilder = ({
             break;
           case 'addTest':
             setPhase('addTest');
+            break;
+          case 'debugTest':
+            // If only one test with steps, go directly to debug
+            const runnableTests = tests.filter((t) => (t.steps || []).length > 0);
+            if (runnableTests.length === 1) {
+              const runnableIndex = tests.findIndex((t) => (t.steps || []).length > 0);
+              setDebugTestIndex(runnableIndex);
+              setPhase('debugRun');
+            } else {
+              setPhase('selectDebugTest');
+            }
             break;
           case 'preview':
             setPhase('preview');
