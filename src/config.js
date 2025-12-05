@@ -320,26 +320,57 @@ let defaultFileTypes = {
       testStart: [
         "{\\/\\*\\s*test\\s+?([\\s\\S]*?)\\s*\\*\\/}",
         "<!--\\s*test\\s*([\\s\\S]*?)\\s*-->",
+        // CommonMark comment syntax with parentheses: [comment]: # (test ...)
         "\\[comment\\]:\\s+#\\s+\\(test\\s*(.*?)\\s*\\)",
         "\\[comment\\]:\\s+#\\s+\\(test start\\s*(.*?)\\s*\\)",
+        // CommonMark comment syntax with single quotes: [comment]: # 'test ...'
+        "\\[comment\\]:\\s+#\\s+'test\\s*(.*?)\\s*'",
+        "\\[comment\\]:\\s+#\\s+'test start\\s*(.*?)\\s*'",
+        // CommonMark comment syntax with double quotes: [comment]: # "test ..."
+        // Uses (?:[^"\\\\]|\\\\.)* to handle escaped quotes within the content
+        '\\[comment\\]:\\s+#\\s+"test\\s*((?:[^"\\\\]|\\\\.)*)\\s*"',
+        '\\[comment\\]:\\s+#\\s+"test start\\s*((?:[^"\\\\]|\\\\.)*)\\s*"',
       ],
       testEnd: [
         "{\\/\\*\\s*test end\\s*\\*\\/}",
         "<!--\\s*test end\\s*([\\s\\S]*?)\\s*-->",
+        // CommonMark comment syntax with parentheses
         "\\[comment\\]:\\s+#\\s+\\(test end\\)",
+        // CommonMark comment syntax with single quotes
+        "\\[comment\\]:\\s+#\\s+'test end'",
+        // CommonMark comment syntax with double quotes
+        '\\[comment\\]:\\s+#\\s+"test end"',
       ],
       ignoreStart: [
         "{\\/\\*\\s*test ignore start\\s*\\*\\/}",
         "<!--\\s*test ignore start\\s*-->",
+        // CommonMark comment syntax with parentheses
+        "\\[comment\\]:\\s+#\\s+\\(test ignore start\\)",
+        // CommonMark comment syntax with single quotes
+        "\\[comment\\]:\\s+#\\s+'test ignore start'",
+        // CommonMark comment syntax with double quotes
+        '\\[comment\\]:\\s+#\\s+"test ignore start"',
       ],
       ignoreEnd: [
         "{\\/\\*\\s*test ignore end\\s*\\*\\/}",
         "<!--\\s*test ignore end\\s*-->",
+        // CommonMark comment syntax with parentheses
+        "\\[comment\\]:\\s+#\\s+\\(test ignore end\\)",
+        // CommonMark comment syntax with single quotes
+        "\\[comment\\]:\\s+#\\s+'test ignore end'",
+        // CommonMark comment syntax with double quotes
+        '\\[comment\\]:\\s+#\\s+"test ignore end"',
       ],
       step: [
         "{\\/\\*\\s*step\\s+?([\\s\\S]*?)\\s*\\*\\/}",
         "<!--\\s*step\\s*([\\s\\S]*?)\\s*-->",
+        // CommonMark comment syntax with parentheses: [comment]: # (step ...)
         "\\[comment\\]:\\s+#\\s+\\(step\\s*(.*?)\\s*\\)",
+        // CommonMark comment syntax with single quotes: [comment]: # 'step ...'
+        "\\[comment\\]:\\s+#\\s+'step\\s*(.*?)\\s*'",
+        // CommonMark comment syntax with double quotes: [comment]: # "step ..."
+        // Uses (?:[^"\\\\]|\\\\.)* to handle escaped quotes within the content
+        '\\[comment\\]:\\s+#\\s+"step\\s*((?:[^"\\\\]|\\\\.)*)\\s*"',
       ],
     },
     markup: [
@@ -472,7 +503,7 @@ async function setConfig({ config }) {
     } catch (error) {
       log(
         config,
-        "warn",
+        "warning",
         `Invalid JSON in DOC_DETECTIVE environment variable: ${error.message}. Ignoring config overrides.`
       );
     }
