@@ -298,6 +298,7 @@ async function downloadAndExtractOutput(
       `/files/${fileId}/publishes/${jobId}/assets-all`,
       {
         responseType: "arraybuffer",
+        timeout: 300000, // 5 minutes for downloads
         headers: {
           Accept: "application/octet-stream",
         },
