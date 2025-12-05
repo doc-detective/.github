@@ -4,7 +4,7 @@
   "tests": [
     {
       "testId": "notepad-type-and-save",
-      "description": "Type text in Notepad and verify content",
+      "description": "Type text in Notepad, save the file, and verify content",
       "contexts": [
         {
           "platforms": "windows",
@@ -32,6 +32,12 @@
           "screenshot": {
             "path": "notepad-text.png",
             "directory": "screenshots"
+          }
+        },
+        {
+          "description": "Save the file with Ctrl+S",
+          "type": {
+            "keys": ["$CONTROL$s"]
           }
         },
         {
