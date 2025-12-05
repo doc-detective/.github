@@ -205,6 +205,8 @@ async function qualifyFiles({ config }) {
     return [];
   }
 
+  const ignoredDitaMaps = [];
+
   for (let source of sequence) {
     log(config, "debug", `source: ${source}`);
     
@@ -234,6 +236,7 @@ async function qualifyFiles({ config }) {
             // Insert the output path into the sequence for processing
             const currentIndex = sequence.indexOf(source);
             sequence.splice(currentIndex + 1, 0, outputPath);
+            ignoredDitaMaps.push(outputPath); // DITA maps are already processed in Heretto
           } else {
             log(
               config,
@@ -277,13 +280,15 @@ async function qualifyFiles({ config }) {
     if (
       isFile &&
       path.extname(source) === ".ditamap" &&
-      config.processDitaMap
+      !ignoredDitaMaps.some((ignored) => source.includes(ignored)) &&
+      config.processDitaMaps
     ) {
       const ditaOutput = await processDitaMap({ config, source });
       if (ditaOutput) {
         // Add output directory to to sequence right after the ditamap file
         const currentIndex = sequence.indexOf(source);
         sequence.splice(currentIndex + 1, 0, ditaOutput);
+        ignoredDitaMaps.push(ditaOutput); // DITA maps are already processed locally
       }
       continue;
     }
