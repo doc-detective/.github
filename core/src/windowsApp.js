@@ -51,6 +51,38 @@ const COMMON_WINDOWS_APPS = {
   },
 };
 
+/**
+ * Extracts a window title from a UWP app identifier.
+ *
+ * UWP identifiers follow the pattern: PackageFamilyName!AppId
+ * Example: Microsoft.WindowsCalculator_8wekyb3d8bbwe!App
+ *
+ * @param {string} appName - The UWP app identifier
+ * @returns {string} The extracted window title
+ */
+function extractUwpWindowTitle(appName) {
+  const exclamationIndex = appName.lastIndexOf("!");
+
+  if (exclamationIndex !== -1) {
+    const appId = appName.substring(exclamationIndex + 1).trim();
+    if (appId.length > 0) {
+      return appId;
+    }
+  }
+
+  // Fallback: try to extract the last segment after "_"
+  const underscoreIndex = appName.lastIndexOf("_");
+  if (underscoreIndex !== -1) {
+    const lastSegment = appName.substring(underscoreIndex + 1).trim();
+    if (lastSegment.length > 0) {
+      return lastSegment;
+    }
+  }
+
+  // Final fallback: use the full appName
+  return appName;
+}
+
 // Exports
 exports.resolveAppPath = resolveAppPath;
 exports.isNovaWindowsAvailable = isNovaWindowsAvailable;
@@ -76,10 +108,11 @@ function resolveAppPath(appName) {
 
   // Check if it's a UWP app identifier (contains "!" to indicate app entry point)
   if (appName.includes("!")) {
+    const windowTitle = extractUwpWindowTitle(appName);
     return {
       path: appName,
       type: "uwp",
-      windowTitle: appName.split("_")[0],
+      windowTitle,
     };
   }
 
