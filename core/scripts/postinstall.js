@@ -1,7 +1,6 @@
 const path = require("path");
 const browsers = require("@puppeteer/browsers");
 const geckodriver = require("geckodriver");
-const { spawn } = require("child_process");
 
 async function main() {
   await installBrowsers();
