@@ -885,3 +885,224 @@ detectSteps: true
     expect(codeblockStep).to.exist;
   });
 });
+
+// AST-based test detection tests
+describe("AST-based Test Detection", function () {
+  it("should detect markdown code blocks using AST matching", async function () {
+    const markdownWithCode = `# Test Document
+
+Here is some bash code:
+
+\`\`\`bash
+echo "Hello from bash"
+\`\`\`
+
+And some JavaScript:
+
+\`\`\`javascript
+console.log("Hello from JS");
+\`\`\`
+`;
+    
+    const tempMarkdownFile = "temp_ast_markdown.md";
+    fs.writeFileSync(tempMarkdownFile, markdownWithCode.trim());
+    const config = {
+      input: tempMarkdownFile,
+      fileTypes: [
+        {
+          name: "markdown",
+          extensions: ["md"],
+          inlineStatements: {},
+          markup: [
+            {
+              name: "bashCodeBlock",
+              ast: {
+                nodeType: "code",
+                attributes: {
+                  lang: ["bash", "sh"]
+                },
+                extract: {
+                  "$1": "lang",
+                  "$2": "value"
+                }
+              },
+              actions: [
+                {
+                  runShell: {
+                    command: "$2"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ],
+    };
+    const results = await detectAndResolveTests({ config });
+    fs.unlinkSync(tempMarkdownFile);
+    
+    expect(results.specs).to.be.an("array").that.has.lengthOf(1);
+    expect(results.specs[0].tests).to.be.an("array").that.has.lengthOf(1);
+    
+    const steps = results.specs[0].tests[0].contexts[0].steps;
+    expect(steps).to.be.an("array").that.has.lengthOf(1);
+    
+    // Should only match bash, not javascript
+    const bashStep = steps.find(s => s.runShell);
+    expect(bashStep).to.exist;
+    expect(bashStep.runShell.command).to.include("Hello from bash");
+  });
+
+  it("should combine AST and regex matching (AND operation)", async function () {
+    const markdownWithCode = `
+\`\`\`bash
+echo "regular command"
+\`\`\`
+
+\`\`\`bash
+# IMPORTANT: This should match
+echo "special command"
+\`\`\`
+`;
+    
+    const tempMarkdownFile = "temp_ast_regex_combo.md";
+    fs.writeFileSync(tempMarkdownFile, markdownWithCode.trim());
+    const config = {
+      input: tempMarkdownFile,
+      fileTypes: [
+        {
+          name: "markdown",
+          extensions: ["md"],
+          inlineStatements: {},
+          markup: [
+            {
+              name: "importantBashCode",
+              ast: {
+                nodeType: "code",
+                attributes: {
+                  lang: ["bash", "sh"]
+                },
+                extract: {
+                  "$1": "value"
+                }
+              },
+              regex: ["# IMPORTANT:([\\s\\S]*)"],
+              actions: [
+                {
+                  runShell: {
+                    command: "$1"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ],
+    };
+    const results = await detectAndResolveTests({ config });
+    fs.unlinkSync(tempMarkdownFile);
+    
+    expect(results.specs).to.be.an("array").that.has.lengthOf(1);
+    expect(results.specs[0].tests).to.be.an("array").that.has.lengthOf(1);
+    
+    const steps = results.specs[0].tests[0].contexts[0].steps;
+    // Should only match the code block with IMPORTANT comment
+    expect(steps).to.be.an("array").that.has.lengthOf(1);
+    expect(steps[0].runShell.command).to.include("special command");
+    expect(steps[0].runShell.command).not.to.include("regular command");
+  });
+
+  it("should detect XML/DITA elements using AST matching", async function () {
+    const ditaContent = `<?xml version="1.0" encoding="UTF-8"?>
+<topic id="test">
+  <title>Test Topic</title>
+  <!-- test testId="ast-dita-test" detectSteps=true -->
+  <body>
+    <codeblock outputclass="bash">echo "DITA bash"</codeblock>
+    <codeblock outputclass="python">print("DITA python")</codeblock>
+  </body>
+  <!-- test end -->
+</topic>`;
+    
+    const tempDitaFile = "temp_ast_dita.dita";
+    fs.writeFileSync(tempDitaFile, ditaContent.trim());
+    const config = {
+      input: tempDitaFile,
+      fileTypes: [
+        {
+          name: "dita",
+          extensions: ["dita", "xml"],
+          inlineStatements: {
+            testStart: ["<!--\\s*test\\s*([\\s\\S]*?)\\s*-->"],
+            testEnd: ["<!--\\s*test end\\s*-->"],
+          },
+          markup: [
+            {
+              name: "ditaBashCodeblock",
+              ast: {
+                nodeType: "element",
+                attributes: {
+                  tagName: "codeblock",
+                  outputclass: ["bash", "shell"]
+                },
+                extract: {
+                  "$1": "attributes.outputclass",
+                  "$2": "content"
+                }
+              },
+              actions: [
+                {
+                  runShell: {
+                    command: "$2"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ],
+    };
+    const results = await detectAndResolveTests({ config });
+    fs.unlinkSync(tempDitaFile);
+    
+    expect(results.specs).to.be.an("array").that.has.lengthOf(1);
+    expect(results.specs[0].tests).to.be.an("array").that.has.lengthOf(1);
+    
+    const steps = results.specs[0].tests[0].contexts[0].steps;
+    // Should only match bash, not python
+    expect(steps).to.be.an("array").that.has.lengthOf(1);
+    expect(steps[0].runShell.command).to.include("DITA bash");
+  });
+
+  it("should support regex-only markup definitions (backward compatibility)", async function () {
+    const markdownInput = `
+Check this [link](https://example.com/test).
+`;
+    
+    const tempMarkdownFile = "temp_regex_only.md";
+    fs.writeFileSync(tempMarkdownFile, markdownInput.trim());
+    const config = {
+      input: tempMarkdownFile,
+      fileTypes: [
+        {
+          name: "markdown",
+          extensions: ["md"],
+          inlineStatements: {},
+          markup: [
+            {
+              name: "checkHyperlink",
+              regex: ["\\[[^\\]]+\\]\\(\\s*(https?:\\/\\/[^\\s)]+)\\s*\\)"],
+              actions: ["checkLink"]
+            }
+          ]
+        }
+      ],
+    };
+    const results = await detectAndResolveTests({ config });
+    fs.unlinkSync(tempMarkdownFile);
+    
+    expect(results.specs).to.be.an("array").that.has.lengthOf(1);
+    expect(results.specs[0].tests[0].contexts[0].steps).to.be.an("array").that.has.lengthOf(1);
+    expect(results.specs[0].tests[0].contexts[0].steps[0].checkLink).to.equal("https://example.com/test");
+  });
+});
