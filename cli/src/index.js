@@ -175,19 +175,19 @@ async function main(argv) {
   let resolvedTests = api?.resolvedTests || null;
   let apiConfig = api?.apiConfig || null;
 
-  // Run tests with the new Ink-based UI
-  // Dynamically import to avoid ESM issues at startup
-  const { runWithUI } = require("./cli/runner");
+  // Run tests directly using doc-detective-core
+  const { runTests } = require("doc-detective-core");
   const output = config.output;
-  const results = await runWithUI(config, { resolvedTests });
+  const results = resolvedTests
+    ? await runTests(config, { resolvedTests })
+    : await runTests(config);
 
   if (apiConfig) {
     await reportResults({ apiConfig, results });
   } else {
-    // Output results to JSON file only (terminal output is handled by Ink UI)
+    // Output results
     await outputResults(config, output, results, { 
       command: "runTests",
-      reporters: ["json"] // Only use JSON reporter, not terminal reporter
     });
   }
 }

@@ -1,6 +1,3 @@
-const { render } = require('ink');
-const React = require('react');
-const App = require('./App');
 const { runTests } = require('doc-detective-core');
 
 /**
@@ -10,6 +7,13 @@ const { runTests } = require('doc-detective-core');
  * @returns {Promise<Object>} Test results
  */
 async function runWithUI(config, options = {}) {
+  // Dynamic import of ESM modules
+  const [{ render }, React, { default: App }] = await Promise.all([
+    import('ink'),
+    import('react'),
+    import('./App.mjs'),
+  ]);
+
   let appInstance;
   let updateState;
 
