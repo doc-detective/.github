@@ -991,7 +991,15 @@ const TestBuilder = ({
   menuItems.push({ label: '🔍 Preview', value: 'preview' });
 
   if (validation.valid && tests.length > 0) {
-    const saveLabel = isEditing ? '💾 Save (overwrite)' : '💾 Save specification';
+    // Use different label based on whether spec has inline sources
+    let saveLabel;
+    if (hasInlineSources) {
+      saveLabel = '💾 Save changes';
+    } else if (isEditing) {
+      saveLabel = '💾 Save (overwrite)';
+    } else {
+      saveLabel = '💾 Save specification';
+    }
     menuItems.push({ label: saveLabel, value: 'save' });
   } else if (tests.length === 0) {
     menuItems.push({
@@ -1033,8 +1041,13 @@ const TestBuilder = ({
     ),
     React.createElement(
       Box,
-      { marginBottom: 1 },
-      React.createElement(
+      { flexDirection: 'column', marginBottom: 1 },
+      // Show inline source info if spec has inline sources
+      hasInlineSources ? React.createElement(
+        Text,
+        { color: 'green', dimColor: true },
+        `📝 Source: ${path.basename(inputFilePath || '')} (inline tests detected)`
+      ) : React.createElement(
         Text,
         { color: 'gray', dimColor: true },
         `Output: ${filePath} (${outputFormat.toUpperCase()})`
