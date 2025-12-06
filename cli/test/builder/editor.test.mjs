@@ -95,10 +95,10 @@ describe('CLI Editor Integration', function() {
     it('should recognize --editor flag', async () => {
       // Create a valid spec file
       const specContent = {
-        id: 'test-spec',
+        specId: 'test-spec',
         tests: [{
-          id: 'test-1',
-          steps: [{ action: 'wait', duration: 100 }]
+          testId: 'test-1',
+          steps: [{ wait: 100 }]
         }]
       };
       const specPath = createTestSpecFile(tempDir, 'test.spec.json', specContent);
@@ -118,10 +118,10 @@ describe('CLI Editor Integration', function() {
     
     it('should recognize -e short flag', async () => {
       const specContent = {
-        id: 'test-spec',
+        specId: 'test-spec',
         tests: [{
-          id: 'test-1',
-          steps: [{ action: 'wait', duration: 100 }]
+          testId: 'test-1',
+          steps: [{ wait: 100 }]
         }]
       };
       const specPath = createTestSpecFile(tempDir, 'test.spec.json', specContent);
@@ -139,10 +139,10 @@ describe('CLI Editor Integration', function() {
   describe('input file handling', () => {
     it('should accept --input flag with spec file', async () => {
       const specContent = {
-        id: 'input-test-spec',
+        specId: 'input-test-spec',
         tests: [{
-          id: 'test-1',
-          steps: [{ action: 'wait', duration: 100 }]
+          testId: 'test-1',
+          steps: [{ wait: 100 }]
         }]
       };
       const specPath = createTestSpecFile(tempDir, 'input-test.spec.json', specContent);
@@ -158,10 +158,10 @@ describe('CLI Editor Integration', function() {
     
     it('should accept -i short flag with spec file', async () => {
       const specContent = {
-        id: 'short-flag-test',
+        specId: 'short-flag-test',
         tests: [{
-          id: 'test-1',
-          steps: [{ action: 'wait', duration: 100 }]
+          testId: 'test-1',
+          steps: [{ wait: 100 }]
         }]
       };
       const specPath = createTestSpecFile(tempDir, 'short-flag.spec.json', specContent);
@@ -176,10 +176,10 @@ describe('CLI Editor Integration', function() {
     
     it('should accept --input=value format', async () => {
       const specContent = {
-        id: 'equals-format-test',
+        specId: 'equals-format-test',
         tests: [{
-          id: 'test-1',
-          steps: [{ action: 'wait', duration: 100 }]
+          testId: 'test-1',
+          steps: [{ wait: 100 }]
         }]
       };
       const specPath = createTestSpecFile(tempDir, 'equals-format.spec.json', specContent);
@@ -208,17 +208,17 @@ describe('CLI Editor Integration', function() {
     
     it('should accept comma-separated input paths', async () => {
       const spec1Content = {
-        id: 'multi-input-1',
+        specId: 'multi-input-1',
         tests: [{
-          id: 'test-1',
-          steps: [{ action: 'wait', duration: 100 }]
+          testId: 'test-1',
+          steps: [{ wait: 100 }]
         }]
       };
       const spec2Content = {
-        id: 'multi-input-2',
+        specId: 'multi-input-2',
         tests: [{
-          id: 'test-2',
-          steps: [{ action: 'wait', duration: 100 }]
+          testId: 'test-2',
+          steps: [{ wait: 100 }]
         }]
       };
       const specPath1 = createTestSpecFile(tempDir, 'multi1.spec.json', spec1Content);
@@ -261,10 +261,10 @@ tests:
   describe('positional arguments', () => {
     it('should accept spec file path as positional argument', async () => {
       const specContent = {
-        id: 'positional-test',
+        specId: 'positional-test',
         tests: [{
-          id: 'test-1',
-          steps: [{ action: 'wait', duration: 100 }]
+          testId: 'test-1',
+          steps: [{ wait: 100 }]
         }]
       };
       const specPath = createTestSpecFile(tempDir, 'positional.spec.json', specContent);
@@ -273,6 +273,177 @@ tests:
       const result = await spawnWithTimeout(['--editor', specPath], {
         timeout: 2000,
         cwd: tempDir,
+      });
+      
+      expect(result.stderr).to.not.include('SyntaxError');
+    });
+  });
+  
+  describe('markdown file support', () => {
+    it('should accept markdown files with inline tests', async () => {
+      const markdownContent = `# Test Documentation
+
+This is a test document with inline tests.
+
+<!-- test testId: "inline-test-1" -->
+<!-- step goTo: "https://example.com" -->
+
+More documentation content.
+`;
+      const mdPath = path.join(tempDir, 'doc-with-tests.md');
+      fs.writeFileSync(mdPath, markdownContent);
+      
+      const result = await spawnWithTimeout(['--editor', '-i', mdPath], {
+        timeout: 3000,
+        cwd: tempDir,
+      });
+      
+      expect(result.stderr).to.not.include('SyntaxError');
+    });
+  });
+  
+  describe('output handling', () => {
+    it('should not produce JavaScript errors on startup', async () => {
+      const specContent = {
+        id: 'startup-test',
+        tests: [{
+          id: 'test-1',
+          steps: [{ goTo: 'https://example.com' }]
+        }]
+      };
+      const specPath = createTestSpecFile(tempDir, 'startup.spec.json', specContent);
+      
+      const result = await spawnWithTimeout(['--editor', '-i', specPath], {
+        timeout: 2000,
+        cwd: tempDir,
+      });
+      
+      expect(result.stderr).to.not.include('ReferenceError');
+      expect(result.stderr).to.not.include('TypeError');
+      expect(result.stderr).to.not.include('Cannot find module');
+    });
+  });
+  
+  describe('complex spec files', () => {
+    it('should handle spec with multiple tests', async () => {
+      const specContent = {
+        specId: 'multi-test-spec',
+        tests: [
+          {
+            testId: 'test-1',
+            description: 'First test',
+            steps: [{ goTo: 'https://example.com/page1' }]
+          },
+          {
+            testId: 'test-2',
+            description: 'Second test',
+            steps: [
+              { goTo: 'https://example.com/page2' },
+              { click: '.button' }
+            ]
+          },
+          {
+            testId: 'test-3',
+            description: 'Third test',
+            steps: [
+              { goTo: 'https://example.com/page3' },
+              { find: '.element' },
+              { screenshot: 'result.png' }
+            ]
+          }
+        ]
+      };
+      const specPath = createTestSpecFile(tempDir, 'multi-test.spec.json', specContent);
+      
+      const result = await spawnWithTimeout(['--editor', '-i', specPath], {
+        timeout: 2000,
+        cwd: tempDir,
+      });
+      
+      expect(result.stderr).to.not.include('SyntaxError');
+      expect(result.stderr).to.not.include('Error:');
+    });
+
+    it('should handle spec with all step types', async () => {
+      const specContent = {
+        specId: 'all-steps-spec',
+        tests: [{
+          testId: 'test-1',
+          steps: [
+            { goTo: 'https://example.com' },
+            { click: '.button' },
+            { find: '.element' },
+            { type: ['test input', '$ENTER$'] },
+            { screenshot: 'screenshot.png' },
+            { wait: 1000 },
+            { httpRequest: { url: 'https://api.example.com', method: 'GET' } },
+            { runShell: 'echo test' }
+          ]
+        }]
+      };
+      const specPath = createTestSpecFile(tempDir, 'all-steps.spec.json', specContent);
+      
+      const result = await spawnWithTimeout(['--editor', '-i', specPath], {
+        timeout: 2000,
+        cwd: tempDir,
+      });
+      
+      expect(result.stderr).to.not.include('SyntaxError');
+    });
+  });
+  
+  describe('invalid spec handling', () => {
+    it('should handle spec with validation errors gracefully', async () => {
+      // Spec with invalid structure but parseable JSON
+      const specContent = {
+        id: 'invalid-spec',
+        tests: 'this should be an array'
+      };
+      const specPath = createTestSpecFile(tempDir, 'invalid.spec.json', specContent);
+      
+      const result = await spawnWithTimeout(['--editor', '-i', specPath], {
+        timeout: 3000,
+        cwd: tempDir,
+      });
+      
+      // Should not crash with JavaScript errors
+      expect(result.stderr).to.not.include('TypeError');
+      expect(result.stderr).to.not.include('Cannot read properties');
+    });
+
+    it('should error on unparseable JSON', async () => {
+      const invalidJson = '{ this is not valid json }';
+      const jsonPath = path.join(tempDir, 'broken.spec.json');
+      fs.writeFileSync(jsonPath, invalidJson);
+      
+      const result = await spawnWithTimeout(['--editor', '-i', jsonPath], {
+        timeout: 3000,
+        cwd: tempDir,
+      });
+      
+      // Should report the file couldn't be parsed
+      expect(result.stderr).to.include('No valid spec files');
+    });
+  });
+  
+  describe('environment handling', () => {
+    it('should work without any environment variables', async () => {
+      const specContent = {
+        id: 'env-test',
+        tests: [{
+          id: 'test-1',
+          steps: [{ goTo: 'https://example.com' }]
+        }]
+      };
+      const specPath = createTestSpecFile(tempDir, 'env-test.spec.json', specContent);
+      
+      const result = await spawnWithTimeout(['--editor', '-i', specPath], {
+        timeout: 2000,
+        cwd: tempDir,
+        env: {
+          PATH: process.env.PATH,
+          NODE_PATH: process.env.NODE_PATH,
+        },
       });
       
       expect(result.stderr).to.not.include('SyntaxError');
