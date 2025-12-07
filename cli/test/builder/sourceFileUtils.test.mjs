@@ -755,9 +755,10 @@ describe('sourceFileUtils', function () {
     });
 
     it('skips unmodified inline steps', function () {
-      const spec = getMockSpec({
+      // Use test without metadata (testId/description) to avoid triggering test declaration insertion
+      const originalSpec = getMockSpec({
         tests: [
-          getMockTest({
+          {
             steps: [
               getMockInlineStep('goTo', 'https://example.com', {
                 file: '/path/to/file.md',
@@ -765,20 +766,24 @@ describe('sourceFileUtils', function () {
                 endOffset: 50,
               }),
             ],
-          }),
+          },
         ],
       });
       
-      // Same spec as original - no modifications
-      const updates = prepareSourceUpdates({ spec, originalSpec: spec });
+      // Create a deep clone with identical content
+      const spec = JSON.parse(JSON.stringify(originalSpec));
+      
+      // Same content as original - no modifications
+      const updates = prepareSourceUpdates({ spec, originalSpec });
       
       expect(updates.size).to.equal(0);
     });
 
     it('handles auto-detected steps with insertLineAfter', function () {
+      // Use test without metadata (testId/description) to avoid triggering test declaration insertion
       const originalSpec = getMockSpec({
         tests: [
-          getMockTest({
+          {
             steps: [
               getMockInlineStep('goTo', 'https://old.com', {
                 file: '/path/to/file.md',
@@ -787,13 +792,13 @@ describe('sourceFileUtils', function () {
                 isAutoDetected: true,
               }),
             ],
-          }),
+          },
         ],
       });
       
       const modifiedSpec = getMockSpec({
         tests: [
-          getMockTest({
+          {
             steps: [
               getMockInlineStep('goTo', 'https://new.com', {
                 file: '/path/to/file.md',
@@ -802,7 +807,7 @@ describe('sourceFileUtils', function () {
                 isAutoDetected: true,
               }),
             ],
-          }),
+          },
         ],
       });
       
@@ -810,7 +815,9 @@ describe('sourceFileUtils', function () {
       
       expect(updates.size).to.equal(1);
       const fileUpdates = updates.get('/path/to/file.md');
-      expect(fileUpdates[0].insertLineAfter).to.be.true;
+      expect(fileUpdates).to.be.an('array');
+      expect(fileUpdates.length).to.be.greaterThan(0);
+      expect(fileUpdates[0]).to.have.property('insertLineAfter', true);
     });
   });
 });
