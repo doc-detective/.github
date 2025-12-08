@@ -726,7 +726,7 @@ function registerReporter(name, reporterFunction) {
 // Export the registerReporter function
 exports.registerReporter = registerReporter;
 
-async function reportResults({ apiConfig, results }) {
+async function reportResults({ config = {}, apiConfig, results }) {
   // Transform results into the required format for the API
   // Extract contexts from the nested structure and format them
   const contexts = [];
@@ -753,7 +753,7 @@ async function reportResults({ apiConfig, results }) {
                 status = "skipped";
               }
               if (!status) {
-                log(config, "error", `Unknown context result status for context ID ${contextId}`);
+                log(`Unknown context result status for context ID ${contextId}`, "error", config);
                 return; 
               }
 

@@ -377,7 +377,7 @@ async function main(argv) {
     : await runTests(config);
 
   if (apiConfig) {
-    await reportResults({ apiConfig, results });
+    await reportResults({ config, apiConfig, results });
   } else {
     // Output results
     await outputResults(config, output, results, { 
