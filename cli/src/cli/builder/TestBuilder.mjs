@@ -703,37 +703,57 @@ const TestBuilder = ({
     );
   }
 
-  // Update inline sources
-  if (phase === 'inlineUpdate') {
-    // Use prepareSourceUpdates to handle both explicit inline steps and auto-detected steps
-    // Auto-detected steps will have new explicit comments inserted after the original content
-    const updatesByFile = prepareSourceUpdates({ spec, originalSpec });
-    
-    // Apply updates to each file
-    const errors = [];
-    for (const [file, updates] of updatesByFile) {
-      const result = batchUpdateSourceContent({ filePath: file, updates });
-      if (!result.success) {
-        errors.push(`${path.basename(file)}: ${result.error || 'Unknown error'}`);
-      }
+  // Effect to handle inline source updates when phase changes to 'inlineUpdate'
+  useEffect(() => {
+    if (phase !== 'inlineUpdate') {
+      return;
     }
-    
-    if (errors.length > 0) {
-      setInlineUpdateError(errors.join('\n'));
-      setPhase('inlineUpdateError');
-    } else {
-      // Update hashes for modified files
-      const newHashes = { ...sourceFileHashes };
-      for (const file of updatesByFile.keys()) {
-        const hash = getFileContentHash(file);
-        if (hash) {
-          newHashes[file] = hash;
+
+    let cancelled = false;
+
+    const performInlineUpdate = async () => {
+      // Use prepareSourceUpdates to handle both explicit inline steps and auto-detected steps
+      // Auto-detected steps will have new explicit comments inserted after the original content
+      const updatesByFile = prepareSourceUpdates({ spec, originalSpec });
+
+      // Apply updates to each file
+      const errors = [];
+      for (const [file, updates] of updatesByFile) {
+        if (cancelled) return;
+        const result = batchUpdateSourceContent({ filePath: file, updates });
+        if (!result.success) {
+          errors.push(`${path.basename(file)}: ${result.error || 'Unknown error'}`);
         }
       }
-      setSourceFileHashes(newHashes);
-      setPhase('inlineUpdateSuccess');
-    }
-    
+
+      if (cancelled) return;
+
+      if (errors.length > 0) {
+        setInlineUpdateError(errors.join('\n'));
+        setPhase('inlineUpdateError');
+      } else {
+        // Update hashes for modified files
+        const newHashes = { ...sourceFileHashes };
+        for (const file of updatesByFile.keys()) {
+          const hash = getFileContentHash(file);
+          if (hash) {
+            newHashes[file] = hash;
+          }
+        }
+        setSourceFileHashes(newHashes);
+        setPhase('inlineUpdateSuccess');
+      }
+    };
+
+    performInlineUpdate();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [phase, spec, originalSpec, sourceFileHashes]);
+
+  // Update inline sources - render only, no side effects
+  if (phase === 'inlineUpdate') {
     return React.createElement(
       Box,
       { flexDirection: 'column', padding: 1 },
