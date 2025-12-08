@@ -70,11 +70,11 @@ function main() {
     console.log(`Version mismatch detected. Setting version to: ${newVersion}`);
   } else {
     // Project version is already equal or greater than core version, just bump patch
+    newVersion = `${projMajor}.${projMinor}.${projPatch + 1}`;
     console.log(
       "Project version is current or ahead. Bumping patch version to:",
       newVersion
     );
-    newVersion = `${projMajor}.${projMinor}.${projPatch + 1}`;
   }
   
   // Validate the new version before setting it
