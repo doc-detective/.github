@@ -354,6 +354,14 @@ const FieldEditor = ({
     onSubmit(localValue);
   };
 
+  const handleStringChange = (val) => {
+    if (val === '?' && hasMultipleVariants && localValue === '') {
+      setShowVariantSelector(true);
+    } else {
+      setLocalValue(val);
+    }
+  };
+
   return React.createElement(
     Box,
     { flexDirection: 'column' },
@@ -372,7 +380,7 @@ const FieldEditor = ({
       ),
       React.createElement(SimpleTextInput, {
         value: localValue,
-        onChange: setLocalValue,
+        onChange: handleStringChange,
         onSubmit: handleSubmit,
         focus: autoFocus,
       })
