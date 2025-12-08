@@ -13,6 +13,12 @@ const path = require('path');
 const crypto = require('crypto');
 
 /**
+ * Step property names that are excluded when determining the action key or checking for simple serialization.
+ * These are common step metadata properties, not action-specific properties.
+ */
+const EXCLUDED_STEP_KEYS = ['stepId', 'description', 'unsafe', 'outputs', 'variables', 'breakpoint', '$schema'];
+
+/**
  * Detect the syntax format used in an inline statement's original text.
  * 
  * @param {string} originalText - The original inline statement text
@@ -45,7 +51,7 @@ function detectSyntaxFormat(originalText) {
   // Now detect the syntax format of the content
   
   // JSON: starts with { or contains "key": pattern
-  if (content.startsWith('{') || /^"?\w+"?\s*:\s*[{\["']/.test(content)) {
+  if (content.startsWith('{') || /^"?\w+"?\s*:\s*[{["']/.test(content)) {
     return 'json';
   }
   
@@ -159,7 +165,7 @@ function serializeStepToInline({ step, commentFormat, fileExtension, originalTex
   
   // Determine the step type (action key)
   const actionKey = Object.keys(stepToSerialize).find(key => 
-    !['stepId', 'description', 'unsafe', 'outputs', 'variables', 'breakpoint', '$schema'].includes(key)
+    !EXCLUDED_STEP_KEYS.includes(key)
   );
   
   if (!actionKey) {
@@ -307,7 +313,7 @@ function canSerializeAsSimple(step, actionKey) {
   // Count properties that aren't the action or common step properties
   const nonActionKeys = Object.keys(step).filter(key => 
     key !== actionKey && 
-    !['stepId', 'description', 'unsafe', 'outputs', 'variables', 'breakpoint', '$schema'].includes(key)
+    !EXCLUDED_STEP_KEYS.includes(key)
   );
   
   // If there are other non-common properties, can't use simple format
@@ -478,14 +484,13 @@ function updateSourceContent({ filePath, startOffset, endOffset, newContent }) {
  * @param {string} options.filePath - Path to the file
  * @param {number} options.offset - Offset where to insert
  * @param {string} options.content - Content to insert
- * @param {boolean} options.insertBefore - If true, insert before the offset position
  * @returns {Object} Result with success status
  */
-function insertSourceContent({ filePath, offset, content, insertBefore = false }) {
+function insertSourceContent({ filePath, offset, content }) {
   return updateSourceContent({
     filePath,
-    startOffset: insertBefore ? offset : offset,
-    endOffset: insertBefore ? offset : offset,
+    startOffset: offset,
+    endOffset: offset,
     newContent: content,
   });
 }
