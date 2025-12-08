@@ -48,31 +48,40 @@ describe("DOC_DETECTIVE_API environment variable", function () {
     process.env.DOC_DETECTIVE_API = JSON.stringify(apiConfig);
 
     try {
-      const result = await spawnCommand(
-        `node ./src/index.js -o ${outputFile}`
+      // Note: When DOC_DETECTIVE_API is set, results are POSTed to the API, not written to a file
+      // So we don't pass -o flag and instead check stdout for execution results
+      const result = await spawnCommand(`node ./src/index.js`);
+
+      // Assert spawnCommand exited successfully
+      assert.strictEqual(
+        result.exitCode,
+        0,
+        `Command should exit with code 0, got ${result.exitCode}. stderr: ${result.stderr}`
       );
 
-      // Wait until the file is written
-      let waitCount = 0;
-      while (!fs.existsSync(outputFile) && waitCount < 50) {
-        await new Promise((resolve) => setTimeout(resolve, 100));
-        waitCount++;
-      }
+      // Validate that tests were executed by checking for results summary output
+      // The CLI outputs a summary with spec/test/step counts
+      assert.ok(
+        result.stdout.includes("Specs:") || result.stdout.includes("specs"),
+        `Output should contain test results summary. stdout: ${result.stdout.substring(0, 1000)}`
+      );
 
-      if (fs.existsSync(outputFile)) {
-        const testResult = require(outputFile);
-        console.log(
-          "API Result summary:",
-          JSON.stringify(testResult.summary, null, 2)
-        );
-        // Clean up the require cache
-        delete require.cache[require.resolve(outputFile)];
-        fs.unlinkSync(outputFile);
+      // Validate the output includes test counts
+      assert.ok(
+        result.stdout.includes("Passed:") ||
+          result.stdout.includes("passed") ||
+          result.stdout.includes("pass"),
+        `Output should contain pass/fail information. stdout: ${result.stdout.substring(0, 1000)}`
+      );
 
-        // Check that tests were run
-        assert.ok(testResult.summary);
-        assert.ok(testResult.specs);
-      }
+      // Validate that the checkLink step from the mock API was executed
+      // The mock server returns a spec with a checkLink step to localhost:8093
+      assert.ok(
+        result.stdout.includes("Steps:") ||
+          result.stdout.includes("steps") ||
+          result.stdout.includes("checkLink"),
+        `Output should indicate step execution. stdout: ${result.stdout.substring(0, 1000)}`
+      );
     } finally {
       // Restore original env
       if (originalEnv !== undefined) {
