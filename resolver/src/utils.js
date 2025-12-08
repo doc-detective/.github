@@ -995,6 +995,8 @@ async function parseTests({ config, files }) {
         object: content,
         filePath: file,
       });
+      // Set sourcePath to track origin file for JSON/YAML specs
+      content.sourcePath = path.resolve(file);
       specs.push(content);
     } else {
       // Process non-object
@@ -1071,6 +1073,8 @@ async function parseTests({ config, files }) {
           object: spec,
           filePath: file,
         });
+        // Set sourcePath to track origin file for non-JSON/YAML specs
+        spec.sourcePath = path.resolve(file);
         specs.push(spec);
       }
     }

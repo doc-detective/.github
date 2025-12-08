@@ -13,9 +13,198 @@ const {
 const { argv } = require("node:process");
 const path = require("path");
 const fs = require("fs");
+const crypto = require("crypto");
 const { validate } = require("doc-detective-common");
 const { detectTests } = require("doc-detective-resolver");
 const yaml = require("js-yaml");
+
+/**
+ * Compute a content hash for a file to enable content-based matching.
+ * @param {string} filePath - Absolute path to the file
+ * @returns {string|null} MD5 hash of file content, or null if file can't be read
+ */
+function computeFileHash(filePath) {
+  try {
+    const content = fs.readFileSync(filePath, 'utf-8');
+    return crypto.createHash('md5').update(content).digest('hex');
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Canonicalize a spec object for content comparison.
+ * Removes volatile fields like sourcePath, contentPath, specId that don't affect spec content.
+ * @param {Object} spec - The spec object to canonicalize
+ * @returns {string} JSON string of canonicalized spec
+ */
+function canonicalizeSpec(spec) {
+  const clone = JSON.parse(JSON.stringify(spec));
+  // Remove metadata fields that don't represent actual spec content
+  delete clone.sourcePath;
+  delete clone.contentPath;
+  delete clone.specId;
+  // Sort keys for consistent comparison
+  return JSON.stringify(clone, Object.keys(clone).sort());
+}
+
+/**
+ * Match detected specs to their source files using explicit metadata first,
+ * then falling back to heuristics.
+ * 
+ * Matching priority:
+ * 1. Explicit sourcePath property (set by resolver)
+ * 2. contentPath property (for markdown files)
+ * 3. Exact filename/basename match
+ * 4. Content hash comparison (parse file content and compare to spec)
+ * 5. Error if no reliable match found
+ * 
+ * @param {Array<Object>} detectedSpecs - Specs returned by the resolver
+ * @param {Array<string>} inputPaths - Input file paths provided by the user
+ * @returns {Array<Object>} Array of { spec, filePath, matchMethod, error } objects
+ */
+function matchSpecsToSourceFiles(detectedSpecs, inputPaths) {
+  const results = [];
+  const usedInputPaths = new Set();
+  
+  // Build a map of input paths by basename for quick lookup
+  const inputsByBasename = new Map();
+  for (const inputPath of inputPaths) {
+    const basename = path.basename(inputPath);
+    if (!inputsByBasename.has(basename)) {
+      inputsByBasename.set(basename, []);
+    }
+    inputsByBasename.get(basename).push(inputPath);
+  }
+  
+  // Build a map of input paths by resolved absolute path
+  const inputsByAbsPath = new Map();
+  for (const inputPath of inputPaths) {
+    const absPath = path.resolve(inputPath);
+    inputsByAbsPath.set(absPath, inputPath);
+  }
+  
+  for (const detectedSpec of detectedSpecs) {
+    let matchedPath = null;
+    let matchMethod = null;
+    let error = null;
+    
+    // Priority 1: Use explicit sourcePath property (set by resolver for all file types)
+    if (detectedSpec.sourcePath) {
+      const absSourcePath = path.resolve(detectedSpec.sourcePath);
+      if (inputsByAbsPath.has(absSourcePath)) {
+        matchedPath = absSourcePath;
+        matchMethod = 'sourcePath';
+      } else if (fs.existsSync(absSourcePath)) {
+        // sourcePath exists but wasn't in inputPaths - still use it
+        matchedPath = absSourcePath;
+        matchMethod = 'sourcePath';
+      }
+    }
+    
+    // Priority 2: Use contentPath property (typically set for markdown files)
+    if (!matchedPath && detectedSpec.contentPath) {
+      const absContentPath = path.resolve(detectedSpec.contentPath);
+      if (inputsByAbsPath.has(absContentPath)) {
+        matchedPath = absContentPath;
+        matchMethod = 'contentPath';
+      } else if (fs.existsSync(absContentPath)) {
+        matchedPath = absContentPath;
+        matchMethod = 'contentPath';
+      }
+    }
+    
+    // Priority 3: Try exact filename/basename match
+    if (!matchedPath) {
+      // If spec has a specId that looks like a filename, try to match it
+      const specId = detectedSpec.specId;
+      if (specId && inputsByBasename.has(specId)) {
+        const candidates = inputsByBasename.get(specId).filter(p => !usedInputPaths.has(p));
+        if (candidates.length === 1) {
+          matchedPath = path.resolve(candidates[0]);
+          matchMethod = 'specIdMatch';
+        }
+      }
+    }
+    
+    // Priority 4: Content hash comparison for JSON/YAML files
+    if (!matchedPath) {
+      const jsonYamlInputs = inputPaths.filter(p => {
+        const ext = path.extname(p).toLowerCase();
+        return (ext === '.json' || ext === '.yaml' || ext === '.yml') && !usedInputPaths.has(p);
+      });
+      
+      if (jsonYamlInputs.length > 0) {
+        const canonicalSpec = canonicalizeSpec(detectedSpec);
+        const matchingFiles = [];
+        
+        for (const inputPath of jsonYamlInputs) {
+          try {
+            const content = fs.readFileSync(inputPath, 'utf-8');
+            let parsedContent;
+            const ext = path.extname(inputPath).toLowerCase();
+            
+            if (ext === '.json') {
+              parsedContent = JSON.parse(content);
+            } else {
+              parsedContent = yaml.load(content);
+            }
+            
+            // Canonicalize and compare
+            const canonicalInput = canonicalizeSpec(parsedContent);
+            if (canonicalSpec === canonicalInput) {
+              matchingFiles.push(inputPath);
+            }
+          } catch {
+            // Skip files that can't be parsed
+            continue;
+          }
+        }
+        
+        if (matchingFiles.length === 1) {
+          matchedPath = path.resolve(matchingFiles[0]);
+          matchMethod = 'contentMatch';
+        } else if (matchingFiles.length > 1) {
+          // Multiple matches - ambiguous, report error
+          error = `Ambiguous match: spec with ID "${detectedSpec.specId}" matches multiple files: ${matchingFiles.join(', ')}. Please provide explicit file paths.`;
+        }
+      }
+    }
+    
+    // Priority 5: Single remaining unmatched input for single unmatched spec
+    if (!matchedPath && !error) {
+      const unmatchedInputs = inputPaths.filter(p => !usedInputPaths.has(p));
+      const remainingSpecs = detectedSpecs.filter(s => 
+        !results.some(r => r.spec === s && r.filePath)
+      );
+      
+      // Only use this fallback if there's exactly one unmatched input and one remaining spec
+      if (unmatchedInputs.length === 1 && remainingSpecs.length === 1 && remainingSpecs[0] === detectedSpec) {
+        matchedPath = path.resolve(unmatchedInputs[0]);
+        matchMethod = 'singleRemaining';
+      }
+    }
+    
+    // If still no match, report error
+    if (!matchedPath && !error) {
+      error = `Unable to reliably match spec with ID "${detectedSpec.specId}" to a source file. ` +
+        `Provide the source file explicitly as input, or ensure the spec file contains a unique identifier.`;
+    }
+    
+    if (matchedPath) {
+      usedInputPaths.add(matchedPath);
+    }
+    
+    results.push({
+      spec: detectedSpec,
+      filePath: matchedPath,
+      matchMethod,
+      error,
+    });
+  }
+  
+  return results;
+}
 
 // Run
 setMeta();
@@ -80,30 +269,17 @@ async function main(argv) {
         const detectedSpecs = await detectTests({ config: resolverConfig });
         
         if (detectedSpecs && detectedSpecs.length > 0) {
-          // Convert detected specs to the format expected by the builder
-          // For JSON/YAML files, the resolver doesn't set contentPath, so we need to
-          // map specs back to their source files using the input paths.
+          // Match detected specs to their source files using explicit metadata,
+          // then fallback to heuristics if needed
+          const matchedSpecs = matchSpecsToSourceFiles(detectedSpecs, inputPaths);
           
-          // If there's a 1:1 mapping between input JSON/YAML files and detected specs,
-          // we can associate them directly
-          const jsonYamlInputs = inputPaths.filter(p => {
-            const ext = path.extname(p).toLowerCase();
-            return ext === '.json' || ext === '.yaml' || ext === '.yml';
-          });
-          
-          for (let i = 0; i < detectedSpecs.length; i++) {
-            const detectedSpec = detectedSpecs[i];
+          for (const matched of matchedSpecs) {
+            const { spec: detectedSpec, filePath, matchMethod, error } = matched;
             
-            // Use contentPath if available (e.g., for markdown files)
-            // Otherwise, try to match with JSON/YAML input files
-            let filePath = detectedSpec.contentPath || null;
-            
-            if (!filePath && jsonYamlInputs.length === detectedSpecs.length) {
-              // 1:1 mapping - use the corresponding input file
-              filePath = jsonYamlInputs[i];
-            } else if (!filePath && jsonYamlInputs.length === 1 && detectedSpecs.length === 1) {
-              // Single input file, single spec - use the input file
-              filePath = jsonYamlInputs[0];
+            if (error) {
+              console.error(`\x1b[31mError: ${error}\x1b[0m`);
+              console.error('\x1b[33mPlease ensure each spec file is provided explicitly as input.\x1b[0m');
+              process.exit(1);
             }
             
             const ext = filePath ? path.extname(filePath).toLowerCase() : '.json';
@@ -117,6 +293,7 @@ async function main(argv) {
               extension: ext,
               isValid: true, // detectTests only returns valid specs
               validationErrors: null,
+              matchMethod, // Track how the match was made for debugging
             });
           }
         }
