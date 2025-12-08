@@ -14,7 +14,6 @@ const { argv } = require("node:process");
 const path = require("path");
 const fs = require("fs");
 const crypto = require("crypto");
-const { validate } = require("doc-detective-common");
 const { detectTests } = require("doc-detective-resolver");
 const yaml = require("js-yaml");
 
@@ -210,11 +209,27 @@ function matchSpecsToSourceFiles(detectedSpecs, inputPaths) {
 setMeta();
 main(argv);
 
+/**
+ * Check if any argument in the array is an exact --editor or -e flag.
+ * Matches: '--editor', '-e', '--editor=<value>', '-e=<value>'
+ * Does NOT match substrings like '--editor-mode' or '--some-editor'
+ * @param {string[]} args - Array of command-line arguments
+ * @returns {boolean} True if an exact editor flag is found
+ */
+function hasEditorFlag(args) {
+  return args.some(arg => 
+    arg === '--editor' || 
+    arg === '-e' || 
+    arg.startsWith('--editor=') || 
+    arg.startsWith('-e=')
+  );
+}
+
 // Run
 async function main(argv) {
   // Check for --editor flag first (before processing other args)
   const rawArgs = argv.slice(2); // Remove 'node' and script path
-  if (rawArgs.includes('--editor') || rawArgs.includes('-e')) {
+  if (hasEditorFlag(rawArgs)) {
     // Parse editor-specific options
     const outputDir = process.cwd();
     
@@ -284,14 +299,16 @@ async function main(argv) {
             
             const ext = filePath ? path.extname(filePath).toLowerCase() : '.json';
             
-            // detectedSpec is already a valid spec_v3 object from detectTests
+            // detectedSpec is already a valid spec_v3 object from detectTests.
+            // The resolver validates specs against the spec_v3 schema and only
+            // returns specs that pass validation (invalid specs are logged and skipped).
             const spec = { ...detectedSpec };
             
             specs.push({
               spec,
               filePath,
               extension: ext,
-              isValid: true, // detectTests only returns valid specs
+              isValid: true,
               validationErrors: null,
               matchMethod, // Track how the match was made for debugging
             });
