@@ -54,7 +54,7 @@ describe('TestBuilder component', function () {
   after(function () {
     // Remove temp directory
     if (fs.existsSync(tempDir)) {
-      fs.rmdirSync(tempDir);
+      fs.rmSync(tempDir, { recursive: true, force: true });
     }
   });
 
