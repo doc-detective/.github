@@ -74,7 +74,7 @@ function findFirstBrowserStepIndex(steps) {
  */
 function hasGoToBefore(steps, beforeIndex) {
   for (let i = 0; i < beforeIndex; i++) {
-    if (steps[i].goTo !== undefined) {
+    if (steps[i].goTo) {
       return true;
     }
   }
@@ -163,6 +163,11 @@ const DebugRunner = ({ test, testIndex, onComplete, onCancel }) => {
       if (phase === 'stepEdit') {
         setPhase('stepPreview');
       } else if (phase === 'stepPreview' || phase === 'stepResult') {
+        // Clear auto-advance timer when leaving stepResult
+        if (autoAdvanceTimer.current) {
+          clearTimeout(autoAdvanceTimer.current);
+          autoAdvanceTimer.current = null;
+        }
         // Confirm exit
         setPhase('confirmExit');
       }
