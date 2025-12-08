@@ -15,7 +15,7 @@ const ResultsSummary = ({ results, config }) => {
   const totalSpecs = specs ? specs.pass + specs.fail + specs.warning + specs.skipped : 0;
   const totalTests = tests ? tests.pass + tests.fail + tests.warning + tests.skipped : 0;
   const totalContexts = contexts ? contexts.pass + contexts.fail + contexts.warning + contexts.skipped : 0;
-  const totalSteps = steps ? steps.pass + steps.fail + steps.warning + specs.skipped : 0;
+  const totalSteps = steps ? steps.pass + steps.fail + steps.warning + steps.skipped : 0;
 
   // Check for failures
   const hasFailures =
