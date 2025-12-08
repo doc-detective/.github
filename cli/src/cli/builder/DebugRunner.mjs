@@ -673,7 +673,16 @@ const GoToInput = ({ onSubmit, onCancel }) => {
       return;
     }
     if (key.backspace || key.delete) {
-      setUrl((prev) => prev.slice(0, -1));
+      setUrl((prev) => {
+        if (prev.length === 0) return prev;
+        if (typeof Intl !== 'undefined' && Intl.Segmenter) {
+          const segmenter = new Intl.Segmenter(undefined, { granularity: 'grapheme' });
+          const segments = [...segmenter.segment(prev)];
+          return segments.slice(0, -1).map(s => s.segment).join('');
+        }
+        const chars = Array.from(prev);
+        return chars.slice(0, -1).join('');
+      });
       return;
     }
     if (!key.ctrl && !key.meta && input) {
