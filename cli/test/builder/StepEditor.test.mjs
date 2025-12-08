@@ -305,11 +305,12 @@ describe('StepEditor component', function () {
   });
 
   describe('validation display', function () {
-    it('shows warning for step with validation errors', function () {
-      // A step with an unrecognized action type would fail validation
-      // but we need a step type to display the menu, so we create an invalid value instead
+    it('shows warning message when step has validation errors', function () {
+      // Create a step with an invalid value that will fail schema validation
+      // An empty object for goTo is invalid since goTo requires either a string URL 
+      // or an object with required 'url' property
       const step = {
-        goTo: { url: '' }, // Empty required field might fail validation
+        goTo: { url: '' }, // Empty required field fails validation
       };
       const { lastFrame } = render(
         React.createElement(StepEditor, {
@@ -320,9 +321,33 @@ describe('StepEditor component', function () {
       );
       
       const frame = lastFrame();
-      // The step might show validation warning or "Fix errors" message
-      // depending on schema validation
-      expect(frame).to.include('goTo');
+      // StepEditor shows these specific messages when validation.valid is false:
+      // 1. A warning banner: '⚠️  Step has validation errors'
+      // 2. A menu item: '⚠️  Fix errors before saving' (instead of 'Save step')
+      expect(frame).to.include('Step has validation errors');
+      expect(frame).to.include('Fix errors before saving');
+      // Additionally, the 'Save step' option should NOT appear when invalid
+      expect(frame).to.not.include('Save step');
+    });
+
+    it('shows save option when step is valid', function () {
+      const step = {
+        goTo: 'https://example.com', // Valid URL format
+      };
+      const { lastFrame } = render(
+        React.createElement(StepEditor, {
+          step,
+          stepIndex: 0,
+          ...noopCallbacks,
+        })
+      );
+      
+      const frame = lastFrame();
+      // When validation passes, 'Save step' should appear
+      expect(frame).to.include('Save step');
+      // And the error messages should NOT appear
+      expect(frame).to.not.include('Step has validation errors');
+      expect(frame).to.not.include('Fix errors before saving');
     });
   });
 
