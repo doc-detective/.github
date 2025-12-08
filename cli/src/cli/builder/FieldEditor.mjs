@@ -102,7 +102,7 @@ const FieldEditor = ({
     }
   }, [localValue, effectiveField.pattern]);
 
-  // Handle escape key
+  // Handle escape and tab keys
   useInput((input, key) => {
     if (key.escape) {
       if (showVariantSelector) {
@@ -110,6 +110,9 @@ const FieldEditor = ({
       } else {
         onCancel();
       }
+    }
+    if (key.tab && hasMultipleVariants) {
+      setShowVariantSelector(true);
     }
   });
 
