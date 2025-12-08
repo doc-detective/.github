@@ -22,6 +22,42 @@ import {
 } from './schemaUtils.mjs';
 
 /**
+ * Truncate a string to a maximum number of grapheme clusters (user-perceived characters).
+ * Uses Intl.Segmenter if available (Node 16+), otherwise falls back to Array.from for code-point safety.
+ * @param {string} str - The string to truncate
+ * @param {number} maxLength - Maximum number of grapheme clusters
+ * @param {string} [ellipsis='…'] - Ellipsis to append if truncated
+ * @returns {string} The truncated string
+ */
+function truncateGraphemeSafe(str, maxLength, ellipsis = '…') {
+  if (typeof str !== 'string' || str.length === 0) {
+    return '';
+  }
+
+  // Use Intl.Segmenter if available (Node 16+)
+  if (typeof Intl !== 'undefined' && Intl.Segmenter) {
+    const segmenter = new Intl.Segmenter(undefined, { granularity: 'grapheme' });
+    const segments = [...segmenter.segment(str)];
+    
+    if (segments.length <= maxLength) {
+      return str;
+    }
+    
+    const truncated = segments.slice(0, maxLength).map(s => s.segment).join('');
+    return truncated + ellipsis;
+  }
+
+  // Fallback: use Array.from for code-point safety
+  const codePoints = Array.from(str);
+  
+  if (codePoints.length <= maxLength) {
+    return str;
+  }
+  
+  return codePoints.slice(0, maxLength).join('') + ellipsis;
+}
+
+/**
  * Find the index of the first browser-requiring step
  * @param {Array} steps - Array of steps
  * @returns {number} Index of first browser step, or -1 if none
@@ -223,9 +259,9 @@ const DebugRunner = ({ test, testIndex, onComplete, onCancel }) => {
     const actionType = getStepActionType(step);
     const actionValue = actionType ? step[actionType] : null;
     const displayValue = typeof actionValue === 'string' 
-      ? actionValue.substring(0, 50) 
+      ? truncateGraphemeSafe(actionValue, 50) 
       : typeof actionValue === 'object' 
-        ? JSON.stringify(actionValue).substring(0, 50)
+        ? truncateGraphemeSafe(JSON.stringify(actionValue), 50)
         : '';
     return { actionType: actionType || 'unknown', displayValue };
   };
