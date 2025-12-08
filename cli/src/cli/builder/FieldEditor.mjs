@@ -116,10 +116,15 @@ const FieldEditor = ({
     }
   });
 
+  // Auto-show variant selector for new values with multiple variants
+  useEffect(() => {
+    if (hasMultipleVariants && !selectedVariant && showVariantSelector === false && value === undefined) {
+      setShowVariantSelector(true);
+    }
+  }, [hasMultipleVariants, selectedVariant, showVariantSelector, value]);
+
   // Show variant selector first if field has multiple variants and none selected
   if (hasMultipleVariants && !selectedVariant && showVariantSelector === false && value === undefined) {
-    // Auto-show variant selector for new values
-    setShowVariantSelector(true);
     return null;
   }
 
