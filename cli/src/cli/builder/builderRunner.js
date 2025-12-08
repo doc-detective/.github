@@ -72,6 +72,10 @@ async function runBuilder(options = {}) {
         // Clear screen on exit for clean terminal
         process.stdout.write('\x1b[2J\x1b[H');
         resolve();
+      }).catch((err) => {
+        // Clear screen on error for clean terminal
+        process.stdout.write('\x1b[2J\x1b[H');
+        reject(err);
       });
     } catch (error) {
       reject(error);
