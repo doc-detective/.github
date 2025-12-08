@@ -571,27 +571,32 @@ const TestBuilder = ({
     );
   }
 
-  // Pre-save check for inline sources
-  if (phase === 'preSave') {
+  // Pre-save check for inline sources - handled by useEffect to avoid state updates during render
+  useEffect(() => {
+    if (phase !== 'preSave') return;
+    
     // Check if any inline source files have changed
-    const changed = [];
-    const inlineFiles = getInlineSourceFiles(spec);
-    for (const file of inlineFiles) {
-      const originalHash = sourceFileHashes[file];
-      if (originalHash && hasSourceFileChanged(file, originalHash)) {
-        changed.push(file);
-      }
-    }
+    const changed = getInlineSourceFiles(spec).filter(
+      file => sourceFileHashes[file] && hasSourceFileChanged(file, sourceFileHashes[file])
+    );
     
-    if (changed.length > 0) {
+    // Determine the next phase
+    const nextPhase = changed.length > 0
+      ? 'sourceChanged'
+      : (hasInlineSources ? 'inlineSaveChoice' : 'save');
+    
+    // Only update if changed files differ from current
+    const changedFilesMatch = 
+      changed.length === changedSourceFiles.length &&
+      changed.every((file, i) => changedSourceFiles[i] === file);
+    
+    if (!changedFilesMatch) {
       setChangedSourceFiles(changed);
-      setPhase('sourceChanged');
-    } else if (hasInlineSources) {
-      setPhase('inlineSaveChoice');
-    } else {
-      setPhase('save');
     }
-    
+    setPhase(nextPhase);
+  }, [phase, spec, sourceFileHashes, hasInlineSources, changedSourceFiles]);
+
+  if (phase === 'preSave') {
     return React.createElement(
       Box,
       { flexDirection: 'column', padding: 1 },
