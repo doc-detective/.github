@@ -82,7 +82,9 @@ const TestEditor = ({
         field: fieldDef,
         value: currentValue,
         onChange: (newValue) => {
-          setLocalTest({ ...localTest, [editingField]: newValue });
+          const updatedTest = { ...localTest, [editingField]: newValue };
+          setLocalTest(updatedTest);
+          onChange(updatedTest);
         },
         onSubmit: () => setView('menu'),
         onCancel: () => setView('menu'),
@@ -100,12 +102,16 @@ const TestEditor = ({
       onChange: (updatedStep) => {
         const newSteps = [...(localTest.steps || [])];
         newSteps[editingStepIndex] = updatedStep;
-        setLocalTest({ ...localTest, steps: newSteps });
+        const updatedTest = { ...localTest, steps: newSteps };
+        setLocalTest(updatedTest);
+        onChange(updatedTest);
       },
       onSave: (updatedStep) => {
         const newSteps = [...(localTest.steps || [])];
         newSteps[editingStepIndex] = updatedStep;
-        setLocalTest({ ...localTest, steps: newSteps });
+        const updatedTest = { ...localTest, steps: newSteps };
+        setLocalTest(updatedTest);
+        onChange(updatedTest);
         setView('menu');
         setEditingStepIndex(null);
       },
@@ -116,7 +122,9 @@ const TestEditor = ({
       onDelete: () => {
         const newSteps = [...(localTest.steps || [])];
         newSteps.splice(editingStepIndex, 1);
-        setLocalTest({ ...localTest, steps: newSteps });
+        const updatedTest = { ...localTest, steps: newSteps };
+        setLocalTest(updatedTest);
+        onChange(updatedTest);
         setView('menu');
         setEditingStepIndex(null);
       },
@@ -134,7 +142,9 @@ const TestEditor = ({
       onChange: () => {},
       onSave: (newStep) => {
         const newSteps = [...(localTest.steps || []), newStep];
-        setLocalTest({ ...localTest, steps: newSteps });
+        const updatedTest = { ...localTest, steps: newSteps };
+        setLocalTest(updatedTest);
+        onChange(updatedTest);
         setView('menu');
       },
       onCancel: () => setView('menu'),
@@ -218,9 +228,10 @@ const TestEditor = ({
       React.createElement(SelectInput, {
         items,
         onSelect: (item) => {
-          const newTest = { ...localTest };
-          delete newTest[item.value];
-          setLocalTest(newTest);
+          const updatedTest = { ...localTest };
+          delete updatedTest[item.value];
+          setLocalTest(updatedTest);
+          onChange(updatedTest);
           setView('menu');
         },
       })
@@ -271,9 +282,10 @@ const TestEditor = ({
     .filter((f) => f.name !== 'steps' && f.name !== '$schema' && localTest[f.name] !== undefined)
     .forEach((f) => {
       const val = localTest[f.name];
-      const displayVal = typeof val === 'object' ? JSON.stringify(val).substring(0, 50) : String(val).substring(0, 50);
+      const stringSource = typeof val === 'object' ? JSON.stringify(val) : String(val);
+      const displayVal = stringSource.substring(0, 50);
       menuItems.push({
-        label: `   ✏️  ${f.name}: ${displayVal}${String(val).length > 50 ? '...' : ''}`,
+        label: `   ✏️  ${f.name}: ${displayVal}${stringSource.length > 50 ? '...' : ''}`,
         value: `editMeta:${f.name}`,
       });
     });
