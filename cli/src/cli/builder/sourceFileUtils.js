@@ -19,6 +19,37 @@ const crypto = require('crypto');
 const EXCLUDED_STEP_KEYS = ['stepId', 'description', 'unsafe', 'outputs', 'variables', 'breakpoint', '$schema'];
 
 /**
+ * Normalize an object for deterministic comparison by removing excluded keys
+ * and serializing with sorted object keys.
+ * 
+ * @param {Object} obj - The object to normalize
+ * @param {Array<string>} excludeKeys - Keys to exclude from the normalized object
+ * @returns {string} A deterministic JSON string representation for comparison
+ */
+function normalizeForComparison(obj, excludeKeys = []) {
+  if (obj === null || obj === undefined) {
+    return JSON.stringify(obj);
+  }
+  
+  const sortedStringify = (value) => {
+    if (value === null || value === undefined) {
+      return JSON.stringify(value);
+    }
+    if (Array.isArray(value)) {
+      return '[' + value.map(sortedStringify).join(',') + ']';
+    }
+    if (typeof value === 'object') {
+      const sortedKeys = Object.keys(value).filter(k => !excludeKeys.includes(k)).sort();
+      const pairs = sortedKeys.map(k => JSON.stringify(k) + ':' + sortedStringify(value[k]));
+      return '{' + pairs.join(',') + '}';
+    }
+    return JSON.stringify(value);
+  };
+  
+  return sortedStringify(obj);
+}
+
+/**
  * Detect the syntax format used in an inline statement's original text.
  * 
  * @param {string} originalText - The original inline statement text
@@ -688,12 +719,9 @@ function prepareSourceUpdates({ spec, originalSpec }) {
     const testLoc = test.sourceLocation;
     if (testLoc?.isInline && testLoc.file) {
       // Check if test metadata was modified by comparing with original (excluding steps and sourceLocation)
-      const testMetadata = JSON.stringify(test, (key, value) => 
-        key === 'sourceLocation' || key === 'steps' ? undefined : value
-      );
-      const originalMetadata = originalTest ? JSON.stringify(originalTest, (key, value) => 
-        key === 'sourceLocation' || key === 'steps' ? undefined : value
-      ) : null;
+      const excludeKeys = ['sourceLocation', 'steps'];
+      const testMetadata = normalizeForComparison(test, excludeKeys);
+      const originalMetadata = originalTest ? normalizeForComparison(originalTest, excludeKeys) : null;
       
       const wasModified = testMetadata !== originalMetadata;
       
@@ -760,12 +788,9 @@ function prepareSourceUpdates({ spec, originalSpec }) {
       if (!loc?.isInline || !loc.file) continue;
       
       // Check if step was modified by comparing with original
-      const stepContent = JSON.stringify(step, (key, value) => 
-        key === 'sourceLocation' ? undefined : value
-      );
-      const originalContent = originalStep ? JSON.stringify(originalStep, (key, value) => 
-        key === 'sourceLocation' ? undefined : value
-      ) : null;
+      const stepExcludeKeys = ['sourceLocation'];
+      const stepContent = normalizeForComparison(step, stepExcludeKeys);
+      const originalContent = originalStep ? normalizeForComparison(originalStep, stepExcludeKeys) : null;
       
       const wasModified = stepContent !== originalContent;
       
@@ -857,4 +882,5 @@ module.exports = {
   isAutoDetectedStep,
   prepareSourceUpdates,
   hasAutoDetectedSteps,
+  normalizeForComparison,
 };
