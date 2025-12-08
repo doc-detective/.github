@@ -123,7 +123,7 @@ async function findScenario(client, log, config) {
     const transtypeParam = scenarioParameters.content.find(
       (param) => param.name === "transtype"
     );
-    if (!transtypeParam || !transtypeParam.options || transtypeParam.options[0].value !== "dita") {
+    if (!transtypeParam || transtypeParam.value !== "dita") {
       log(
         config,
         "error",
@@ -136,11 +136,11 @@ async function findScenario(client, log, config) {
     const toolKitParam = scenarioParameters.content.find(
       (param) => param.name === "tool-kit-name"
     );
-    if (!toolKitParam || !toolKitParam.value || toolKitParam.value !== "default/dita-ot-3.6.1") {
+    if (!toolKitParam || !toolKitParam.value) {
       log(
         config,
         "error",
-        `Existing "${SCENARIO_NAME}" scenario has incorrect "tool-kit-name" parameter settings. Make sure it is set to "default/dita-ot-3.6.1".`
+        `Existing "${SCENARIO_NAME}" scenario has incorrect "tool-kit-name" parameter settings".`
       );
       return null;
     }
