@@ -6,7 +6,7 @@
 
 import React from 'react';
 const { useState, useEffect } = React;
-import { Box, Text, useApp } from 'ink';
+import { Box, Text, useApp, useInput } from 'ink';
 import * as path from 'path';
 import { ScrollableSelect, NoIndicator } from './components.mjs';
 
@@ -20,13 +20,20 @@ const SpecSelector = ({ specs, outputDir }) => {
   const { exit } = useApp();
   const [selectedSpec, setSelectedSpec] = useState(null);
   const [TestBuilder, setTestBuilder] = useState(null);
+  const [importError, setImportError] = useState(null);
 
   // Dynamically import TestBuilder when a spec is selected
   useEffect(() => {
     if (selectedSpec) {
-      import('./TestBuilder.mjs').then(module => {
-        setTestBuilder(() => module.default);
-      });
+      import('./TestBuilder.mjs')
+        .then(module => {
+          setTestBuilder(() => module.default);
+        })
+        .catch(error => {
+          console.error('Failed to load TestBuilder:', error);
+          setImportError(error);
+          setTestBuilder(null);
+        });
     }
   }, [selectedSpec]);
 
@@ -34,7 +41,42 @@ const SpecSelector = ({ specs, outputDir }) => {
   const handleBack = () => {
     setSelectedSpec(null);
     setTestBuilder(null);
+    setImportError(null);
   };
+
+  // Handle key press to go back from error state
+  useInput(() => {
+    if (importError) {
+      handleBack();
+    }
+  }, { isActive: !!importError });
+
+  // Show error state if TestBuilder import failed
+  if (selectedSpec && importError) {
+    return React.createElement(
+      Box,
+      { flexDirection: 'column', padding: 1 },
+      React.createElement(
+        Text,
+        { color: 'red', bold: true },
+        '❌ Failed to load editor'
+      ),
+      React.createElement(
+        Text,
+        { color: 'gray' },
+        importError.message || 'An unknown error occurred'
+      ),
+      React.createElement(
+        Box,
+        { marginTop: 1 },
+        React.createElement(
+          Text,
+          { color: 'cyan' },
+          'Press any key to go back...'
+        )
+      )
+    );
+  }
 
   // If a spec is selected and TestBuilder is loaded, render the TestBuilder
   if (selectedSpec && TestBuilder) {
