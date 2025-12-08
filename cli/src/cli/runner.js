@@ -68,8 +68,13 @@ async function runWithUI(config, options = {}) {
       results,
     }));
 
-    // Wait a bit to show the results before unmounting
-    await new Promise((resolve) => setTimeout(resolve, 100));
+    // Wait for React to flush the completed state to the screen
+    // Uses requestAnimationFrame to ensure the paint cycle completes
+    await new Promise((resolve) => {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(resolve);
+      });
+    });
 
     // Unmount the app
     if (appInstance) {
@@ -82,7 +87,7 @@ async function runWithUI(config, options = {}) {
     updateState((prev) => ({
       ...prev,
       phase: 'error',
-      error: error.message,
+      error: error.message ? error : new Error(String(error)),
     }));
 
     // Wait a bit to show the error before unmounting
