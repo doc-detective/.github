@@ -17,10 +17,9 @@ const modelMap = {
   "anthropic/claude-sonnet-4.5": "claude-sonnet-4-5",
   "anthropic/claude-opus-4.5": "claude-opus-4-5",
   // OpenAI models
-  "openai/gpt-4": "gpt-4",
-  "openai/gpt-4-turbo": "gpt-4-turbo",
-  "openai/gpt-4o": "gpt-4o",
-  "openai/gpt-3.5-turbo": "gpt-3.5-turbo",
+  "openai/gpt-5.1": "gpt-5.1",
+  "openai/gpt-5-mini": "gpt-5-mini",
+  "openai/gpt-5-nano": "gpt-5-nano",
 };
 
 /**
