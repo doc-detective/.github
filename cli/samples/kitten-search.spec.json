@@ -10,12 +10,9 @@
         {
           "find": {
             "selector": "#searchbox_input",
-            "click": "true",
+            "click": true,
             "type": {
-              "keys": [
-                "American Shorthair kittens",
-                "$ENTER$"
-              ]
+              "keys": ["American Shorthair kittens", "$ENTER$"]
             }
           },
           "variables": {}
