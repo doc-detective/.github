@@ -272,14 +272,14 @@ const StepEditor = ({
         if (variant.type === 'string') {
           newValue = '';
         } else if (variant.type === 'number' || variant.type === 'integer') {
-          newValue = variant.schema.default !== undefined ? variant.schema.default : 0;
+          newValue = variant.schema?.default !== undefined ? variant.schema.default : 0;
         } else if (variant.type === 'boolean') {
-          newValue = variant.schema.default !== undefined ? variant.schema.default : false;
+          newValue = variant.schema?.default !== undefined ? variant.schema.default : false;
         } else if (variant.type === 'object') {
           // Create object with required fields
           newValue = {};
-          const required = variant.schema.required || [];
-          if (variant.schema.properties) {
+          const required = variant.schema?.required || [];
+          if (variant.schema?.properties) {
             Object.entries(variant.schema.properties).forEach(([key, prop]) => {
               if (required.includes(key)) {
                 if (prop.default !== undefined) {
@@ -332,9 +332,9 @@ const StepEditor = ({
           if (variant.type === 'string') {
             defaultValue = '';
           } else if (variant.type === 'number' || variant.type === 'integer') {
-            defaultValue = variant.schema.default !== undefined ? variant.schema.default : 0;
+            defaultValue = variant.schema?.default !== undefined ? variant.schema.default : 0;
           } else if (variant.type === 'boolean') {
-            defaultValue = variant.schema.default !== undefined ? variant.schema.default : false;
+            defaultValue = variant.schema?.default !== undefined ? variant.schema.default : false;
           } else {
             defaultValue = {};
           }
