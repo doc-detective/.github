@@ -69,6 +69,29 @@ const TestEditor = ({
   // Edit metadata field view
   if (view === 'editMeta' && editingField) {
     const fieldDef = testFields.find((f) => f.name === editingField);
+
+    if (!fieldDef) {
+      console.warn(`[TestEditor] Missing field definition for editingField: "${editingField}"`);
+      return React.createElement(
+        Box,
+        { flexDirection: 'column' },
+        React.createElement(StatusBar, {
+          location: ['Test ' + (testIndex + 1), editingField],
+          validationStatus: validation.valid,
+        }),
+        React.createElement(
+          Box,
+          { marginBottom: 1 },
+          React.createElement(Text, { color: 'yellow' }, `⚠️  Unknown field: "${editingField}"`)
+        ),
+        React.createElement(
+          Text,
+          { color: 'gray' },
+          'Press Esc to go back'
+        )
+      );
+    }
+
     const currentValue = localTest[editingField];
 
     return React.createElement(
