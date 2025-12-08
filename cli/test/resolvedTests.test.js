@@ -38,7 +38,7 @@ describe("DOC_DETECTIVE_API environment variable", function () {
   it("Should fetch and run resolved tests from API", async () => {
     const apiConfig = {
       accountId: "test-account",
-      url: "http://localhost:8093/api/resolved-tests",
+      url: "http://localhost:8093/api",
       token: "test-token-123",
       contextIds: "test-context",
     };
@@ -112,7 +112,7 @@ describe("DOC_DETECTIVE_API environment variable", function () {
   it("Should reject unauthorized API requests", async () => {
     const apiConfigBadToken = {
       accountId: "test-account",
-      url: "http://localhost:8093/api/resolved-tests",
+      url: "http://localhost:8093/api",
       token: "wrong-token",
       contextIds: "test-context",
     };
@@ -140,7 +140,7 @@ describe("DOC_DETECTIVE_API environment variable", function () {
   it("Should apply config overrides from DOC_DETECTIVE_CONFIG to API-fetched tests", async () => {
     const apiConfig = {
       accountId: "test-account",
-      url: "http://localhost:8093/api/resolved-tests",
+      url: "http://localhost:8093/api",
       token: "test-token-123",
       contextIds: "test-context",
     };
@@ -155,27 +155,26 @@ describe("DOC_DETECTIVE_API environment variable", function () {
     process.env.DOC_DETECTIVE_CONFIG = JSON.stringify(configOverride);
 
     try {
-      await spawnCommand(
-        `node ./src/index.js -o ${outputFile}`
+      const result = await spawnCommand(
+        `node ./src/index.js`
       );
 
-      // Wait until the file is written
-      let waitCount = 0;
-      while (!fs.existsSync(outputFile) && waitCount < 50) {
-        await new Promise((resolve) => setTimeout(resolve, 100));
-        waitCount++;
-      }
+      // Assert the command exited successfully
+      assert.strictEqual(result.exitCode, 0, `Command should exit with code 0, got ${result.exitCode}. stderr: ${result.stderr}`);
 
-      if (fs.existsSync(outputFile)) {
-        const testResult = require(outputFile);
-        // Clean up the require cache
-        delete require.cache[require.resolve(outputFile)];
-        fs.unlinkSync(outputFile);
+      // Verify that the DOC_DETECTIVE_CONFIG override (logLevel: "debug") was applied
+      // When logLevel is set to debug, the CLI outputs debug logs including "CLI:RESOLVED_TESTS"
+      // Note: When DOC_DETECTIVE_API is set, results are POSTed to the API, not written to a file
+      assert.ok(
+        result.stdout.includes("CLI:RESOLVED_TESTS") || result.stdout.includes("CLI:CONFIG"),
+        `Debug log output should be present when logLevel is set to 'debug'. stdout: ${result.stdout.substring(0, 500)}`
+      );
 
-        // Check that tests were run
-        assert.ok(testResult.summary);
-        assert.ok(testResult.specs);
-      }
+      // Verify the resolved tests output includes the merged config with logLevel: "debug"
+      assert.ok(
+        result.stdout.includes('"logLevel": "debug"') || result.stdout.includes('"logLevel":"debug"'),
+        `Resolved tests output should show logLevel: "debug" from the config override. stdout: ${result.stdout.substring(0, 1000)}`
+      );
     } finally {
       // Restore original env
       if (originalApiEnv !== undefined) {
