@@ -216,7 +216,7 @@ const TestBuilder = ({
     if (phase !== 'preSave') return;
     
     // Check if any inline source files have changed
-    const changed = getInlineSourceFiles(spec).filter(
+    const changed = Array.from(getInlineSourceFiles(spec)).filter(
       file => sourceFileHashes[file] && hasSourceFileChanged(file, sourceFileHashes[file])
     );
     
