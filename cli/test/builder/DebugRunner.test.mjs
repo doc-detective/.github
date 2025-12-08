@@ -29,6 +29,39 @@ before(async function () {
   global.expect = expect;
 });
 
+/**
+ * Polls until a condition is met or timeout is reached.
+ * @param {() => boolean} conditionFn - Function that returns true when condition is met
+ * @param {object} options - Polling options
+ * @param {number} options.timeout - Maximum time to wait in ms (default: 2000)
+ * @param {number} options.interval - Polling interval in ms (default: 20)
+ * @returns {Promise<void>} Resolves when condition is met, rejects on timeout
+ */
+const waitForCondition = async (conditionFn, { timeout = 2000, interval = 20 } = {}) => {
+  const startTime = Date.now();
+  while (Date.now() - startTime < timeout) {
+    if (conditionFn()) {
+      return;
+    }
+    await new Promise(resolve => setTimeout(resolve, interval));
+  }
+  throw new Error(`waitForCondition timed out after ${timeout}ms`);
+};
+
+/**
+ * Waits for the rendered frame to contain specific text.
+ * @param {() => string} lastFrameFn - Function that returns the current frame
+ * @param {string} text - Text to wait for
+ * @param {object} options - Polling options
+ * @returns {Promise<void>}
+ */
+const waitForText = async (lastFrameFn, text, options = {}) => {
+  await waitForCondition(() => {
+    const frame = lastFrameFn();
+    return frame && frame.includes(text);
+  }, options);
+};
+
 describe('DebugRunner component', function () {
   // Store original require for stubbing
   let coreModule;
@@ -96,8 +129,8 @@ describe('DebugRunner component', function () {
         })
       );
       
-      // Wait for async initialization
-      await new Promise(resolve => setTimeout(resolve, 50));
+      // Wait for component to show navigation warning
+      await waitForText(lastFrame, 'Navigation');
       
       const frame = lastFrame();
       expect(frame).to.include('Navigation');
@@ -130,8 +163,8 @@ describe('DebugRunner component', function () {
         })
       );
       
-      // Wait for async initialization
-      await new Promise(resolve => setTimeout(resolve, 50));
+      // Wait for step preview to render
+      await waitForText(lastFrame, 'Step 1');
       
       const frame = lastFrame();
       expect(frame).to.include('Step 1');
@@ -163,7 +196,8 @@ describe('DebugRunner component', function () {
         })
       );
       
-      await new Promise(resolve => setTimeout(resolve, 50));
+      // Wait for step info to render
+      await waitForText(lastFrame, 'goTo');
       
       const frame = lastFrame();
       expect(frame).to.include('goTo');
@@ -194,7 +228,8 @@ describe('DebugRunner component', function () {
         })
       );
       
-      await new Promise(resolve => setTimeout(resolve, 50));
+      // Wait for menu options to render
+      await waitForText(lastFrame, 'Run this step');
       
       const frame = lastFrame();
       expect(frame).to.include('Run this step');
@@ -224,7 +259,8 @@ describe('DebugRunner component', function () {
         })
       );
       
-      await new Promise(resolve => setTimeout(resolve, 50));
+      // Wait for menu options to render
+      await waitForText(lastFrame, 'Edit step');
       
       const frame = lastFrame();
       expect(frame).to.include('Edit step');
@@ -254,7 +290,8 @@ describe('DebugRunner component', function () {
         })
       );
       
-      await new Promise(resolve => setTimeout(resolve, 50));
+      // Wait for menu options to render
+      await waitForText(lastFrame, 'Stop debug');
       
       const frame = lastFrame();
       expect(frame).to.include('Stop debug');
@@ -288,7 +325,8 @@ describe('DebugRunner component', function () {
         })
       );
       
-      await new Promise(resolve => setTimeout(resolve, 50));
+      // Wait for step count to render
+      await waitForText(lastFrame, '1/3');
       
       const frame = lastFrame();
       expect(frame).to.include('1/3');
@@ -312,7 +350,8 @@ describe('DebugRunner component', function () {
         })
       );
       
-      await new Promise(resolve => setTimeout(resolve, 50));
+      // Wait for error message to render
+      await waitForText(lastFrame, 'Error');
       
       const frame = lastFrame();
       expect(frame).to.include('Error');
@@ -345,7 +384,8 @@ describe('DebugRunner component', function () {
         })
       );
       
-      await new Promise(resolve => setTimeout(resolve, 50));
+      // Wait for progress tracking to render
+      await waitForText(lastFrame, 'passed');
       
       const frame = lastFrame();
       expect(frame).to.include('passed');
