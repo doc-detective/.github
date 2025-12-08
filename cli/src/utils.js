@@ -18,7 +18,7 @@ exports.getResolvedTestsFromEnv = getResolvedTestsFromEnv;
 exports.reportResults = reportResults;
 
 // Log function that respects logLevel
-function log(message, level = "info", config = {}) {
+function log(config = {}, level = "info", message) {
   const logLevels = ["silent", "error", "warning", "info", "debug"];
   const currentLevel = config.logLevel || "info";
   const currentLevelIndex = logLevels.indexOf(currentLevel);
@@ -86,14 +86,14 @@ async function getResolvedTestsFromEnv(config = {}) {
     // Validate the structure: { accountId, url, token, contextIds }
     if (!apiConfig.accountId || !apiConfig.url || !apiConfig.token || !apiConfig.contextIds) {
       log(
-        "Invalid DOC_DETECTIVE_API: must contain 'accountId', 'url', 'token', and 'contextIds' properties",
+        config,
         "error",
-        config
+        "Invalid DOC_DETECTIVE_API: must contain 'accountId', 'url', 'token', and 'contextIds' properties"
       );
       process.exit(1);
     }
 
-    log(`CLI:Fetching resolved tests from ${apiConfig.url}/resolved-tests`, "debug", config);
+    log(config, "debug", `CLI:Fetching resolved tests from ${apiConfig.url}/resolved-tests`);
 
     // Make GET request to the specified URL with token in header
     const response = await axios.get(`${apiConfig.url}/resolved-tests`, {
@@ -113,9 +113,9 @@ async function getResolvedTestsFromEnv(config = {}) {
 
     if (!validation.valid) {
       log(
-        "Invalid resolvedTests from API response. " + validation.errors,
+        config,
         "error",
-        config
+        "Invalid resolvedTests from API response. " + validation.errors
       );
       process.exit(1);
     }
@@ -132,15 +132,15 @@ async function getResolvedTestsFromEnv(config = {}) {
     }
 
     log(
-      `CLI:RESOLVED_TESTS:\n${JSON.stringify(resolvedTests, null, 2)}`,
+      config,
       "debug",
-      config
+      `CLI:RESOLVED_TESTS:\n${JSON.stringify(resolvedTests, null, 2)}`
     );
   } catch (error) {
     log(
-      `Error fetching resolved tests from DOC_DETECTIVE_API: ${error.message}`,
+      config,
       "error",
-      config
+      `Error fetching resolved tests from DOC_DETECTIVE_API: ${error.message}`
     );
     process.exit(1);
   }
@@ -171,7 +171,7 @@ async function getConfigFromEnv() {
       process.exit(1);
     }
 
-    log(`CLI:ENV_CONFIG:\n${JSON.stringify(envConfig, null, 2)}`, "debug", envConfig);
+    log(envConfig, "debug", `CLI:ENV_CONFIG:\n${JSON.stringify(envConfig, null, 2)}`);
   } catch (error) {
     console.error(
       `Error parsing DOC_DETECTIVE_CONFIG environment variable: ${error.message}`
@@ -753,7 +753,7 @@ async function reportResults({ config = {}, apiConfig, results }) {
                 status = "skipped";
               }
               if (!status) {
-                log(`Unknown context result status for context ID ${contextId}`, "error", config);
+                log(config, "error", `Unknown context result status for context ID ${contextId}`);
                 return; 
               }
 
