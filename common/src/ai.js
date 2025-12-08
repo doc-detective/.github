@@ -16,6 +16,11 @@ const modelMap = {
   "anthropic/claude-haiku-4.5": "claude-haiku-4-5",
   "anthropic/claude-sonnet-4.5": "claude-sonnet-4-5",
   "anthropic/claude-opus-4.5": "claude-opus-4-5",
+  // OpenAI models
+  "openai/gpt-4": "gpt-4",
+  "openai/gpt-4-turbo": "gpt-4-turbo",
+  "openai/gpt-4o": "gpt-4o",
+  "openai/gpt-3.5-turbo": "gpt-3.5-turbo",
 };
 
 /**
@@ -223,7 +228,7 @@ const toAiSdkSchema = (schema) => {
  * @param {string} [options.files[].type] - File type ("image").
  * @param {string} [options.files[].data] - Base64 data or URL.
  * @param {string} [options.files[].mimeType] - MIME type (e.g., "image/png").
- * @param {string} [options.model] - Model identifier (default: "claude-3-5-haiku-latest").
+ * @param {string} [options.model] - Model identifier (default: "anthropic/claude-haiku-4.5").
  * @param {string} [options.system] - System message.
  * @param {z.ZodSchema | Object} [options.schema] - Zod schema or JSON schema for structured output.
  * @param {string} [options.schemaName] - Name for the schema (used in API calls).
@@ -304,9 +309,12 @@ const generate = async ({
   
   // Build messages or prompt
   if (messages && messages.length > 0) {
-    // Use messages array directly
-    generationOptions.messages = messages.map((msg) => {
-      if (msg.role === "user" && files && files.length > 0) {
+    // Find the index of the last user message
+    const lastUserIndex = messages.findLastIndex((msg) => msg.role === "user");
+    
+    // Use messages array, attaching files only to the last user message
+    generationOptions.messages = messages.map((msg, index) => {
+      if (index === lastUserIndex && files && files.length > 0) {
         return {
           ...msg,
           content: buildMessageContent({ prompt: msg.content, files }),
