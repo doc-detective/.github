@@ -5,7 +5,7 @@ import Spinner from 'ink-spinner';
 import TestRunner from './TestRunner.mjs';
 import ResultsSummary from './ResultsSummary.mjs';
 
-const App = ({ config, resolvedTests, state }) => {
+const App = ({ config, state }) => {
   return h(Box, { flexDirection: 'column', paddingY: 1 },
     h(Box, { marginBottom: 1 },
       h(Text, { bold: true, color: 'cyan' }, 'Doc Detective')
@@ -31,7 +31,7 @@ const App = ({ config, resolvedTests, state }) => {
 
     state.phase === 'error' && h(Box, { flexDirection: 'column' },
       h(Text, { color: 'red', bold: true }, '✖ Error'),
-      h(Text, { color: 'red' }, state.error)
+      h(Text, { color: 'red' }, state.error?.message || String(state.error))
     )
   );
 };
