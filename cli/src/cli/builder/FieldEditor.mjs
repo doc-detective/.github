@@ -300,6 +300,10 @@ const FieldEditor = ({
 
     const handleSubmit = () => {
       if (error) return;
+      if (localValue === '' && effectiveField.default === undefined) {
+        setError('A value is required');
+        return;
+      }
       const num = localValue === '' ? effectiveField.default : Number(localValue);
       onChange(num);
       onSubmit(num);
