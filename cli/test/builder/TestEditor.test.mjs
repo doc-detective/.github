@@ -6,10 +6,6 @@
 
 import React from 'react';
 import { render } from 'ink-testing-library';
-import { createRequire } from 'module';
-
-const require = createRequire(import.meta.url);
-
 import TestEditor from '../../src/cli/builder/TestEditor.mjs';
 import {
   getMockTest,

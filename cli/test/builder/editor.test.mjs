@@ -69,7 +69,7 @@ const spawnWithTimeout = async (args, options = {}) => {
     
     child.on('error', (err) => {
       clearTimeout(timer);
-      resolve({ stdout, stderr, exitCode: 1, error: err.message });
+      resolve({ stdout, stderr, exitCode: null, error: err.message });
     });
   });
 };

@@ -5,10 +5,6 @@
  * accepting optional partial overrides following the project pattern.
  */
 
-import { createRequire } from 'module';
-const require = createRequire(import.meta.url);
-const { schemas } = require('doc-detective-common');
-
 /**
  * Create a mock spec object with sensible defaults.
  * @param {Object} overrides - Optional partial overrides

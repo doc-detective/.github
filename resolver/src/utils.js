@@ -49,36 +49,70 @@ function isRelativeUrl(url) {
  * @returns {Object} Object with startLine, endLine, startColumn, endColumn
  */
 function calculateLineColumn(content, startOffset, endOffset) {
+  // Validate and normalize offsets
+  let start = Math.max(0, startOffset);
+  let end = Math.max(0, endOffset);
+  
+  // Swap if start > end
+  if (start > end) {
+    [start, end] = [end, start];
+  }
+  
+  // Clamp to content length
+  start = Math.min(start, content.length);
+  end = Math.min(end, content.length);
+
   let startLine = 1;
   let startColumn = 1;
   let endLine = 1;
   let endColumn = 1;
   let currentOffset = 0;
+  let startFound = false;
+  let endFound = false;
 
   const lines = content.split('\n');
   
   for (let i = 0; i < lines.length; i++) {
-    const lineLength = lines[i].length + 1; // +1 for the newline character
+    const isLastLine = i === lines.length - 1;
+    // Only add 1 for newline if this line actually has a trailing newline (not the last line)
+    const hasNewline = !isLastLine;
+    const lineLength = lines[i].length + (hasNewline ? 1 : 0);
     const lineEnd = currentOffset + lineLength;
+    // For the last line, lineEnd should equal content.length
+    const effectiveLineEnd = isLastLine ? content.length : lineEnd;
     
-    // Check if startOffset falls within this line
-    if (startOffset >= currentOffset && startOffset < lineEnd) {
-      startLine = i + 1;
-      startColumn = startOffset - currentOffset + 1;
+    // Check if start falls within this line: [currentOffset, effectiveLineEnd)
+    // For last line, use <= to include EOF position
+    if (!startFound) {
+      const startInLine = isLastLine
+        ? (start >= currentOffset && start <= effectiveLineEnd)
+        : (start >= currentOffset && start < effectiveLineEnd);
+      if (startInLine) {
+        startLine = i + 1;
+        startColumn = start - currentOffset + 1;
+        startFound = true;
+      }
     }
     
-    // Check if endOffset falls within this line
-    if (endOffset >= currentOffset && endOffset <= lineEnd) {
-      endLine = i + 1;
-      endColumn = endOffset - currentOffset + 1;
+    // Check if end falls within this line: [currentOffset, effectiveLineEnd)
+    // For last line, use <= to include EOF position
+    if (!endFound) {
+      const endInLine = isLastLine
+        ? (end >= currentOffset && end <= effectiveLineEnd)
+        : (end >= currentOffset && end < effectiveLineEnd);
+      if (endInLine) {
+        endLine = i + 1;
+        endColumn = end - currentOffset + 1;
+        endFound = true;
+      }
+    }
+    
+    // Break when both offsets have been located
+    if (startFound && endFound) {
+      break;
     }
     
     currentOffset = lineEnd;
-    
-    // If we've passed both offsets, we can stop
-    if (currentOffset > endOffset) {
-      break;
-    }
   }
   
   return { startLine, endLine, startColumn, endColumn };

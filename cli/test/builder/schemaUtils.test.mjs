@@ -41,6 +41,14 @@ import {
   stepRequiresBrowser,
 } from '../../src/cli/builder/schemaUtils.mjs';
 
+// Use dynamic import for chai to support ESM
+let expect;
+before(async function () {
+  const chai = await import('chai');
+  expect = chai.expect;
+  global.expect = expect;
+});
+
 describe('schemaUtils', function () {
   describe('getStepTypes', function () {
     it('returns an array of step type names', function () {
@@ -565,12 +573,4 @@ describe('schemaUtils', function () {
       expect(stepRequiresBrowser(step)).to.be.false;
     });
   });
-});
-
-// Use dynamic import for chai to support ESM
-let expect;
-before(async function () {
-  const chai = await import('chai');
-  expect = chai.expect;
-  global.expect = expect;
 });
