@@ -66,6 +66,11 @@ export const ScrollableSelect = ({
   const { stdout } = useStdout();
   const [selectedIndex, setSelectedIndex] = useState(initialIndex);
   
+  // Sync local state when initialIndex prop changes
+  useEffect(() => {
+    setSelectedIndex(initialIndex);
+  }, [initialIndex]);
+  
   // Calculate visible items based on terminal height
   const terminalHeight = stdout?.rows || 24;
   const availableLines = Math.max(terminalHeight - reservedLines, linesPerItem);
