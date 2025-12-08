@@ -64,11 +64,12 @@ export const ScrollableSelect = ({
   initialIndex = 0,
 }) => {
   const { stdout } = useStdout();
-  const [selectedIndex, setSelectedIndex] = useState(initialIndex);
+  // Track the actual index in the full items array (not the visible window)
+  const [highlightedIndex, setHighlightedIndex] = useState(initialIndex);
   
   // Sync local state when initialIndex prop changes
   useEffect(() => {
-    setSelectedIndex(initialIndex);
+    setHighlightedIndex(initialIndex);
   }, [initialIndex]);
   
   // Calculate visible items based on terminal height
@@ -76,38 +77,52 @@ export const ScrollableSelect = ({
   const availableLines = Math.max(terminalHeight - reservedLines, linesPerItem);
   const defaultLimit = Math.max(1, Math.floor(availableLines / linesPerItem));
   const limit = customLimit || defaultLimit;
+  
+  // Check if we need scrolling at all
+  const hasLimit = items.length > limit;
 
-  // Track scroll position
-  const scrollOffset = useMemo(() => {
-    if (selectedIndex < limit) {
-      return 0;
+  // Calculate scroll indicators based on ink-select-input's rotation behavior
+  // ink-select-input uses array rotation: when you scroll down past the limit,
+  // it rotates the array so the selected item stays visible within the limit window
+  const scrollInfo = useMemo(() => {
+    if (!hasLimit) {
+      return { hasItemsAbove: false, hasItemsBelow: false, aboveCount: 0, belowCount: 0 };
     }
-    return Math.min(selectedIndex - limit + 1, items.length - limit);
-  }, [selectedIndex, limit, items.length]);
-
-  const hasItemsAbove = scrollOffset > 0;
-  const hasItemsBelow = scrollOffset + limit < items.length;
-
-  // Handle keyboard navigation to track selected index
-  useInput((input, key) => {
-    if (key.upArrow) {
-      setSelectedIndex(prev => Math.max(0, prev - 1));
-    } else if (key.downArrow) {
-      setSelectedIndex(prev => Math.min(items.length - 1, prev + 1));
-    }
-  });
+    
+    // ink-select-input keeps the selected item visible by rotating the array
+    // The visible window always contains `limit` items with the selection inside it
+    // We need to figure out which items are "before" and "after" the visible window
+    
+    // When selectedIndex is within [0, limit-1], no rotation needed, window is [0, limit)
+    // When selectedIndex >= limit, the window has rotated to keep selection visible
+    
+    // The rotation keeps the highlighted item visible, so we calculate based on 
+    // where we are in the full list
+    const aboveCount = Math.max(0, highlightedIndex - (limit - 1));
+    const belowCount = Math.max(0, items.length - highlightedIndex - 1);
+    
+    // Clamp belowCount to account for visible items
+    const adjustedBelowCount = Math.max(0, items.length - limit - aboveCount);
+    
+    return {
+      hasItemsAbove: aboveCount > 0,
+      hasItemsBelow: adjustedBelowCount > 0,
+      aboveCount,
+      belowCount: adjustedBelowCount,
+    };
+  }, [highlightedIndex, limit, items.length, hasLimit]);
 
   return React.createElement(
     Box,
     { flexDirection: 'column' },
     // Scroll up indicator
-    hasItemsAbove && React.createElement(
+    scrollInfo.hasItemsAbove && React.createElement(
       Box,
       { marginLeft: 2 },
       React.createElement(
         Text,
         { color: 'yellow' },
-        `▲ ${scrollOffset} more above`
+        `▲ ${scrollInfo.aboveCount} more above`
       )
     ),
     // The actual select input
@@ -119,18 +134,21 @@ export const ScrollableSelect = ({
       indicatorComponent,
       onSelect,
       onHighlight: (item) => {
+        // Track the highlighted item's index in the full items array
         const idx = items.findIndex(i => i.value === item.value);
-        if (idx !== -1) setSelectedIndex(idx);
+        if (idx !== -1) {
+          setHighlightedIndex(idx);
+        }
       },
     }),
     // Scroll down indicator
-    hasItemsBelow && React.createElement(
+    scrollInfo.hasItemsBelow && React.createElement(
       Box,
       { marginLeft: 2 },
       React.createElement(
         Text,
         { color: 'yellow' },
-        `▼ ${items.length - scrollOffset - limit} more below`
+        `▼ ${scrollInfo.belowCount} more below`
       )
     )
   );
