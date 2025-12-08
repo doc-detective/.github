@@ -164,16 +164,19 @@ async function getConfigFromEnv() {
     });
 
     if (!envValidation.valid) {
-      console.error(
-        "Invalid config from DOC_DETECTIVE_CONFIG environment variable.",
-        envValidation.errors
+      log(
+        envConfig,
+        "error",
+        `Invalid config from DOC_DETECTIVE_CONFIG environment variable. ${envValidation.errors}`
       );
       process.exit(1);
     }
 
     log(envConfig, "debug", `CLI:ENV_CONFIG:\n${JSON.stringify(envConfig, null, 2)}`);
   } catch (error) {
-    console.error(
+    log(
+      {},
+      "error",
       `Error parsing DOC_DETECTIVE_CONFIG environment variable: ${error.message}`
     );
     process.exit(1);
@@ -774,8 +777,6 @@ async function reportResults({ config = {}, apiConfig, results }) {
   try {
     const url = `${apiConfig.url}/contexts`;
     const payload = { contexts };
-
-    console.log(payload);
 
     const response = await axios.post(url, payload, {
       headers: {
