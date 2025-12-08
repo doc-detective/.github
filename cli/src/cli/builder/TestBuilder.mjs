@@ -210,6 +210,81 @@ const TestBuilder = ({
     }
   });
 
+  // Pre-save check for inline sources - handled by useEffect to avoid state updates during render
+  // NOTE: All useEffect hooks must be called before any conditional returns to maintain hook order
+  useEffect(() => {
+    if (phase !== 'preSave') return;
+    
+    // Check if any inline source files have changed
+    const changed = getInlineSourceFiles(spec).filter(
+      file => sourceFileHashes[file] && hasSourceFileChanged(file, sourceFileHashes[file])
+    );
+    
+    // Determine the next phase
+    const nextPhase = changed.length > 0
+      ? 'sourceChanged'
+      : (hasInlineSources ? 'inlineSaveChoice' : 'save');
+    
+    // Only update if changed files differ from current
+    const changedFilesMatch = 
+      changed.length === changedSourceFiles.length &&
+      changed.every((file, i) => changedSourceFiles[i] === file);
+    
+    if (!changedFilesMatch) {
+      setChangedSourceFiles(changed);
+    }
+    setPhase(nextPhase);
+  }, [phase, spec, sourceFileHashes, hasInlineSources, changedSourceFiles]);
+
+  // Effect to handle inline source updates when phase changes to 'inlineUpdate'
+  useEffect(() => {
+    if (phase !== 'inlineUpdate') {
+      return;
+    }
+
+    let cancelled = false;
+
+    const performInlineUpdate = async () => {
+      // Use prepareSourceUpdates to handle both explicit inline steps and auto-detected steps
+      // Auto-detected steps will have new explicit comments inserted after the original content
+      const updatesByFile = prepareSourceUpdates({ spec, originalSpec });
+
+      // Apply updates to each file
+      const errors = [];
+      for (const [file, updates] of updatesByFile) {
+        if (cancelled) return;
+        const result = batchUpdateSourceContent({ filePath: file, updates });
+        if (!result.success) {
+          errors.push(`${path.basename(file)}: ${result.error || 'Unknown error'}`);
+        }
+      }
+
+      if (cancelled) return;
+
+      if (errors.length > 0) {
+        setInlineUpdateError(errors.join('\n'));
+        setPhase('inlineUpdateError');
+      } else {
+        // Update hashes for modified files
+        const newHashes = { ...sourceFileHashes };
+        for (const file of updatesByFile.keys()) {
+          const hash = getFileContentHash(file);
+          if (hash) {
+            newHashes[file] = hash;
+          }
+        }
+        setSourceFileHashes(newHashes);
+        setPhase('inlineUpdateSuccess');
+      }
+    };
+
+    performInlineUpdate();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [phase, spec, originalSpec, sourceFileHashes]);
+
   // Show validation warning for invalid loaded specs
   if (showValidationWarning) {
     return React.createElement(
@@ -571,31 +646,6 @@ const TestBuilder = ({
     );
   }
 
-  // Pre-save check for inline sources - handled by useEffect to avoid state updates during render
-  useEffect(() => {
-    if (phase !== 'preSave') return;
-    
-    // Check if any inline source files have changed
-    const changed = getInlineSourceFiles(spec).filter(
-      file => sourceFileHashes[file] && hasSourceFileChanged(file, sourceFileHashes[file])
-    );
-    
-    // Determine the next phase
-    const nextPhase = changed.length > 0
-      ? 'sourceChanged'
-      : (hasInlineSources ? 'inlineSaveChoice' : 'save');
-    
-    // Only update if changed files differ from current
-    const changedFilesMatch = 
-      changed.length === changedSourceFiles.length &&
-      changed.every((file, i) => changedSourceFiles[i] === file);
-    
-    if (!changedFilesMatch) {
-      setChangedSourceFiles(changed);
-    }
-    setPhase(nextPhase);
-  }, [phase, spec, sourceFileHashes, hasInlineSources, changedSourceFiles]);
-
   if (phase === 'preSave') {
     return React.createElement(
       Box,
@@ -707,55 +757,6 @@ const TestBuilder = ({
       })
     );
   }
-
-  // Effect to handle inline source updates when phase changes to 'inlineUpdate'
-  useEffect(() => {
-    if (phase !== 'inlineUpdate') {
-      return;
-    }
-
-    let cancelled = false;
-
-    const performInlineUpdate = async () => {
-      // Use prepareSourceUpdates to handle both explicit inline steps and auto-detected steps
-      // Auto-detected steps will have new explicit comments inserted after the original content
-      const updatesByFile = prepareSourceUpdates({ spec, originalSpec });
-
-      // Apply updates to each file
-      const errors = [];
-      for (const [file, updates] of updatesByFile) {
-        if (cancelled) return;
-        const result = batchUpdateSourceContent({ filePath: file, updates });
-        if (!result.success) {
-          errors.push(`${path.basename(file)}: ${result.error || 'Unknown error'}`);
-        }
-      }
-
-      if (cancelled) return;
-
-      if (errors.length > 0) {
-        setInlineUpdateError(errors.join('\n'));
-        setPhase('inlineUpdateError');
-      } else {
-        // Update hashes for modified files
-        const newHashes = { ...sourceFileHashes };
-        for (const file of updatesByFile.keys()) {
-          const hash = getFileContentHash(file);
-          if (hash) {
-            newHashes[file] = hash;
-          }
-        }
-        setSourceFileHashes(newHashes);
-        setPhase('inlineUpdateSuccess');
-      }
-    };
-
-    performInlineUpdate();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [phase, spec, originalSpec, sourceFileHashes]);
 
   // Update inline sources - render only, no side effects
   if (phase === 'inlineUpdate') {

@@ -31,6 +31,9 @@ before(async function () {
   global.expect = expect;
 });
 
+// Helper to wait for React state updates after input
+const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
 describe('TestBuilder component', function () {
   // Temp file handling for save tests
   const tempDir = path.join(__dirname, 'temp');
@@ -347,6 +350,179 @@ describe('TestBuilder component', function () {
       
       const frame = lastFrame();
       expect(frame).to.include('3 steps');
+    });
+  });
+
+  describe('creating a new spec', function () {
+    it('shows name input phase when no initial spec is provided', function () {
+      const { lastFrame } = render(
+        React.createElement(TestBuilder, { outputDir: tempDir })
+      );
+      
+      const frame = lastFrame();
+      expect(frame).to.include('Doc Detective Test Builder');
+      expect(frame).to.include('Spec name');
+      expect(frame).to.include('Create a new test specification');
+    });
+
+    it('shows expected output path hint in name input phase', function () {
+      const { lastFrame } = render(
+        React.createElement(TestBuilder, { outputDir: tempDir })
+      );
+      
+      const frame = lastFrame();
+      expect(frame).to.include('Will be saved as');
+      expect(frame).to.include('.spec.json');
+    });
+
+    it('shows navigation hints in name input phase', function () {
+      const { lastFrame } = render(
+        React.createElement(TestBuilder, { outputDir: tempDir })
+      );
+      
+      const frame = lastFrame();
+      expect(frame).to.include('Press Enter to continue');
+      expect(frame).to.include('Esc to exit');
+    });
+
+    it('skips name phase when initial spec is provided', function () {
+      const spec = getMockSpec({ specId: 'pre-existing-spec' });
+      const { lastFrame } = render(
+        React.createElement(TestBuilder, {
+          initialSpec: spec,
+          inputFilePath: path.join(tempDir, 'pre-existing-spec.json'),
+          outputDir: tempDir,
+        })
+      );
+      
+      const frame = lastFrame();
+      // Should go directly to menu, not name input
+      expect(frame).to.not.include('Create a new test specification');
+      expect(frame).to.include('Test Builder');
+      expect(frame).to.include('pre-existing-spec');
+    });
+
+    it('shows empty test list for new spec', function () {
+      const spec = getMockSpec({ specId: 'new-empty-spec', tests: [] });
+      const { lastFrame } = render(
+        React.createElement(TestBuilder, {
+          initialSpec: spec,
+          inputFilePath: path.join(tempDir, 'new-empty-spec.json'),
+          outputDir: tempDir,
+        })
+      );
+      
+      const frame = lastFrame();
+      expect(frame).to.include('Tests (0)');
+      expect(frame).to.include('Add at least one test');
+    });
+
+    it('uses specId from initialSpec when provided', function () {
+      const spec = getMockSpec({ specId: 'custom-spec-id' });
+      const { lastFrame } = render(
+        React.createElement(TestBuilder, {
+          initialSpec: spec,
+          inputFilePath: path.join(tempDir, 'test.json'),
+          outputDir: tempDir,
+        })
+      );
+      
+      const frame = lastFrame();
+      expect(frame).to.include('custom-spec-id');
+    });
+
+    it('derives spec name from filename when specId not in initialSpec', function () {
+      const spec = getMockSpec();
+      delete spec.specId;
+      const { lastFrame } = render(
+        React.createElement(TestBuilder, {
+          initialSpec: spec,
+          inputFilePath: path.join(tempDir, 'my-derived-name.spec.json'),
+          outputDir: tempDir,
+        })
+      );
+      
+      const frame = lastFrame();
+      expect(frame).to.include('my-derived-name.spec');
+    });
+
+    it('allows entering a spec name via keyboard input', async function () {
+      const { lastFrame, stdin } = render(
+        React.createElement(TestBuilder, { outputDir: tempDir })
+      );
+      
+      // Initial state: name input phase with placeholder
+      let frame = lastFrame();
+      expect(frame).to.include('Spec name');
+      expect(frame).to.include('my-tests'); // placeholder
+      
+      // Type a spec name (full string at once)
+      stdin.write('my-spec');
+      
+      // Wait for React to process the input
+      await delay(50);
+      
+      frame = lastFrame();
+      expect(frame).to.include('my-spec');
+      expect(frame).to.include('my-spec.spec.json');
+    });
+
+    it('transitions to menu phase after entering name and pressing Enter', async function () {
+      const { lastFrame, stdin } = render(
+        React.createElement(TestBuilder, { outputDir: tempDir })
+      );
+      
+      // Type a spec name
+      stdin.write('test-spec');
+      await delay(50);
+      
+      // Press Enter to submit
+      stdin.write('\r');
+      await delay(50);
+      
+      // Should transition to menu phase
+      const frame = lastFrame();
+      expect(frame).to.include('Test Builder');
+      expect(frame).to.include('test-spec');
+      expect(frame).to.include('Tests (0)');
+      expect(frame).to.include('Add test');
+    });
+
+    it('does not transition to menu if spec name is empty when Enter is pressed', async function () {
+      const { lastFrame, stdin } = render(
+        React.createElement(TestBuilder, { outputDir: tempDir })
+      );
+      
+      // Initial state: name input phase
+      let frame = lastFrame();
+      expect(frame).to.include('Spec name');
+      
+      // Press Enter without entering a name (spec name is empty by default)
+      stdin.write('\r');
+      await delay(50);
+      
+      // Should stay in name input phase
+      frame = lastFrame();
+      expect(frame).to.include('Spec name');
+      expect(frame).to.include('Create a new test specification');
+    });
+
+    it('initializes spec with specId matching entered name', async function () {
+      const { lastFrame, stdin } = render(
+        React.createElement(TestBuilder, { outputDir: tempDir })
+      );
+      
+      // Type a spec name and submit
+      stdin.write('my-initialized-spec');
+      await delay(50);
+      
+      stdin.write('\r');
+      await delay(50);
+      
+      // Should be in menu phase with the spec initialized
+      const frame = lastFrame();
+      expect(frame).to.include('my-initialized-spec');
+      expect(frame).to.include('specId: my-initialized-spec');
     });
   });
 });
