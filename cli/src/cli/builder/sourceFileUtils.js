@@ -669,6 +669,12 @@ function getInlineSourceFiles(spec) {
   
   if (!spec) return files;
   
+  // If spec has contentPath, include it as an inline source file
+  // contentPath indicates the spec was extracted from a markdown file with inline tests
+  if (spec.contentPath) {
+    files.add(spec.contentPath);
+  }
+  
   for (const test of (spec.tests || [])) {
     if (test.sourceLocation?.isInline && test.sourceLocation.file) {
       files.add(test.sourceLocation.file);

@@ -41,9 +41,10 @@ const {
  * @param {string|null} inputFileExtension - Original file extension
  * @param {string} specName - Spec name for new files
  * @param {string} outputDir - Default output directory
+ * @param {string|null} contentPath - The spec's contentPath (for markdown files with inline tests)
  * @returns {string} The computed output file path
  */
-function computeOutputPath(inputFilePath, inputFileExtension, specName, outputDir) {
+function computeOutputPath(inputFilePath, inputFileExtension, specName, outputDir, contentPath = null) {
   if (inputFilePath) {
     const ext = inputFileExtension?.toLowerCase() || path.extname(inputFilePath).toLowerCase();
     
@@ -52,7 +53,13 @@ function computeOutputPath(inputFilePath, inputFileExtension, specName, outputDi
       return inputFilePath;
     }
     
-    // For other formats (e.g., .md), save as .spec.json in the same directory
+    // For markdown files with contentPath (inline tests), use the original file
+    // The contentPath indicates the spec was extracted from markdown with inline tests
+    if (contentPath) {
+      return inputFilePath;
+    }
+    
+    // For other formats (e.g., .md without inline tests), save as .spec.json in the same directory
     const dir = path.dirname(inputFilePath);
     const baseName = path.basename(inputFilePath, ext);
     return path.join(dir, `${baseName}.spec.json`);
@@ -169,8 +176,11 @@ const TestBuilder = ({
     return currentJson !== originalJson;
   }, [spec, originalSpec]);
 
-  // Check if spec has inline source locations
-  const hasInlineSources = useMemo(() => hasInlineSourceLocations(spec), [spec]);
+  // Check if spec has inline source locations (either via sourceLocation.isInline or via contentPath)
+  // contentPath indicates the spec was extracted from a markdown file with inline tests
+  const hasInlineSources = useMemo(() => {
+    return hasInlineSourceLocations(spec) || !!spec.contentPath;
+  }, [spec]);
   
   // Check if spec has auto-detected steps
   const hasAutoDetected = useMemo(() => hasAutoDetectedSteps(spec), [spec]);
@@ -188,9 +198,10 @@ const TestBuilder = ({
   }, [spec]);
 
   // Get file path - use computed path for existing files, or generate new path
+  // Pass the spec's contentPath to determine if this is a markdown file with inline tests
   const filePath = useMemo(() => {
-    return computeOutputPath(inputFilePath, inputFileExtension, specName, saveDir);
-  }, [inputFilePath, inputFileExtension, specName, saveDir]);
+    return computeOutputPath(inputFilePath, inputFileExtension, specName, saveDir, spec.contentPath);
+  }, [inputFilePath, inputFileExtension, specName, saveDir, spec.contentPath]);
 
   // Get output format
   const outputFormat = useMemo(() => getOutputFormat(filePath), [filePath]);
