@@ -201,9 +201,9 @@ const StepEditor = ({
       }
     }
 
-    // Add common step properties that are set
+    // Add common step properties that are set (excluding internal metadata like sourceLocation)
     Object.entries(localStep).forEach(([key, val]) => {
-      if (key !== stepType && commonProps[key]) {
+      if (key !== stepType && key !== 'sourceLocation' && commonProps[key]) {
         result.push({
           name: key,
           value: val,
