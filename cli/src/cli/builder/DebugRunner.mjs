@@ -21,6 +21,19 @@ import {
   stepRequiresBrowser,
 } from './schemaUtils.mjs';
 
+// AI utilities from common
+const { refineStep, detectProvider } = require('doc-detective-common');
+
+/**
+ * Check if an AI provider is available via environment variables or config
+ * @param {Object} [config={}] - Optional configuration object
+ * @returns {boolean} True if an AI provider is available
+ */
+function isAiAvailable(config = {}) {
+  const detected = detectProvider(config, null);
+  return detected.provider !== null && detected.apiKey !== null;
+}
+
 /**
  * Truncate a string to a maximum number of grapheme clusters (user-perceived characters).
  * Uses Intl.Segmenter if available (Node 16+), otherwise falls back to Array.from for code-point safety.
@@ -93,7 +106,7 @@ const DebugRunner = ({ test, testIndex, onComplete, onCancel }) => {
   const { exit } = useApp();
   
   // Phase states
-  const [phase, setPhase] = useState('init'); // 'init', 'checkGoTo', 'addGoTo', 'running', 'stepPreview', 'stepEdit', 'stepResult', 'complete', 'error'
+  const [phase, setPhase] = useState('init'); // 'init', 'checkGoTo', 'addGoTo', 'running', 'stepPreview', 'stepEdit', 'stepResult', 'aiRefining', 'aiRefineResult', 'complete', 'error'
   
   // Runner state
   const [runner, setRunner] = useState(null);
@@ -108,6 +121,11 @@ const DebugRunner = ({ test, testIndex, onComplete, onCancel }) => {
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [stepResult, setStepResult] = useState(null);
   const [isExecuting, setIsExecuting] = useState(false);
+  
+  // AI refinement state
+  const [aiAvailable] = useState(() => isAiAvailable());
+  const [aiRefinedStep, setAiRefinedStep] = useState(null);
+  const [aiRefineError, setAiRefineError] = useState(null);
   
   // Results tracking
   const [results, setResults] = useState({ passed: 0, failed: 0 });
@@ -162,6 +180,11 @@ const DebugRunner = ({ test, testIndex, onComplete, onCancel }) => {
     if (key.escape) {
       if (phase === 'stepEdit') {
         setPhase('stepPreview');
+      } else if (phase === 'aiRefineResult') {
+        // Go back to stepResult without AI
+        setAiRefinedStep(null);
+        setAiRefineError(null);
+        setPhase('stepResult');
       } else if (phase === 'stepPreview' || phase === 'stepResult') {
         // Clear auto-advance timer when leaving stepResult
         if (autoAdvanceTimer.current) {
@@ -188,6 +211,44 @@ const DebugRunner = ({ test, testIndex, onComplete, onCancel }) => {
     }
     callback();
   }, [cleanup]);
+
+  // Attempt AI refinement of a failed step
+  const attemptAiRefinement = useCallback(async (step, failureMessage) => {
+    if (!aiAvailable) return;
+    
+    setAiRefinedStep(null);
+    setAiRefineError(null);
+    setPhase('aiRefining');
+    
+    try {
+      // Get previous steps for context
+      const previousSteps = (localTest.steps || []).slice(0, currentStepIndex);
+      
+      // Try to get the current browser DOM for context
+      let dom = null;
+      if (runner) {
+        try {
+          dom = await runner.getPageSource();
+        } catch (domError) {
+          // Ignore DOM fetch errors - browser might not have a page loaded
+        }
+      }
+      
+      const refined = await refineStep({
+        step,
+        failureMessage,
+        previousSteps,
+        context: dom ? { dom } : undefined,
+        config: {}, // Uses env vars for API keys
+      });
+      
+      setAiRefinedStep(refined);
+      setPhase('aiRefineResult');
+    } catch (error) {
+      setAiRefineError(error.message || 'AI refinement failed');
+      setPhase('aiRefineResult');
+    }
+  }, [aiAvailable, localTest.steps, currentStepIndex, runner]);
 
   // Execute current step
   const executeStep = useCallback(async () => {
@@ -231,7 +292,12 @@ const DebugRunner = ({ test, testIndex, onComplete, onCancel }) => {
         }, 1500);
       } else {
         setResults((prev) => ({ ...prev, failed: prev.failed + 1 }));
-        setPhase('stepResult');
+        // If AI is available, attempt automatic refinement
+        if (aiAvailable) {
+          attemptAiRefinement(step, result.description || 'Step failed');
+        } else {
+          setPhase('stepResult');
+        }
       }
     } catch (error) {
       setStepResult({
@@ -239,11 +305,16 @@ const DebugRunner = ({ test, testIndex, onComplete, onCancel }) => {
         description: error.message || 'Step execution failed',
       });
       setResults((prev) => ({ ...prev, failed: prev.failed + 1 }));
-      setPhase('stepResult');
+      // If AI is available, attempt automatic refinement
+      if (aiAvailable) {
+        attemptAiRefinement(steps[currentStepIndex], error.message || 'Step execution failed');
+      } else {
+        setPhase('stepResult');
+      }
     } finally {
       setIsExecuting(false);
     }
-  }, [runStep, runner, localTest.steps, currentStepIndex]);
+  }, [runStep, runner, localTest.steps, currentStepIndex, aiAvailable, attemptAiRefinement]);
 
   // Add goTo step at the specified index
   const addGoToStep = useCallback((url, insertIndex) => {
@@ -541,6 +612,159 @@ const DebugRunner = ({ test, testIndex, onComplete, onCancel }) => {
         })
       );
     }
+  }
+
+  // AI refining phase - loading state
+  if (phase === 'aiRefining') {
+    const { actionType } = getStepDisplay(currentStep);
+    return React.createElement(
+      Box,
+      { flexDirection: 'column', padding: 1 },
+      React.createElement(StatusBar, {
+        location: ['Debug Runner', `Step ${currentStepIndex + 1}/${totalSteps}`, 'AI Refinement'],
+      }),
+      React.createElement(
+        Box,
+        { marginBottom: 1 },
+        React.createElement(Text, { color: 'red', bold: true }, '❌ Step Failed')
+      ),
+      React.createElement(
+        Box,
+        { marginBottom: 1 },
+        React.createElement(Text, null, `"${actionType}" failed to execute.`)
+      ),
+      stepResult?.description && React.createElement(
+        Box,
+        { marginBottom: 1, paddingX: 1, borderStyle: 'single', borderColor: 'red' },
+        React.createElement(Text, { color: 'red' }, stepResult.description)
+      ),
+      React.createElement(
+        Box,
+        { marginBottom: 1 },
+        React.createElement(Text, { color: 'cyan' }, '🤖 Attempting AI-powered step refinement...')
+      ),
+      React.createElement(
+        Text,
+        { color: 'gray', dimColor: true },
+        'The AI is analyzing the failure and suggesting fixes.'
+      )
+    );
+  }
+
+  // AI refine result phase - show AI suggestion or error
+  if (phase === 'aiRefineResult') {
+    const { actionType } = getStepDisplay(currentStep);
+    
+    if (aiRefineError) {
+      // AI refinement failed - fall back to manual editing
+      return React.createElement(
+        Box,
+        { flexDirection: 'column', padding: 1 },
+        React.createElement(StatusBar, {
+          location: ['Debug Runner', `Step ${currentStepIndex + 1}/${totalSteps}`],
+          validationStatus: false,
+        }),
+        React.createElement(
+          Box,
+          { marginBottom: 1 },
+          React.createElement(Text, { color: 'red', bold: true }, '❌ Step Failed')
+        ),
+        React.createElement(
+          Box,
+          { marginBottom: 1 },
+          React.createElement(Text, null, `"${actionType}" failed to execute.`)
+        ),
+        stepResult?.description && React.createElement(
+          Box,
+          { marginBottom: 1, paddingX: 1, borderStyle: 'single', borderColor: 'red' },
+          React.createElement(Text, { color: 'red' }, stepResult.description)
+        ),
+        React.createElement(
+          Box,
+          { marginBottom: 1 },
+          React.createElement(Text, { color: 'yellow' }, '⚠️  AI refinement failed: '),
+          React.createElement(Text, { color: 'gray' }, truncateGraphemeSafe(aiRefineError, 80))
+        ),
+        React.createElement(
+          Box,
+          { marginBottom: 1 },
+          React.createElement(Text, { color: 'gray' }, `Progress: ${results.passed} passed, ${results.failed} failed`)
+        ),
+        React.createElement(SelectInput, {
+          items: [
+            { label: '✏️  Edit step manually and retry', value: 'editRetry' },
+            { label: '⛔ Stop debug session', value: 'stop' },
+          ],
+          onSelect: (item) => {
+            if (item.value === 'editRetry') {
+              setResults((prev) => ({ ...prev, failed: prev.failed - 1 }));
+              setPhase('stepEdit');
+            } else {
+              cleanupAndExit(() => onComplete(localTest));
+            }
+          },
+        })
+      );
+    }
+    
+    // AI refinement succeeded - show the suggestion
+    const refinedDisplay = getStepDisplay(aiRefinedStep);
+    return React.createElement(
+      Box,
+      { flexDirection: 'column', padding: 1 },
+      React.createElement(StatusBar, {
+        location: ['Debug Runner', `Step ${currentStepIndex + 1}/${totalSteps}`, 'AI Suggestion'],
+        validationStatus: null,
+      }),
+      React.createElement(
+        Box,
+        { marginBottom: 1 },
+        React.createElement(Text, { color: 'cyan', bold: true }, '🤖 AI Suggested Fix')
+      ),
+      React.createElement(
+        Box,
+        { marginBottom: 1 },
+        React.createElement(Text, null, 'The AI has suggested a refined version of this step:')
+      ),
+      React.createElement(
+        Box,
+        { marginBottom: 1, borderStyle: 'single', borderColor: 'cyan', paddingX: 1 },
+        React.createElement(
+          Box,
+          { flexDirection: 'column' },
+          React.createElement(Text, { color: 'gray', dimColor: true }, 'Suggested Step:'),
+          React.createElement(Text, { color: 'white' }, JSON.stringify(aiRefinedStep, null, 2))
+        )
+      ),
+      React.createElement(
+        Box,
+        { marginBottom: 1 },
+        React.createElement(Text, { color: 'gray' }, `Progress: ${results.passed} passed, ${results.failed} failed`)
+      ),
+      React.createElement(SelectInput, {
+        items: [
+          { label: '✅ Accept AI suggestion', value: 'accept' },
+          { label: '↩️  Keep original step and edit manually', value: 'editOriginal' },
+          { label: '⛔ Stop debug session', value: 'stop' },
+        ],
+        onSelect: (item) => {
+          if (item.value === 'accept') {
+            // Apply the AI suggestion and retry
+            updateStep(currentStepIndex, aiRefinedStep);
+            setResults((prev) => ({ ...prev, failed: prev.failed - 1 }));
+            setAiRefinedStep(null);
+            setPhase('stepPreview');
+          } else if (item.value === 'editOriginal') {
+            // Discard AI suggestion, edit original
+            setResults((prev) => ({ ...prev, failed: prev.failed - 1 }));
+            setAiRefinedStep(null);
+            setPhase('stepEdit');
+          } else {
+            cleanupAndExit(() => onComplete(localTest));
+          }
+        },
+      })
+    );
   }
 
   // Confirm exit phase
