@@ -22,37 +22,44 @@ const modelMap = {
   "openai/gpt-5-nano": "gpt-5-nano",
 };
 
-/**
- * Detects the platform-specific model identifier from a model string.
- * @param {string} model - The model identifier.
- * @returns {string | null} The platform-specific model identifier or null if not found.
- */
-const detectModel = (model) => {
-  if (!model) return null;
-  return modelMap[model] || null;
+const getDefaultProvider = (config) => {
+  // Try to detect from environment variables if no model is provided
+  if (process.env.ANTHROPIC_API_KEY || config.integrations?.anthropic) {
+    return {
+      provider: "anthropic",
+      model: "claude-haiku-4-5",
+      apiKey: process.env.ANTHROPIC_API_KEY || config.integrations.anthropic.apiKey,
+    };
+  } else if (process.env.OPENAI_API_KEY || config.integrations?.openAi) {
+    return {
+      provider: "openai",
+      model: "gpt-5-mini",
+      apiKey: process.env.OPENAI_API_KEY || config.integrations.openAi.apiKey,
+    };
+  } else {
+    return { provider: null, model: null, apiKey: null };
+  }
 };
 
 /**
- * Detects the provider and model from a model string.
+ * Detects the provider, model, and API from a model string and environment variables.
  * @param {string} model - The model identifier.
- * @returns {{ provider: "openai" | "anthropic" | null, model: string | null }} The detected provider and model.
+ * @returns {{ provider: "openai" | "anthropic" | null, model: string | null, apiKey: string | null }} The detected provider, model, and API key.
  */
-const detectProvider = (model) => {
-  if (!model) return { provider: null, model: null };
-  
-  const openaiPatterns = [/^openai\//];
-  const anthropicPatterns = [/^anthropic\//];
-  
-  const detectedModel = detectModel(model);
-  
-  if (openaiPatterns.some((pattern) => pattern.test(model))) {
-    return { provider: "openai", model: detectedModel };
+const detectProvider = (config, model) => {
+  const detectedModel = modelMap[model] || null;
+  if (!detectedModel) return getDefaultProvider(config);
+
+  if (model.startsWith("anthropic/") && (process.env.ANTHROPIC_API_KEY || config.integrations?.anthropic)) {
+    const apiKey = process.env.ANTHROPIC_API_KEY || config.integrations.anthropic.apiKey;
+    return { provider: "anthropic", model: detectedModel, apiKey };
   }
-  
-  if (anthropicPatterns.some((pattern) => pattern.test(model))) {
-    return { provider: "anthropic", model: detectedModel };
+
+  if (model.startsWith("openai/") && (process.env.OPENAI_API_KEY || config.integrations?.openAi)) {
+    const apiKey = process.env.OPENAI_API_KEY || config.integrations.openAi.apiKey;
+    return { provider: "openai", model: detectedModel, apiKey };
   }
-  
+
   return { provider: null, model: null };
 };
 
@@ -71,14 +78,14 @@ const createProvider = ({ provider, apiKey, baseURL }) => {
     if (baseURL) options.baseURL = baseURL;
     return createOpenAI(options);
   }
-  
+
   if (provider === "anthropic") {
     const options = {};
     if (apiKey) options.apiKey = apiKey;
     if (baseURL) options.baseURL = baseURL;
     return createAnthropic(options);
   }
-  
+
   throw new Error(`Unsupported provider: ${provider}`);
 };
 
@@ -92,19 +99,22 @@ const createProvider = ({ provider, apiKey, baseURL }) => {
  */
 const fileToImagePart = (file) => {
   if (file.type !== "image") {
-    throw new Error(`Unsupported file type: ${file.type}. Only "image" is supported.`);
+    throw new Error(
+      `Unsupported file type: ${file.type}. Only "image" is supported.`
+    );
   }
-  
+
   // Check if data is a URL
-  const isUrl = file.data.startsWith("http://") || file.data.startsWith("https://");
-  
+  const isUrl =
+    file.data.startsWith("http://") || file.data.startsWith("https://");
+
   if (isUrl) {
     return {
       type: "image",
       image: new URL(file.data),
     };
   }
-  
+
   // Base64 data
   return {
     type: "image",
@@ -124,17 +134,17 @@ const buildMessageContent = ({ prompt, files }) => {
   if (!files || files.length === 0) {
     return prompt;
   }
-  
+
   const parts = [];
-  
+
   // Add text part
   parts.push({ type: "text", text: prompt });
-  
+
   // Add file parts
   for (const file of files) {
     parts.push(fileToImagePart(file));
   }
-  
+
   return parts;
 };
 
@@ -155,15 +165,15 @@ const isZodSchema = (schema) => {
  */
 const validateAgainstZodSchema = (object, schema) => {
   const result = schema.safeParse(object);
-  
+
   if (result.success) {
     return { valid: true, errors: null, object: result.data };
   }
-  
+
   const errors = result.error.issues
     .map((issue) => `${issue.path.join(".")}: ${issue.message}`)
     .join(", ");
-  
+
   return { valid: false, errors, object };
 };
 
@@ -174,20 +184,25 @@ const validateAgainstZodSchema = (object, schema) => {
  * @returns {{ valid: boolean, errors: string | null, object: Object }} Validation result.
  */
 const validateAgainstJsonSchema = (object, schema) => {
-  const ajv = new Ajv({ allErrors: true, useDefaults: true, coerceTypes: true, strict: false });
+  const ajv = new Ajv({
+    allErrors: true,
+    useDefaults: true,
+    coerceTypes: true,
+    strict: false,
+  });
   addFormats(ajv);
-  
+
   const validate = ajv.compile(schema);
   const valid = validate(object);
-  
+
   if (valid) {
     return { valid: true, errors: null, object };
   }
-  
+
   const errors = validate.errors
     .map((error) => `${error.instancePath || "/"} ${error.message}`)
     .join(", ");
-  
+
   return { valid: false, errors, object };
 };
 
@@ -225,15 +240,23 @@ const toAiSdkSchema = (schema) => {
  */
 const getApiKey = (config, provider) => {
   if (!config || !config.integrations) return undefined;
-  
-  if (provider === "anthropic" && (process.env.ANTHROPIC_API_KEY || config.integrations.anthropic)) {
-    return process.env.ANTHROPIC_API_KEY || config.integrations.anthropic.apiKey;
+
+  if (
+    provider === "anthropic" &&
+    (process.env.ANTHROPIC_API_KEY || config.integrations.anthropic)
+  ) {
+    return (
+      process.env.ANTHROPIC_API_KEY || config.integrations.anthropic.apiKey
+    );
   }
-  
-  if (provider === "openai" && (process.env.OPENAI_API_KEY || config.integrations.openai)) {
+
+  if (
+    provider === "openai" &&
+    (process.env.OPENAI_API_KEY || config.integrations.openai)
+  ) {
     return process.env.OPENAI_API_KEY || config.integrations.openai.apiKey;
   }
-  
+
   return undefined;
 };
 
@@ -270,13 +293,13 @@ const generate = async ({
   prompt,
   messages,
   files,
-  model = DEFAULT_MODEL,
+  model,
   system,
   schema,
   schemaName,
   schemaDescription,
   provider,
-  config,
+  config = {},
   apiKey,
   baseURL,
   temperature,
@@ -286,56 +309,51 @@ const generate = async ({
   if (!prompt && (!messages || messages.length === 0)) {
     throw new Error("Either 'prompt' or 'messages' is required.");
   }
-  
+
   // Determine provider, model, and API key
-  const detected = detectProvider(model);
-  const resolvedProvider = provider || detected.provider;
-  const resolvedModel = detected.model || model;
-  
-  if (!resolvedProvider) {
+  const detected = detectProvider(config, model);
+
+  if (!detected.provider) {
     throw new Error(
       `Cannot determine provider for model "${model}". Please specify a 'provider' option ("openai" or "anthropic").`
     );
   }
-  
-  // Resolve API key: explicit apiKey > config > env vars (handled by SDK)
-  const resolvedApiKey = apiKey || getApiKey(config, resolvedProvider);
-  
+
   // Create provider instance
   const providerFactory = createProvider({
-    provider: resolvedProvider,
-    apiKey: resolvedApiKey,
+    provider: detected.provider,
+    apiKey: detected.apiKey,
     baseURL,
   });
-  
+
   // Get model instance
-  const modelInstance = providerFactory(resolvedModel);
-  
+  const modelInstance = providerFactory(detected.model);
+
   // Build generation options
   const generationOptions = {
     model: modelInstance,
   };
-  
+
   // Add system message if provided
   if (system) {
     generationOptions.system = system;
   }
-  
+
   // Add temperature if provided
   if (temperature !== undefined) {
     generationOptions.temperature = temperature;
   }
-  
+
   // Add maxTokens if provided
   if (maxTokens !== undefined) {
     generationOptions.maxTokens = maxTokens;
   }
-  
+
   // Build messages or prompt
   if (messages && messages.length > 0) {
     // Find the index of the last user message
     const lastUserIndex = messages.findLastIndex((msg) => msg.role === "user");
-    
+
     // Use messages array, attaching files only to the last user message
     generationOptions.messages = messages.map((msg, index) => {
       if (index === lastUserIndex && files && files.length > 0) {
@@ -358,7 +376,7 @@ const generate = async ({
     // Use simple prompt for text-only requests
     generationOptions.prompt = prompt;
   }
-  
+
   // Handle structured output with schema
   if (schema) {
     return generateWithSchemaValidation({
@@ -370,7 +388,7 @@ const generate = async ({
       messages,
     });
   }
-  
+
   // Generate text
   const result = await generateText(generationOptions);
 
@@ -416,28 +434,28 @@ const generateWithSchemaValidation = async ({
     };
     wrappedSchema = true;
   }
-  
+
   // Convert schema to AI SDK format (wraps JSON schemas with jsonSchema())
   const aiSdkSchema = toAiSdkSchema(schema);
-  
+
   for (let attempt = 1; attempt <= MAX_SCHEMA_VALIDATION_RETRIES; attempt++) {
     const objectOptions = {
       ...generationOptions,
       schema: aiSdkSchema,
     };
-    
+
     if (schemaName) {
       objectOptions.schemaName = schemaName;
     }
-    
+
     if (schemaDescription) {
       objectOptions.schemaDescription = schemaDescription;
     }
-    
+
     // Add retry context if this is a retry attempt
     if (attempt > 1 && lastError) {
       const retryMessage = `Previous attempt failed schema validation with errors: ${lastError}. Please fix these issues and try again.`;
-      
+
       if (objectOptions.messages) {
         // Add retry context to messages
         objectOptions.messages = [
@@ -450,16 +468,23 @@ const generateWithSchemaValidation = async ({
         objectOptions.prompt = `${objectOptions.prompt}\n\n${retryMessage}`;
       }
     }
-    
+
     try {
       const result = await generateObject(objectOptions);
-      
-      const validationObject = wrappedSchema ? result.object.object : result.object;
-      const validationSchema = wrappedSchema ? schema.properties.object : schema;
+
+      const validationObject = wrappedSchema
+        ? result.object.object
+        : result.object;
+      const validationSchema = wrappedSchema
+        ? schema.properties.object
+        : schema;
 
       // Validate the generated object against the schema ourselves
-      const validation = validateAgainstSchema(validationObject, validationSchema);
-      
+      const validation = validateAgainstSchema(
+        validationObject,
+        validationSchema
+      );
+
       if (validation.valid) {
         return {
           object: validationObject,
@@ -467,11 +492,11 @@ const generateWithSchemaValidation = async ({
           finishReason: result.finishReason,
         };
       }
-      
+
       // Schema validation failed, store error for retry
       lastError = validation.errors;
       lastObject = result.object;
-      
+
       if (attempt === MAX_SCHEMA_VALIDATION_RETRIES) {
         throw new Error(
           `Schema validation failed after ${MAX_SCHEMA_VALIDATION_RETRIES} attempts. Last errors: ${validation.errors}`
@@ -479,16 +504,19 @@ const generateWithSchemaValidation = async ({
       }
     } catch (error) {
       // If it's our validation error and we have retries left, continue
-      if (error.message.includes("Schema validation failed after") || attempt === MAX_SCHEMA_VALIDATION_RETRIES) {
+      if (
+        error.message.includes("Schema validation failed after") ||
+        attempt === MAX_SCHEMA_VALIDATION_RETRIES
+      ) {
         throw error;
       }
-      
+
       // Store the error and retry
       lastError = error.message;
       lastObject = null;
     }
   }
-  
+
   throw new Error(
     `Schema validation failed after ${MAX_SCHEMA_VALIDATION_RETRIES} attempts. Last errors: ${lastError}`
   );
@@ -497,7 +525,6 @@ const generateWithSchemaValidation = async ({
 module.exports = {
   generate,
   detectProvider,
-  detectModel,
   getApiKey,
   modelMap,
   DEFAULT_MODEL,

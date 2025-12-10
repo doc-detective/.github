@@ -1,21 +1,13 @@
 const { validate, schemas, refineStep } = require("../src/index");
+const { detectProvider } = require("../src/ai");
 
 (async () => {
 
-const originalStep = {
-  stepId: "step-123",
-  find: { selector: ".old-button-class" },
-};
-
-const refinedStep = await refineStep({
-  step: originalStep,
-  failureMessage: "Element not found: .old-button-class",
-  context: {
-    dom: `<html><body>
-      <button class="new-submit-button" id="submit">Submit</button>
-    </body></html>`,
-  },
-});
-console.log(refinedStep);
+const providerInfo = detectProvider({
+  integrations: {
+    openAi: { apiKey: "sk-..." },
+  }
+}, "openai/gpt-5.1");
+console.log("Detected provider and model:", providerInfo);
 })();
 

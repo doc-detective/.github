@@ -10407,7 +10407,7 @@
           },
           "title": "Anthropic"
         },
-        "openai": {
+        "openAi": {
           "type": "object",
           "description": "Configuration for OpenAI integration.",
           "additionalProperties": false,

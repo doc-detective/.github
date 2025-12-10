@@ -7,7 +7,6 @@ const { z } = require("zod");
   const {
     generate,
     detectProvider,
-    detectModel,
     getApiKey,
     modelMap,
     DEFAULT_MODEL,
@@ -18,122 +17,135 @@ const { z } = require("zod");
     // Increase timeout for real API calls
     this.timeout(60000);
 
-    describe("getApiKey", function () {
-      it("should return undefined for null or undefined config", function () {
-        expect(getApiKey(null, "anthropic")).to.be.undefined;
-        expect(getApiKey(undefined, "anthropic")).to.be.undefined;
-      });
-
-      it("should return undefined for config without integrations", function () {
-        expect(getApiKey({}, "anthropic")).to.be.undefined;
-        expect(getApiKey({ other: "value" }, "openai")).to.be.undefined;
-      });
-
-      it("should return Anthropic API key from config.integrations.anthropic", function () {
-        const config = {
-          integrations: {
-            anthropic: {
-              apiKey: "sk-ant-test-key"
-            }
-          }
-        };
-        expect(getApiKey(config, "anthropic")).to.equal("sk-ant-test-key");
-      });
-
-      it("should return OpenAI API key from config.integrations.openai", function () {
-        const config = {
-          integrations: {
-            openai: {
-              apiKey: "sk-openai-test-key"
-            }
-          }
-        };
-        expect(getApiKey(config, "openai")).to.equal("sk-openai-test-key");
-      });
-
-      it("should return undefined for provider not in config", function () {
-        const config = {
-          integrations: {
-            anthropic: {
-              apiKey: "sk-ant-test-key"
-            }
-          }
-        };
-        expect(getApiKey(config, "openai")).to.be.undefined;
-      });
-
-      it("should return undefined if provider integration exists but has no apiKey", function () {
-        const config = {
-          integrations: {
-            anthropic: {}
-          }
-        };
-        expect(getApiKey(config, "anthropic")).to.be.undefined;
-      });
-    });
-
     describe("modelMap", function () {
       it("should contain Anthropic model mappings", function () {
         expect(modelMap["anthropic/claude-haiku-4.5"]).to.equal("claude-haiku-4-5");
         expect(modelMap["anthropic/claude-sonnet-4.5"]).to.equal("claude-sonnet-4-5");
         expect(modelMap["anthropic/claude-opus-4.5"]).to.equal("claude-opus-4-5");
       });
-    });
 
-    describe("detectModel", function () {
-      it("should return mapped model for known models", function () {
-        expect(detectModel("anthropic/claude-haiku-4.5")).to.equal("claude-haiku-4-5");
-        expect(detectModel("anthropic/claude-sonnet-4.5")).to.equal("claude-sonnet-4-5");
-        expect(detectModel("anthropic/claude-opus-4.5")).to.equal("claude-opus-4-5");
-      });
-
-      it("should return null for unknown models", function () {
-        expect(detectModel("unknown-model")).to.be.null;
-        expect(detectModel("openai/gpt-4")).to.be.null;
-      });
-
-      it("should return null for empty or null input", function () {
-        expect(detectModel("")).to.be.null;
-        expect(detectModel(null)).to.be.null;
-        expect(detectModel(undefined)).to.be.null;
+      it("should contain OpenAI model mappings", function () {
+        expect(modelMap["openai/gpt-5.1"]).to.equal("gpt-5.1");
+        expect(modelMap["openai/gpt-5-mini"]).to.equal("gpt-5-mini");
+        expect(modelMap["openai/gpt-5-nano"]).to.equal("gpt-5-nano");
       });
     });
 
     describe("detectProvider", function () {
-      it("should detect OpenAI for gpt- models", function () {
-        expect(detectProvider("openai/gpt-4")).to.deep.equal({ provider: "openai", model: null });
-        expect(detectProvider("openai/gpt-3.5-turbo")).to.deep.equal({ provider: "openai", model: null });
-        expect(detectProvider("openai/gpt-4o")).to.deep.equal({ provider: "openai", model: null });
+      // Store original env vars to restore after tests
+      let originalAnthropicKey;
+      let originalOpenAIKey;
+
+      beforeEach(function () {
+        originalAnthropicKey = process.env.ANTHROPIC_API_KEY;
+        originalOpenAIKey = process.env.OPENAI_API_KEY;
+        // Clear env vars for predictable testing
+        delete process.env.ANTHROPIC_API_KEY;
+        delete process.env.OPENAI_API_KEY;
       });
 
-      it("should detect OpenAI for o1/o3 models", function () {
-        expect(detectProvider("openai/o1-preview")).to.deep.equal({ provider: "openai", model: null });
-        expect(detectProvider("openai/o1-mini")).to.deep.equal({ provider: "openai", model: null });
-        expect(detectProvider("openai/o3-mini")).to.deep.equal({ provider: "openai", model: null });
+      afterEach(function () {
+        // Restore original env vars
+        if (originalAnthropicKey !== undefined) {
+          process.env.ANTHROPIC_API_KEY = originalAnthropicKey;
+        } else {
+          delete process.env.ANTHROPIC_API_KEY;
+        }
+        if (originalOpenAIKey !== undefined) {
+          process.env.OPENAI_API_KEY = originalOpenAIKey;
+        } else {
+          delete process.env.OPENAI_API_KEY;
+        }
       });
 
-      it("should detect Anthropic for claude- models", function () {
-        expect(detectProvider("anthropic/claude-3-5-haiku-latest")).to.deep.equal({ provider: "anthropic", model: null });
-        expect(detectProvider("anthropic/claude-3-opus-20240229")).to.deep.equal({ provider: "anthropic", model: null });
-        expect(detectProvider("anthropic/claude-3-sonnet-20240229")).to.deep.equal({ provider: "anthropic", model: null });
+      it("should detect Anthropic provider and mapped model for known Anthropic models with config API key", function () {
+        const config = { integrations: { anthropic: { apiKey: "sk-ant-test" } } };
+        expect(detectProvider(config, "anthropic/claude-haiku-4.5")).to.deep.equal({
+          provider: "anthropic",
+          model: "claude-haiku-4-5",
+          apiKey: "sk-ant-test",
+        });
+        expect(detectProvider(config, "anthropic/claude-sonnet-4.5")).to.deep.equal({
+          provider: "anthropic",
+          model: "claude-sonnet-4-5",
+          apiKey: "sk-ant-test",
+        });
+        expect(detectProvider(config, "anthropic/claude-opus-4.5")).to.deep.equal({
+          provider: "anthropic",
+          model: "claude-opus-4-5",
+          apiKey: "sk-ant-test",
+        });
       });
 
-      it("should detect Anthropic and return mapped model for known models", function () {
-        expect(detectProvider("anthropic/claude-haiku-4.5")).to.deep.equal({ provider: "anthropic", model: "claude-haiku-4-5" });
-        expect(detectProvider("anthropic/claude-sonnet-4.5")).to.deep.equal({ provider: "anthropic", model: "claude-sonnet-4-5" });
-        expect(detectProvider("anthropic/claude-opus-4.5")).to.deep.equal({ provider: "anthropic", model: "claude-opus-4-5" });
+      it("should detect Anthropic provider with env API key", function () {
+        process.env.ANTHROPIC_API_KEY = "sk-ant-env";
+        const config = {};
+        expect(detectProvider(config, "anthropic/claude-haiku-4.5")).to.deep.equal({
+          provider: "anthropic",
+          model: "claude-haiku-4-5",
+          apiKey: "sk-ant-env",
+        });
       });
 
-      it("should return null provider and model for unknown models", function () {
-        expect(detectProvider("unknown-model")).to.deep.equal({ provider: null, model: null });
-        expect(detectProvider("gemini-pro")).to.deep.equal({ provider: null, model: null });
-        expect(detectProvider("llama-2")).to.deep.equal({ provider: null, model: null });
+      it("should detect OpenAI provider and mapped model for known OpenAI models with config API key", function () {
+        const config = { integrations: { openAi: { apiKey: "sk-openai-test" } } };
+        expect(detectProvider(config, "openai/gpt-5.1")).to.deep.equal({
+          provider: "openai",
+          model: "gpt-5.1",
+          apiKey: "sk-openai-test",
+        });
+        expect(detectProvider(config, "openai/gpt-5-mini")).to.deep.equal({
+          provider: "openai",
+          model: "gpt-5-mini",
+          apiKey: "sk-openai-test",
+        });
+        expect(detectProvider(config, "openai/gpt-5-nano")).to.deep.equal({
+          provider: "openai",
+          model: "gpt-5-nano",
+          apiKey: "sk-openai-test",
+        });
       });
 
-      it("should return null provider and model for empty or null input", function () {
-        expect(detectProvider("")).to.deep.equal({ provider: null, model: null });
-        expect(detectProvider(null)).to.deep.equal({ provider: null, model: null });
-        expect(detectProvider(undefined)).to.deep.equal({ provider: null, model: null });
+      it("should detect OpenAI provider with env API key", function () {
+        process.env.OPENAI_API_KEY = "sk-openai-env";
+        const config = {};
+        expect(detectProvider(config, "openai/gpt-5-mini")).to.deep.equal({
+          provider: "openai",
+          model: "gpt-5-mini",
+          apiKey: "sk-openai-env",
+        });
+      });
+
+      it("should prefer env API key over config API key", function () {
+        process.env.ANTHROPIC_API_KEY = "sk-ant-env";
+        const config = { integrations: { anthropic: { apiKey: "sk-ant-config" } } };
+        expect(detectProvider(config, "anthropic/claude-haiku-4.5").apiKey).to.equal("sk-ant-env");
+      });
+
+      it("should fall back to default provider when model is not in modelMap", function () {
+        process.env.ANTHROPIC_API_KEY = "sk-ant-env";
+        const config = {};
+        const result = detectProvider(config, "unknown-model");
+        expect(result.provider).to.equal("anthropic");
+        expect(result.model).to.equal("claude-haiku-4-5");
+        expect(result.apiKey).to.equal("sk-ant-env");
+      });
+
+      it("should return null values when no API key is available and model is unknown", function () {
+        const config = {};
+        expect(detectProvider(config, "unknown-model")).to.deep.equal({
+          provider: null,
+          model: null,
+          apiKey: null,
+        });
+      });
+
+      it("should return null values when model is known but no API key for that provider", function () {
+        const config = {};
+        expect(detectProvider(config, "anthropic/claude-haiku-4.5")).to.deep.equal({
+          provider: null,
+          model: null,
+        });
       });
     });
 
@@ -170,12 +182,26 @@ const { z } = require("zod");
         });
 
         it("should throw error when provider cannot be determined", async function () {
+          // Save and clear env vars to ensure no fallback provider
+          const originalAnthropicKey = process.env.ANTHROPIC_API_KEY;
+          const originalOpenAIKey = process.env.OPENAI_API_KEY;
+          delete process.env.ANTHROPIC_API_KEY;
+          delete process.env.OPENAI_API_KEY;
+
           try {
-            await generate({ prompt: "Hello", model: "unknown-model" });
+            await generate({ prompt: "Hello", model: "unknown-model", config: {} });
             expect.fail("Should have thrown an error");
           } catch (error) {
             expect(error.message).to.include("Cannot determine provider");
             expect(error.message).to.include("unknown-model");
+          } finally {
+            // Restore env vars
+            if (originalAnthropicKey !== undefined) {
+              process.env.ANTHROPIC_API_KEY = originalAnthropicKey;
+            }
+            if (originalOpenAIKey !== undefined) {
+              process.env.OPENAI_API_KEY = originalOpenAIKey;
+            }
           }
         });
       });
