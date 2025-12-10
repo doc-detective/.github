@@ -8,6 +8,7 @@ const { z } = require("zod");
     generate,
     detectProvider,
     detectModel,
+    getApiKey,
     modelMap,
     DEFAULT_MODEL,
     MAX_SCHEMA_VALIDATION_RETRIES,
@@ -16,6 +17,60 @@ const { z } = require("zod");
   describe("AI Module", function () {
     // Increase timeout for real API calls
     this.timeout(60000);
+
+    describe("getApiKey", function () {
+      it("should return undefined for null or undefined config", function () {
+        expect(getApiKey(null, "anthropic")).to.be.undefined;
+        expect(getApiKey(undefined, "anthropic")).to.be.undefined;
+      });
+
+      it("should return undefined for config without integrations", function () {
+        expect(getApiKey({}, "anthropic")).to.be.undefined;
+        expect(getApiKey({ other: "value" }, "openai")).to.be.undefined;
+      });
+
+      it("should return Anthropic API key from config.integrations.anthropic", function () {
+        const config = {
+          integrations: {
+            anthropic: {
+              apiKey: "sk-ant-test-key"
+            }
+          }
+        };
+        expect(getApiKey(config, "anthropic")).to.equal("sk-ant-test-key");
+      });
+
+      it("should return OpenAI API key from config.integrations.openai", function () {
+        const config = {
+          integrations: {
+            openai: {
+              apiKey: "sk-openai-test-key"
+            }
+          }
+        };
+        expect(getApiKey(config, "openai")).to.equal("sk-openai-test-key");
+      });
+
+      it("should return undefined for provider not in config", function () {
+        const config = {
+          integrations: {
+            anthropic: {
+              apiKey: "sk-ant-test-key"
+            }
+          }
+        };
+        expect(getApiKey(config, "openai")).to.be.undefined;
+      });
+
+      it("should return undefined if provider integration exists but has no apiKey", function () {
+        const config = {
+          integrations: {
+            anthropic: {}
+          }
+        };
+        expect(getApiKey(config, "anthropic")).to.be.undefined;
+      });
+    });
 
     describe("modelMap", function () {
       it("should contain Anthropic model mappings", function () {

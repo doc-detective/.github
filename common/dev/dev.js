@@ -1,31 +1,21 @@
-const { validate, schemas } = require("../src/index");
+const { validate, schemas, refineStep } = require("../src/index");
 
-const object = {
-  tests: [
-    {
-      steps: [
-        {
-          goTo: {
-            url: "http://localhost:8092",
-            waitUntil: {
-              find: {
-                selector: "button",
-                elementText: "Standard Button",
-                elementTestId: "standard-btn",
-                elementAria: "Sample Standard Button",
-                elementId: "standard-btn",
-                elementClass: ["btn"],
-                elementAttribute: {
-                  type: "button",
-                  value: "Standard Button",
-                },
-              },
-            },
-          },
-        },
-      ],
-    },
-  ],
+(async () => {
+
+const originalStep = {
+  stepId: "step-123",
+  find: { selector: ".old-button-class" },
 };
 
-console.log(validate({ schemaKey: "spec_v3", object }));
+const refinedStep = await refineStep({
+  step: originalStep,
+  failureMessage: "Element not found: .old-button-class",
+  context: {
+    dom: `<html><body>
+      <button class="new-submit-button" id="submit">Submit</button>
+    </body></html>`,
+  },
+});
+console.log(refinedStep);
+})();
+

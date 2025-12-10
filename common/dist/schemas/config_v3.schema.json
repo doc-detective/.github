@@ -10394,6 +10394,30 @@
             }
           },
           "title": "Doc Detective Orchestration API"
+        },
+        "anthropic": {
+          "type": "object",
+          "description": "Configuration for Anthropic AI integration.",
+          "additionalProperties": false,
+          "properties": {
+            "apiKey": {
+              "type": "string",
+              "description": "API key for authenticating with Anthropic."
+            }
+          },
+          "title": "Anthropic"
+        },
+        "openai": {
+          "type": "object",
+          "description": "Configuration for OpenAI integration.",
+          "additionalProperties": false,
+          "properties": {
+            "apiKey": {
+              "type": "string",
+              "description": "API key for authenticating with OpenAI."
+            }
+          },
+          "title": "OpenAI"
         }
       },
       "title": "Integrations options"

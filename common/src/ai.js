@@ -174,7 +174,7 @@ const validateAgainstZodSchema = (object, schema) => {
  * @returns {{ valid: boolean, errors: string | null, object: Object }} Validation result.
  */
 const validateAgainstJsonSchema = (object, schema) => {
-  const ajv = new Ajv({ allErrors: true, useDefaults: true, coerceTypes: true });
+  const ajv = new Ajv({ allErrors: true, useDefaults: true, coerceTypes: true, strict: false });
   addFormats(ajv);
   
   const validate = ajv.compile(schema);
@@ -218,6 +218,26 @@ const toAiSdkSchema = (schema) => {
 };
 
 /**
+ * Extracts the API key for a provider from a Doc Detective config object.
+ * @param {Object} config - The Doc Detective configuration object.
+ * @param {"openai" | "anthropic"} provider - The provider name.
+ * @returns {string | undefined} The API key if found.
+ */
+const getApiKey = (config, provider) => {
+  if (!config || !config.integrations) return undefined;
+  
+  if (provider === "anthropic" && (process.env.ANTHROPIC_API_KEY || config.integrations.anthropic)) {
+    return process.env.ANTHROPIC_API_KEY || config.integrations.anthropic.apiKey;
+  }
+  
+  if (provider === "openai" && (process.env.OPENAI_API_KEY || config.integrations.openai)) {
+    return process.env.OPENAI_API_KEY || config.integrations.openai.apiKey;
+  }
+  
+  return undefined;
+};
+
+/**
  * Generates text or structured output using an AI model.
  *
  * @param {Object} options - Generation options.
@@ -233,7 +253,8 @@ const toAiSdkSchema = (schema) => {
  * @param {string} [options.schemaName] - Name for the schema (used in API calls).
  * @param {string} [options.schemaDescription] - Description for the schema.
  * @param {"openai" | "anthropic"} [options.provider] - Explicit provider override.
- * @param {string} [options.apiKey] - API key override (falls back to env vars).
+ * @param {Object} [options.config] - Doc Detective config object with integrations.anthropic/openai API keys.
+ * @param {string} [options.apiKey] - API key override (takes precedence over config and env vars).
  * @param {string} [options.baseURL] - Base URL override for the provider.
  * @param {number} [options.temperature] - Temperature for generation.
  * @param {number} [options.maxTokens] - Maximum tokens to generate.
@@ -255,6 +276,7 @@ const generate = async ({
   schemaName,
   schemaDescription,
   provider,
+  config,
   apiKey,
   baseURL,
   temperature,
@@ -265,7 +287,7 @@ const generate = async ({
     throw new Error("Either 'prompt' or 'messages' is required.");
   }
   
-  // Determine provider and model
+  // Determine provider, model, and API key
   const detected = detectProvider(model);
   const resolvedProvider = provider || detected.provider;
   const resolvedModel = detected.model || model;
@@ -276,10 +298,13 @@ const generate = async ({
     );
   }
   
+  // Resolve API key: explicit apiKey > config > env vars (handled by SDK)
+  const resolvedApiKey = apiKey || getApiKey(config, resolvedProvider);
+  
   // Create provider instance
   const providerFactory = createProvider({
     provider: resolvedProvider,
-    apiKey,
+    apiKey: resolvedApiKey,
     baseURL,
   });
   
@@ -377,6 +402,20 @@ const generateWithSchemaValidation = async ({
 }) => {
   let lastError = null;
   let lastObject = null;
+  let wrappedSchema = false;
+
+  // If JSON schema with allOf/anyOf/oneOf at the top level, wrap it in an object
+  if (!isZodSchema(schema) && (schema.allOf || schema.anyOf || schema.oneOf)) {
+    schema = {
+      type: "object",
+      properties: {
+        object: schema,
+      },
+      required: ["object"],
+      additionalProperties: false,
+    };
+    wrappedSchema = true;
+  }
   
   // Convert schema to AI SDK format (wraps JSON schemas with jsonSchema())
   const aiSdkSchema = toAiSdkSchema(schema);
@@ -415,12 +454,15 @@ const generateWithSchemaValidation = async ({
     try {
       const result = await generateObject(objectOptions);
       
+      const validationObject = wrappedSchema ? result.object.object : result.object;
+      const validationSchema = wrappedSchema ? schema.properties.object : schema;
+
       // Validate the generated object against the schema ourselves
-      const validation = validateAgainstSchema(result.object, schema);
+      const validation = validateAgainstSchema(validationObject, validationSchema);
       
       if (validation.valid) {
         return {
-          object: validation.object,
+          object: validationObject,
           usage: result.usage,
           finishReason: result.finishReason,
         };
@@ -456,6 +498,7 @@ module.exports = {
   generate,
   detectProvider,
   detectModel,
+  getApiKey,
   modelMap,
   DEFAULT_MODEL,
   MAX_SCHEMA_VALIDATION_RETRIES,
