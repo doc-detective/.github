@@ -1,11 +1,13 @@
 const { setConfig } = require("./config");
 const { qualifyFiles, parseTests, log } = require("./utils");
 const { resolveDetectedTests } = require("./resolve");
+const { analyze } = require("./analyze");
 // const { telemetryNotice, sendTelemetry } = require("./telem");
 
 exports.detectTests = detectTests;
 exports.resolveTests = resolveTests;
 exports.detectAndResolveTests = detectAndResolveTests;
+exports.analyze = analyze;
 
 // const supportMessage = `
 // ##########################################################################

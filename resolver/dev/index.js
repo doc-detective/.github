@@ -1,6 +1,7 @@
 const { detectTests, resolveTests, detectAndResolveTests } = require("../src");
 const { validate, schemas } = require("doc-detective-common");
 const { execCommand, spawnCommand } = require("../src/utils");
+const { analyze } = require("../src/analyze");
 const path = require("path");
 
 main();
@@ -19,9 +20,21 @@ async function main() {
         platforms: ["linux", "mac", "windows"],
         browsers: ["chrome", "firefox"],
       },
-    ]
+    ],
+    integrations: {
+      anthropic: {
+        apiKey: process.env.ANTHROPIC_API_KEY,
+      }
+    }
   };
-  result = await detectTests({ config: json });
+  const content = `To search for American Shorthair kittens,
+
+1. Go to [DuckDuckGo](https://www.duckduckgo.com).
+2. In the search bar, enter "American Shorthair kittens", then press Enter.
+
+!["Search results for kittens"](search-results.png){ .screenshot }`;
+  
+  const result = await analyze({ content, config: json });
   console.log(JSON.stringify(result, null, 2));
   // Output the result to a file
   const outputPath = path.join(__dirname, "output.json");
