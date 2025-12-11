@@ -10418,6 +10418,19 @@
             }
           },
           "title": "OpenAI"
+        },
+        "ollama": {
+          "type": "object",
+          "description": "Configuration for Ollama integration. Ollama runs locally and doesn't need an API key.",
+          "additionalProperties": false,
+          "properties": {
+            "baseUrl": {
+              "type": "string",
+              "description": "Base URL for the Ollama API.",
+              "default": "http://localhost:11434/api"
+            }
+          },
+          "title": "Ollama"
         }
       },
       "title": "Integrations options"

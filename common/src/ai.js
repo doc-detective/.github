@@ -1,11 +1,14 @@
 const { generateText, generateObject, jsonSchema } = require("ai");
 const { createOpenAI } = require("@ai-sdk/openai");
 const { createAnthropic } = require("@ai-sdk/anthropic");
+const { createOllama } = require("ollama-ai-provider-v2");
 const { z } = require("zod");
 const Ajv = require("ajv");
 const addFormats = require("ajv-formats");
 
-const DEFAULT_MODEL = "anthropic/claude-haiku-4.5";
+const DEFAULT_MODEL = "ollama/qwen3-vl:2b";
+const OLLAMA_AVAILABILITY_TIMEOUT_MS = 500;
+const DEFAULT_OLLAMA_BASE_URL = "http://localhost:11434/api";
 const MAX_SCHEMA_VALIDATION_RETRIES = 3;
 
 /**
@@ -20,9 +23,46 @@ const modelMap = {
   "openai/gpt-5.1": "gpt-5.1",
   "openai/gpt-5-mini": "gpt-5-mini",
   "openai/gpt-5-nano": "gpt-5-nano",
+  // Ollama models
+  "ollama/qwen3-vl:2b": "qwen3-vl:2b",
+  "ollama/qwen3-vl": "qwen3-vl",
 };
 
-const getDefaultProvider = (config) => {
+/**
+ * Checks if Ollama is available at localhost:11434.
+ * @param {string} [baseUrl] - Optional base URL override.
+ * @returns {Promise<boolean>} True if Ollama is available.
+ */
+const isOllamaAvailable = async (baseUrl) => {
+  const url = baseUrl || "http://localhost:11434";
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), OLLAMA_AVAILABILITY_TIMEOUT_MS);
+    
+    const response = await fetch(url, {
+      method: "GET",
+      signal: controller.signal,
+    });
+    
+    clearTimeout(timeoutId);
+    return response.ok;
+  } catch {
+    return false;
+  }
+};
+
+const getDefaultProvider = async (config) => {
+  // Try Ollama first (local, no API key needed)
+  const ollamaBaseUrl = config.integrations?.ollama?.baseUrl;
+  if (await isOllamaAvailable(ollamaBaseUrl)) {
+    return {
+      provider: "ollama",
+      model: "qwen3-vl:2b",
+      apiKey: null,
+      baseURL: ollamaBaseUrl || DEFAULT_OLLAMA_BASE_URL,
+    };
+  }
+  
   // Try to detect from environment variables if no model is provided
   if (process.env.ANTHROPIC_API_KEY || config.integrations?.anthropic) {
     return {
@@ -43,12 +83,18 @@ const getDefaultProvider = (config) => {
 
 /**
  * Detects the provider, model, and API from a model string and environment variables.
+ * @param {Object} config - The Doc Detective configuration object.
  * @param {string} model - The model identifier.
- * @returns {{ provider: "openai" | "anthropic" | null, model: string | null, apiKey: string | null }} The detected provider, model, and API key.
+ * @returns {Promise<{ provider: "openai" | "anthropic" | "ollama" | null, model: string | null, apiKey: string | null, baseURL?: string }>} The detected provider, model, and API key.
  */
-const detectProvider = (config, model) => {
+const detectProvider = async (config, model) => {
   const detectedModel = modelMap[model] || null;
   if (!detectedModel) return getDefaultProvider(config);
+
+  if (model.startsWith("ollama/")) {
+    const ollamaBaseUrl = config.integrations?.ollama?.baseUrl || DEFAULT_OLLAMA_BASE_URL;
+    return { provider: "ollama", model: detectedModel, apiKey: null, baseURL: ollamaBaseUrl };
+  }
 
   if (model.startsWith("anthropic/") && (process.env.ANTHROPIC_API_KEY || config.integrations?.anthropic)) {
     const apiKey = process.env.ANTHROPIC_API_KEY || config.integrations.anthropic.apiKey;
@@ -66,12 +112,18 @@ const detectProvider = (config, model) => {
 /**
  * Creates a provider instance based on the provider name.
  * @param {Object} options
- * @param {"openai" | "anthropic"} options.provider - The provider name.
+ * @param {"openai" | "anthropic" | "ollama"} options.provider - The provider name.
  * @param {string} [options.apiKey] - Optional API key override.
  * @param {string} [options.baseURL] - Optional base URL override.
  * @returns {Function} The provider factory function.
  */
 const createProvider = ({ provider, apiKey, baseURL }) => {
+  if (provider === "ollama") {
+    const options = {};
+    if (baseURL) options.baseURL = baseURL;
+    return createOllama(options);
+  }
+
   if (provider === "openai") {
     const options = {};
     if (apiKey) options.apiKey = apiKey;
@@ -311,7 +363,7 @@ const generate = async ({
   }
 
   // Determine provider, model, and API key
-  const detected = detectProvider(config, model);
+  const detected = await detectProvider(config, model);
 
   if (!detected.provider) {
     throw new Error(
@@ -526,6 +578,7 @@ module.exports = {
   generate,
   detectProvider,
   getApiKey,
+  isOllamaAvailable,
   modelMap,
   DEFAULT_MODEL,
   MAX_SCHEMA_VALIDATION_RETRIES,
