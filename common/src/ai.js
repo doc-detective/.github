@@ -145,7 +145,7 @@ const createProvider = ({ provider, apiKey, baseURL }) => {
  * Converts a file object to AI SDK image part format.
  * @param {Object} file - The file object.
  * @param {string} file.type - The file type (e.g., "image").
- * @param {string} file.data - Base64 data or URL.
+ * @param {string | Buffer | Uint8Array} file.data - Base64 string, URL, Buffer, or Uint8Array.
  * @param {string} [file.mimeType] - The MIME type (e.g., "image/png").
  * @returns {Object} The AI SDK image part.
  */
@@ -156,18 +156,29 @@ const fileToImagePart = (file) => {
     );
   }
 
-  // Check if data is a URL
-  const isUrl =
-    file.data.startsWith("http://") || file.data.startsWith("https://");
+  // Check if data is binary (Buffer or Uint8Array) - convert to base64
+  // Note: The Ollama provider expects base64 strings, not raw binary
+  if (Buffer.isBuffer(file.data) || file.data instanceof Uint8Array) {
+    const base64Data = Buffer.isBuffer(file.data)
+      ? file.data.toString("base64")
+      : Buffer.from(file.data).toString("base64");
+    return {
+      type: "image",
+      image: base64Data,
+      mimeType: file.mimeType,
+    };
+  }
 
-  if (isUrl) {
+  // Check if data is a URL string
+  if (typeof file.data === "string" && 
+      (file.data.startsWith("http://") || file.data.startsWith("https://"))) {
     return {
       type: "image",
       image: new URL(file.data),
     };
   }
 
-  // Base64 data
+  // Base64 string data
   return {
     type: "image",
     image: file.data,

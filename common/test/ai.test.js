@@ -604,6 +604,9 @@ describe("AI Module", function () {
       });
 
       describe("multimodal input with files", function () {
+        // 100x100 grid PNG with red, blue, and green squares
+        const GRID_PNG_BASE64 = "iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAYAAABw4pVUAAABvUlEQVR4nO3YUW7DQAwD0b3/pZ0jhEjW2rE5LfT3ANGlE0Bda63LQc26kh/dmMMHbHP4gG0OH7DN4QO2OXzANocP2ObwAdscPmCbyy7Ia/McuICfMllzdxSy+c16i7MQmLMQmLMQmLMQmLMQmLMQmLMQmLMQmPNSh42fEJizEJizEJizEJizEJizEJizEJizEJizEJg7fpk6v1zqujGHD9jm8AHbHD5gm8MHbHP4gG0OH7DN4QO2OXzANnf8Mv0yu/9rc/p5Hn+p7y/kzHO85ivLQqYWh85CphaHzkKmFofOQqYWh85CphaHzkKmFofOQqYWh66wEPbsLwQ+9Dem8BNyaHHoLGRqcegsZGpx6CxkanHoLGRqcegsZGpx6CxkanHoLGRqcegKC3FQg39j2hw+YJvDB2xz+IBtDh+wzeEDtjl8wDaHD9jm8AHb3PHLlDm7f73U/3Q3FBLmg/9hLOTPB3mLsxCYsxCYsxCYsxCYsxCYsxCYO1mI46XOd35lwZyFwJyFwJyFwJyFwJyFwJyFwJyFwNzJQhzUwN/UPocP2ObwAdscPmCbwwdsc/iAbQ4fsM3hA7Y5fMAq9wGhbdAbu3rjOQAAAABJRU5ErkJggg==";
+
         it("should handle image URL input", async function () {
           // Skip if Ollama is not available
           if (!(await isOllamaAvailable())) {
@@ -630,6 +633,146 @@ describe("AI Module", function () {
             // Some Ollama models may not support remote URLs well
             // Skip if we get a Bad Request error related to image handling
             if (error.message && error.message.includes("Bad Request")) {
+              this.skip();
+            }
+            throw error;
+          }
+        });
+
+        it("should handle base64 image data", async function () {
+          // Skip if Ollama is not available
+          if (!(await isOllamaAvailable())) {
+            this.skip();
+          }
+
+          try {
+            const result = await generate({
+              prompt: "Describe what you see in this image. Be brief.",
+              files: [
+                {
+                  type: "image",
+                  data: GRID_PNG_BASE64,
+                  mimeType: "image/png",
+                },
+              ],
+              maxTokens: 100,
+            });
+
+            expect(result.text).to.be.a("string");
+            expect(result.text.length).to.be.greaterThan(0);
+            expect(result.usage).to.be.an("object");
+            expect(result.finishReason).to.be.a("string");
+          } catch (error) {
+            // Some Ollama models may have issues with certain image formats
+            if (error.message && (error.message.includes("Bad Request") || error.message.includes("Internal Server Error"))) {
+              this.skip();
+            }
+            throw error;
+          }
+        });
+
+        it("should handle Buffer image data", async function () {
+          // Skip if Ollama is not available
+          if (!(await isOllamaAvailable())) {
+            this.skip();
+          }
+
+          // Convert base64 to Buffer
+          const imageBuffer = Buffer.from(GRID_PNG_BASE64, "base64");
+
+          try {
+            const result = await generate({
+              prompt: "Describe what you see in this image. Be brief.",
+              files: [
+                {
+                  type: "image",
+                  data: imageBuffer,
+                  mimeType: "image/png",
+                },
+              ],
+              maxTokens: 100,
+            });
+
+            expect(result.text).to.be.a("string");
+            expect(result.text.length).to.be.greaterThan(0);
+            expect(result.usage).to.be.an("object");
+            expect(result.finishReason).to.be.a("string");
+          } catch (error) {
+            // Some Ollama models may have issues with certain image formats
+            if (error.message && (error.message.includes("Bad Request") || error.message.includes("Internal Server Error"))) {
+              this.skip();
+            }
+            throw error;
+          }
+        });
+
+        it("should handle Uint8Array image data", async function () {
+          // Skip if Ollama is not available
+          if (!(await isOllamaAvailable())) {
+            this.skip();
+          }
+
+          // Convert base64 to Uint8Array
+          const buffer = Buffer.from(GRID_PNG_BASE64, "base64");
+          const uint8Array = new Uint8Array(buffer);
+
+          try {
+            const result = await generate({
+              prompt: "Describe what you see in this image. Be brief.",
+              files: [
+                {
+                  type: "image",
+                  data: uint8Array,
+                  mimeType: "image/png",
+                },
+              ],
+              maxTokens: 100,
+            });
+
+            expect(result.text).to.be.a("string");
+            expect(result.text.length).to.be.greaterThan(0);
+            expect(result.usage).to.be.an("object");
+            expect(result.finishReason).to.be.a("string");
+          } catch (error) {
+            // Some Ollama models may have issues with certain image formats
+            if (error.message && (error.message.includes("Bad Request") || error.message.includes("Internal Server Error"))) {
+              this.skip();
+            }
+            throw error;
+          }
+        });
+
+        it("should handle multiple images with mixed data types", async function () {
+          // Skip if Ollama is not available
+          if (!(await isOllamaAvailable())) {
+            this.skip();
+          }
+
+          const imageBuffer = Buffer.from(GRID_PNG_BASE64, "base64");
+
+          try {
+            const result = await generate({
+              prompt: "Describe what you see in these images. Be brief.",
+              files: [
+                {
+                  type: "image",
+                  data: GRID_PNG_BASE64,
+                  mimeType: "image/png",
+                },
+                {
+                  type: "image",
+                  data: imageBuffer,
+                  mimeType: "image/png",
+                },
+              ],
+              maxTokens: 100,
+            });
+
+            expect(result.text).to.be.a("string");
+            expect(result.text.length).to.be.greaterThan(0);
+          } catch (error) {
+            // Some Ollama models may have issues with certain image formats
+            if (error.message && (error.message.includes("Bad Request") || error.message.includes("Internal Server Error"))) {
               this.skip();
             }
             throw error;
