@@ -34,7 +34,7 @@ const isOllamaAvailable = async (baseUrl) => {
 };
 
 /** Default Ollama base URL */
-const DEFAULT_OLLAMA_BASE_URL = "http://localhost:11434";
+const DEFAULT_OLLAMA_BASE_URL = "http://localhost:11434/api";
 
 /** Maximum time to wait for model pull (10 minutes) */
 const MODEL_PULL_TIMEOUT_MS = 10 * 60 * 1000;
@@ -136,41 +136,6 @@ const waitForOllama = async (timeoutMs = OLLAMA_STARTUP_TIMEOUT_MS) => {
 };
 
 /**
- * Pulls the specified Ollama model with progress output.
- * @param {string} [model=DEFAULT_OLLAMA_MODEL] - The model to pull.
- * @returns {Promise<void>}
- */
-const pullOllamaModel = async (model = DEFAULT_OLLAMA_MODEL) => {
-  console.log(`    Pulling ${model} model (this may take up to 10 minutes on first run)...`);
-  
-  return new Promise((resolve, reject) => {
-    const pullProcess = spawn("docker", ["exec", "ollama", "ollama", "pull", model], {
-      stdio: "inherit"
-    });
-
-    const timeoutId = setTimeout(() => {
-      pullProcess.kill();
-      reject(new Error("Model pull timed out after 10 minutes"));
-    }, MODEL_PULL_TIMEOUT_MS);
-
-    pullProcess.on("close", (code) => {
-      clearTimeout(timeoutId);
-      if (code === 0) {
-        console.log(`    Model ${model} is ready.`);
-        resolve();
-      } else {
-        reject(new Error(`Model pull failed with exit code ${code}`));
-      }
-    });
-
-    pullProcess.on("error", (err) => {
-      clearTimeout(timeoutId);
-      reject(err);
-    });
-  });
-};
-
-/**
  * Stops and removes the Ollama container.
  * @returns {Promise<void>}
  */
@@ -212,7 +177,7 @@ const ensureOllamaRunning = async (model = DEFAULT_OLLAMA_MODEL) => {
     throw new Error("Ollama container started but did not become available");
   }
 
-  await pullOllamaModel(model);
+  await ensureModelAvailable({ model });
   return true;
 };
 
@@ -225,7 +190,7 @@ const ensureOllamaRunning = async (model = DEFAULT_OLLAMA_MODEL) => {
  */
 const isModelAvailable = async ({ model, baseUrl = DEFAULT_OLLAMA_BASE_URL }) => {
   try {
-    const response = await fetch(`${baseUrl}/api/tags`);
+    const response = await fetch(`${baseUrl}/tags`);
     if (!response.ok) {
       return false;
     }
@@ -305,7 +270,7 @@ const ensureModelAvailable = async ({ model, baseUrl = DEFAULT_OLLAMA_BASE_URL }
   console.log(`    Pulling model ${model}...`);
 
   try {
-    const response = await fetch(`${baseUrl}/api/pull`, {
+    const response = await fetch(`${baseUrl}/pull`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ model }),
@@ -419,7 +384,6 @@ module.exports = {
   detectGpuType,
   startOllamaContainer,
   waitForOllama,
-  pullOllamaModel,
   stopOllamaContainer,
   ensureOllamaRunning,
   isModelAvailable,

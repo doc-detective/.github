@@ -717,7 +717,6 @@ describe("AI Module", function () {
               { role: "assistant", content: "Okay, three balls of different colors." },
               { role: "user", content: "Which colors were the balls?" },
             ],
-            model: "ollama/qwen3-vl:4b",
             maxTokens: 50,
           });
 

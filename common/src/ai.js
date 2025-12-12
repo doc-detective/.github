@@ -6,7 +6,7 @@ const { createOllama } = require("ollama-ai-provider-v2");
 const { z } = require("zod");
 const Ajv = require("ajv");
 const addFormats = require("ajv-formats");
-const { ensureModelAvailable, isOllamaAvailable } = require("./ollama");
+const { ensureModelAvailable, isOllamaAvailable, DEFAULT_OLLAMA_BASE_URL } = require("./ollama");
 
 const DEFAULT_MODEL = "ollama/qwen3-vl:8b";
 const MAX_SCHEMA_VALIDATION_RETRIES = 3;
@@ -85,8 +85,8 @@ const detectProvider = async (config, model) => {
 
   if (model.startsWith("ollama/")) {
     const ollamaBaseUrl =
-      config.integrations?.ollama?.baseUrl || undefined;
-    const isModelAvailable = await ensureModelAvailable({
+      config.integrations?.ollama?.baseUrl || DEFAULT_OLLAMA_BASE_URL;
+    await ensureModelAvailable({
       model: detectedModel,
       baseUrl: ollamaBaseUrl,
     });
