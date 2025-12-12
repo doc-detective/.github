@@ -1,9 +1,9 @@
 const { execSync, spawn } = require("child_process");
 const fs = require("fs");
-const { isOllamaAvailable } = require("./ai");
+const { isOllamaAvailable, modelMap } = require("./ai");
 
 /** Default Ollama model to use */
-const DEFAULT_OLLAMA_MODEL = "qwen3-vl:2b";
+const DEFAULT_OLLAMA_MODEL = modelMap["ollama/qwen3-vl:8b"];
 
 /** Maximum time to wait for model pull (10 minutes) */
 const MODEL_PULL_TIMEOUT_MS = 10 * 60 * 1000;

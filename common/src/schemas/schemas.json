@@ -10829,6 +10829,18 @@
               }
             },
             "title": "Ollama"
+          },
+          "google": {
+            "type": "object",
+            "description": "Configuration for Google Gemini AI integration.",
+            "additionalProperties": false,
+            "properties": {
+              "apiKey": {
+                "type": "string",
+                "description": "API key for authenticating with Google Generative AI."
+              }
+            },
+            "title": "Google Gemini"
           }
         },
         "title": "Integrations options"
@@ -34991,6 +35003,18 @@
                   }
                 },
                 "title": "Ollama"
+              },
+              "google": {
+                "type": "object",
+                "description": "Configuration for Google Gemini AI integration.",
+                "additionalProperties": false,
+                "properties": {
+                  "apiKey": {
+                    "type": "string",
+                    "description": "API key for authenticating with Google Generative AI."
+                  }
+                },
+                "title": "Google Gemini"
               }
             },
             "title": "Integrations options"

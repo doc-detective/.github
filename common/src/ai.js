@@ -1,6 +1,7 @@
 const { generateText, generateObject, jsonSchema } = require("ai");
 const { createOpenAI } = require("@ai-sdk/openai");
 const { createAnthropic } = require("@ai-sdk/anthropic");
+const { createGoogleGenerativeAI } = require("@ai-sdk/google");
 const { createOllama } = require("ollama-ai-provider-v2");
 const { z } = require("zod");
 const Ajv = require("ajv");
@@ -20,12 +21,16 @@ const modelMap = {
   "anthropic/claude-sonnet-4.5": "claude-sonnet-4-5",
   "anthropic/claude-opus-4.5": "claude-opus-4-5",
   // OpenAI models
-  "openai/gpt-5.1": "gpt-5.1",
+  "openai/gpt-5.2": "gpt-5.2",
   "openai/gpt-5-mini": "gpt-5-mini",
   "openai/gpt-5-nano": "gpt-5-nano",
+  // Google Gemini models
+  "google/gemini-2.5-flash": "gemini-2.5-flash",
+  "google/gemini-2.5-pro": "gemini-2.5-pro",
+  "google/gemini-3-pro": "gemini-3-pro-preview",
   // Ollama models
-  "ollama/qwen3-vl:2b": "qwen3-vl:2b",
-  "ollama/qwen3-vl": "qwen3-vl",
+  "ollama/qwen3-vl:8b": "hf.co/unsloth/Qwen3-VL-8B-Instruct-GGUF:UD-Q4_K_XL",
+  "ollama/qwen3-vl:2b": "hf.co/unsloth/Qwen3-VL-2B-Instruct-GGUF:Q4_K_M",
 };
 
 /**
@@ -66,6 +71,12 @@ const getDefaultProvider = async (config = {}) => {
       model: "gpt-5-mini",
       apiKey: process.env.OPENAI_API_KEY || config.integrations.openAi.apiKey,
     };
+  } else if (process.env.GOOGLE_GENERATIVE_AI_API_KEY || config.integrations?.google) {
+    return {
+      provider: "google",
+      model: "gemini-2.5-flash",
+      apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY || config.integrations.google.apiKey,
+    };
   } else if (await isOllamaAvailable(ollamaBaseUrl)) {
     // Local, no API key needed
     return {
@@ -104,6 +115,11 @@ const detectProvider = async (config, model) => {
     return { provider: "openai", model: detectedModel, apiKey };
   }
 
+  if (model.startsWith("google/") && (process.env.GOOGLE_GENERATIVE_AI_API_KEY || config.integrations?.google)) {
+    const apiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY || config.integrations.google.apiKey;
+    return { provider: "google", model: detectedModel, apiKey };
+  }
+
   return { provider: null, model: null };
 };
 
@@ -134,6 +150,13 @@ const createProvider = ({ provider, apiKey, baseURL }) => {
     if (apiKey) options.apiKey = apiKey;
     if (baseURL) options.baseURL = baseURL;
     return createAnthropic(options);
+  }
+
+  if (provider === "google") {
+    const options = {};
+    if (apiKey) options.apiKey = apiKey;
+    if (baseURL) options.baseURL = baseURL;
+    return createGoogleGenerativeAI(options);
   }
 
   throw new Error(`Unsupported provider: ${provider}`);
@@ -316,6 +339,13 @@ const getApiKey = (config, provider) => {
     (process.env.OPENAI_API_KEY || config.integrations.openai)
   ) {
     return process.env.OPENAI_API_KEY || config.integrations.openai.apiKey;
+  }
+
+  if (
+    provider === "google" &&
+    (process.env.GOOGLE_GENERATIVE_AI_API_KEY || config.integrations.google)
+  ) {
+    return process.env.GOOGLE_GENERATIVE_AI_API_KEY || config.integrations.google.apiKey;
   }
 
   return undefined;
