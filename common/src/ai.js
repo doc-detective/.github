@@ -6,10 +6,9 @@ const { createOllama } = require("ollama-ai-provider-v2");
 const { z } = require("zod");
 const Ajv = require("ajv");
 const addFormats = require("ajv-formats");
+const { ensureModelAvailable, isOllamaAvailable } = require("./ollama");
 
-const DEFAULT_MODEL = "ollama/qwen3-vl:2b";
-const OLLAMA_AVAILABILITY_TIMEOUT_MS = 500;
-const DEFAULT_OLLAMA_BASE_URL = "http://localhost:11434/api";
+const DEFAULT_MODEL = "ollama/qwen3-vl:8b";
 const MAX_SCHEMA_VALIDATION_RETRIES = 3;
 
 /**
@@ -29,41 +28,20 @@ const modelMap = {
   "google/gemini-2.5-pro": "gemini-2.5-pro",
   "google/gemini-3-pro": "gemini-3-pro-preview",
   // Ollama models
-  "ollama/qwen3-vl:8b": "hf.co/unsloth/Qwen3-VL-8B-Instruct-GGUF:UD-Q4_K_XL",
-  "ollama/qwen3-vl:2b": "hf.co/unsloth/Qwen3-VL-2B-Instruct-GGUF:Q4_K_M",
+  "ollama/qwen3-vl:8b": "qwen3-vl:8b-instruct-q4_K_M",
+  "ollama/qwen3-vl:4b": "qwen3-vl:4b-instruct-q4_K_M",
+  "ollama/qwen3-vl:2b": "qwen3-vl:2b-instruct-q4_K_M",
 };
 
-/**
- * Checks if Ollama is available at localhost:11434.
- * @param {string} [baseUrl] - Optional base URL override.
- * @returns {Promise<boolean>} True if Ollama is available.
- */
-const isOllamaAvailable = async (baseUrl) => {
-  const url = baseUrl || "http://localhost:11434";
-  try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), OLLAMA_AVAILABILITY_TIMEOUT_MS);
-    
-    const response = await fetch(url, {
-      method: "GET",
-      signal: controller.signal,
-    });
-    
-    clearTimeout(timeoutId);
-    return response.ok;
-  } catch {
-    return false;
-  }
-};
-
-const getDefaultProvider = async (config = {}) => {  
+const getDefaultProvider = async (config = {}) => {
   const ollamaBaseUrl = config?.integrations?.ollama?.baseUrl;
   // Try to detect from environment variables if no model is provided
   if (process.env.ANTHROPIC_API_KEY || config.integrations?.anthropic) {
     return {
       provider: "anthropic",
       model: "claude-haiku-4-5",
-      apiKey: process.env.ANTHROPIC_API_KEY || config.integrations.anthropic.apiKey,
+      apiKey:
+        process.env.ANTHROPIC_API_KEY || config.integrations.anthropic.apiKey,
     };
   } else if (process.env.OPENAI_API_KEY || config.integrations?.openAi) {
     return {
@@ -71,11 +49,16 @@ const getDefaultProvider = async (config = {}) => {
       model: "gpt-5-mini",
       apiKey: process.env.OPENAI_API_KEY || config.integrations.openAi.apiKey,
     };
-  } else if (process.env.GOOGLE_GENERATIVE_AI_API_KEY || config.integrations?.google) {
+  } else if (
+    process.env.GOOGLE_GENERATIVE_AI_API_KEY ||
+    config.integrations?.google
+  ) {
     return {
       provider: "google",
       model: "gemini-2.5-flash",
-      apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY || config.integrations.google.apiKey,
+      apiKey:
+        process.env.GOOGLE_GENERATIVE_AI_API_KEY ||
+        config.integrations.google.apiKey,
     };
   } else if (await isOllamaAvailable(ollamaBaseUrl)) {
     // Local, no API key needed
@@ -83,7 +66,7 @@ const getDefaultProvider = async (config = {}) => {
       provider: "ollama",
       model: modelMap["ollama/qwen3-vl:8b"],
       apiKey: null,
-      baseURL: ollamaBaseUrl || DEFAULT_OLLAMA_BASE_URL,
+      baseURL: ollamaBaseUrl || undefined,
     };
   } else {
     return { provider: null, model: null, apiKey: null };
@@ -101,22 +84,45 @@ const detectProvider = async (config, model) => {
   if (!detectedModel) return getDefaultProvider(config);
 
   if (model.startsWith("ollama/")) {
-    const ollamaBaseUrl = config.integrations?.ollama?.baseUrl || DEFAULT_OLLAMA_BASE_URL;
-    return { provider: "ollama", model: detectedModel, apiKey: null, baseURL: ollamaBaseUrl };
+    const ollamaBaseUrl =
+      config.integrations?.ollama?.baseUrl || undefined;
+    const isModelAvailable = await ensureModelAvailable({
+      model: detectedModel,
+      baseUrl: ollamaBaseUrl,
+    });
+    return {
+      provider: "ollama",
+      model: detectedModel,
+      apiKey: null,
+      baseURL: ollamaBaseUrl,
+    };
   }
 
-  if (model.startsWith("anthropic/") && (process.env.ANTHROPIC_API_KEY || config.integrations?.anthropic)) {
-    const apiKey = process.env.ANTHROPIC_API_KEY || config.integrations.anthropic.apiKey;
+  if (
+    model.startsWith("anthropic/") &&
+    (process.env.ANTHROPIC_API_KEY || config.integrations?.anthropic)
+  ) {
+    const apiKey =
+      process.env.ANTHROPIC_API_KEY || config.integrations.anthropic.apiKey;
     return { provider: "anthropic", model: detectedModel, apiKey };
   }
 
-  if (model.startsWith("openai/") && (process.env.OPENAI_API_KEY || config.integrations?.openAi)) {
-    const apiKey = process.env.OPENAI_API_KEY || config.integrations.openAi.apiKey;
+  if (
+    model.startsWith("openai/") &&
+    (process.env.OPENAI_API_KEY || config.integrations?.openAi)
+  ) {
+    const apiKey =
+      process.env.OPENAI_API_KEY || config.integrations.openAi.apiKey;
     return { provider: "openai", model: detectedModel, apiKey };
   }
 
-  if (model.startsWith("google/") && (process.env.GOOGLE_GENERATIVE_AI_API_KEY || config.integrations?.google)) {
-    const apiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY || config.integrations.google.apiKey;
+  if (
+    model.startsWith("google/") &&
+    (process.env.GOOGLE_GENERATIVE_AI_API_KEY || config.integrations?.google)
+  ) {
+    const apiKey =
+      process.env.GOOGLE_GENERATIVE_AI_API_KEY ||
+      config.integrations.google.apiKey;
     return { provider: "google", model: detectedModel, apiKey };
   }
 
@@ -191,8 +197,10 @@ const fileToImagePart = (file) => {
   }
 
   // Check if data is a URL string
-  if (typeof file.data === "string" && 
-      (file.data.startsWith("http://") || file.data.startsWith("https://"))) {
+  if (
+    typeof file.data === "string" &&
+    (file.data.startsWith("http://") || file.data.startsWith("https://"))
+  ) {
     return {
       type: "image",
       image: new URL(file.data),
@@ -345,7 +353,10 @@ const getApiKey = (config, provider) => {
     provider === "google" &&
     (process.env.GOOGLE_GENERATIVE_AI_API_KEY || config.integrations.google)
   ) {
-    return process.env.GOOGLE_GENERATIVE_AI_API_KEY || config.integrations.google.apiKey;
+    return (
+      process.env.GOOGLE_GENERATIVE_AI_API_KEY ||
+      config.integrations.google.apiKey
+    );
   }
 
   return undefined;
@@ -617,7 +628,6 @@ module.exports = {
   generate,
   detectProvider,
   getApiKey,
-  isOllamaAvailable,
   modelMap,
   DEFAULT_MODEL,
   MAX_SCHEMA_VALIDATION_RETRIES,

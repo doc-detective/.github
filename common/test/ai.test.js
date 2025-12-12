@@ -3,6 +3,7 @@ const { z } = require("zod");
 const {
   ensureOllamaRunning,
   stopOllamaContainer,
+  isOllamaAvailable,
   MODEL_PULL_TIMEOUT_MS,
 } = require("../src/ollama");
 
@@ -17,7 +18,6 @@ const {
   generate,
   detectProvider,
   getApiKey,
-  isOllamaAvailable,
   modelMap,
   DEFAULT_MODEL,
   MAX_SCHEMA_VALIDATION_RETRIES,
@@ -60,8 +60,8 @@ describe("AI Module", function () {
       });
 
       it("should contain Ollama model mappings", function () {
-        expect(modelMap["ollama/qwen3-vl:2b"]).to.equal("hf.co/unsloth/Qwen3-VL-2B-Instruct-GGUF:Q4_K_M");
-        expect(modelMap["ollama/qwen3-vl:8b"]).to.equal("hf.co/unsloth/Qwen3-VL-8B-Instruct-GGUF:UD-Q4_K_XL");
+        expect(modelMap["ollama/qwen3-vl:2b"]).to.equal("qwen3-vl:2b-instruct-q4_K_M");
+        expect(modelMap["ollama/qwen3-vl:8b"]).to.equal("qwen3-vl:8b-instruct-q4_K_M");
       });
 
       it("should contain Google Gemini model mappings", function () {
@@ -108,16 +108,16 @@ describe("AI Module", function () {
 
       it("should detect Ollama provider for known Ollama models", async function () {
         const config = {};
-        const result = await detectProvider(config, "ollama/qwen3-vl:2b");
+        const result = await detectProvider(config, "ollama/qwen3-vl:8b");
         expect(result.provider).to.equal("ollama");
-        expect(result.model).to.equal("hf.co/unsloth/Qwen3-VL-2B-Instruct-GGUF:Q4_K_M");
+        expect(result.model).to.equal("qwen3-vl:8b-instruct-q4_K_M");
         expect(result.apiKey).to.be.null;
         expect(result.baseURL).to.equal("http://localhost:11434/api");
       });
 
       it("should use custom baseUrl from config for Ollama", async function () {
         const config = { integrations: { ollama: { baseUrl: "http://custom:11434/api" } } };
-        const result = await detectProvider(config, "ollama/qwen3-vl:2b");
+        const result = await detectProvider(config, "ollama/qwen3-vl:8b");
         expect(result.provider).to.equal("ollama");
         expect(result.baseURL).to.equal("http://custom:11434/api");
       });
@@ -226,7 +226,7 @@ describe("AI Module", function () {
         const result = await detectProvider(config, "unknown-model");
         // Ollama should be preferred when available
         expect(result.provider).to.equal("ollama");
-        expect(result.model).to.equal("qwen3-vl:2b");
+        expect(result.model).to.equal("qwen3-vl:8b-instruct-q4_K_M");
       });
 
       it("should return null values when model is known but no API key for that provider", async function () {
@@ -240,8 +240,8 @@ describe("AI Module", function () {
     });
 
     describe("DEFAULT_MODEL", function () {
-      it("should be ollama/qwen3-vl:2b", function () {
-        expect(DEFAULT_MODEL).to.equal("ollama/qwen3-vl:2b");
+      it("should be ollama/qwen3-vl:8b", function () {
+        expect(DEFAULT_MODEL).to.equal("ollama/qwen3-vl:8b");
       });
     });
 
@@ -326,7 +326,7 @@ describe("AI Module", function () {
           try {
             const result = await generate({
               prompt: "Reply with exactly one word: Yes",
-              model: "ollama/qwen3-vl:2b",
+              model: "ollama/qwen3-vl:8b",
               maxTokens: 20,
             });
 
@@ -713,15 +713,18 @@ describe("AI Module", function () {
 
           const result = await generate({
             messages: [
-              { role: "user", content: "My name is Alice." },
-              { role: "assistant", content: "Hello Alice! Nice to meet you." },
-              { role: "user", content: "What is my name?" },
+              { role: "user", content: "There were red, blue, and green balls." },
+              { role: "assistant", content: "Okay, three balls of different colors." },
+              { role: "user", content: "Which colors were the balls?" },
             ],
+            model: "ollama/qwen3-vl:4b",
             maxTokens: 50,
           });
 
           expect(result.text).to.be.a("string");
-          expect(result.text.toLowerCase()).to.include("alice");
+          expect(result.text.toLowerCase()).to.include("red");
+          expect(result.text.toLowerCase()).to.include("blue");
+          expect(result.text.toLowerCase()).to.include("green");
         });
       });
 
