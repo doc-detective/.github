@@ -9,6 +9,9 @@ import { Box, Text, useInput, useApp } from 'ink';
 import SelectInput from 'ink-select-input';
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
+const os = await import('os');
+const path = await import('path');
+const fs = await import('fs');
 
 import StepEditor from './StepEditor.mjs';
 import { StatusBar, JsonPreview, ConfirmPrompt } from './components.mjs';
@@ -223,14 +226,38 @@ const DebugRunner = ({ test, testIndex, onComplete, onCancel }) => {
     try {
       // Get previous steps for context
       const previousSteps = (localTest.steps || []).slice(0, currentStepIndex);
-      
+      const detectedProvider = await detectProvider();
+
       // Try to get the current browser DOM for context
       let dom = null;
-      if (runner) {
+      if (runner && detectedProvider.provider !== 'ollama') {
         try {
           dom = await runner.getPageSource();
         } catch (domError) {
           // Ignore DOM fetch errors - browser might not have a page loaded
+        }
+      }
+      
+      // Capture a screenshot of the current browser viewport for AI analysis
+      let files = [];
+      if (runner && detectedProvider.provider !== 'ollama') {
+        try {
+          const tempPath = path.default.join(os.default.tmpdir(), `dd-debug-screenshot-${Date.now()}.png`);
+          const screenshotBuffer = await runner.saveScreenshot(tempPath);
+          const screenshotBase64 = screenshotBuffer.toString('base64');
+          files.push({
+            type: 'image',
+            data: screenshotBase64,
+            mimeType: 'image/png',
+          });
+          // Clean up temp file
+          try {
+            fs.default.unlinkSync(tempPath);
+          } catch (cleanupError) {
+            // Ignore cleanup errors
+          }
+        } catch (screenshotError) {
+          // Ignore screenshot errors - browser might not have a page loaded
         }
       }
       
@@ -240,6 +267,7 @@ const DebugRunner = ({ test, testIndex, onComplete, onCancel }) => {
         previousSteps,
         context: dom ? { dom } : undefined,
         config: {}, // Uses env vars for API keys
+        files: files.length > 0 ? files : undefined,
       });
       
       setAiRefinedStep(refined);
