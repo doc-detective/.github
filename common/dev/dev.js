@@ -11,6 +11,7 @@ const testRefineStep = async (model) => {
   const refinedStep = await refineStep({
     step: originalStep,
     failureMessage: "Element not found: .old-button-class",
+    model: model,
     context: {
       dom: `<html><body>
                 <button class="new-submit-button" id="submit">Submit</button>

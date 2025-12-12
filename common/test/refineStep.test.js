@@ -6,23 +6,39 @@ const {
   REFINE_STEP_SYSTEM_PROMPT,
   DEFAULT_MAX_CONTEXT_LENGTH,
 } = require("../src/refineStep");
-const { isOllamaAvailable } = require("../src/ai");
-const { ensureOllamaRunning, MODEL_PULL_TIMEOUT_MS } = require("../src/ollama");
+const { isLocalLlmAvailable } = require("../src/ai");
+const {
+  ensureModelAvailable,
+  disposeLocalLlm,
+  MODEL_DOWNLOAD_TIMEOUT_MS,
+  DEFAULT_LOCAL_MODEL_SMALL,
+} = require("../src/localLlm");
 
 // Import chai using dynamic import (needed for ESM)
 let expect;
 
 describe("RefineStep Module", function () {
-  // Increase timeout for real API calls and container setup
-  this.timeout(MODEL_PULL_TIMEOUT_MS + 60000);
+  // Increase timeout for real API calls and model download
+  this.timeout(MODEL_DOWNLOAD_TIMEOUT_MS + 120000);
 
   before(async function () {
     // Dynamic import for chai ESM
     const chai = await import("chai");
     expect = chai.expect;
     
-    console.log("  Setting up Ollama for tests...");
-    await ensureOllamaRunning();
+    console.log("  Setting up local LLM for tests...");
+    try {
+      await ensureModelAvailable(DEFAULT_LOCAL_MODEL_SMALL);
+      console.log("  Local LLM model ready.");
+    } catch (error) {
+      console.log("  Warning: Could not set up local LLM:", error.message);
+      console.log("  Some tests will be skipped.");
+    }
+  });
+
+  after(async function () {
+    console.log("  Cleaning up local LLM resources...");
+    await disposeLocalLlm();
   });
 
     describe("truncateContent", function () {
@@ -230,7 +246,7 @@ describe("RefineStep Module", function () {
       describe("step refinement", function () {
         it("should refine a step with failure context", async function () {
           // Skip if no API key is set
-          if (!(await isOllamaAvailable())) {
+          if (!(await isLocalLlmAvailable())) {
             this.skip();
           }
 
@@ -257,7 +273,7 @@ describe("RefineStep Module", function () {
 
         it("should preserve stepId from original step", async function () {
           // Skip if no API key is set
-          if (!(await isOllamaAvailable())) {
+          if (!(await isLocalLlmAvailable())) {
             this.skip();
           }
 
@@ -276,7 +292,7 @@ describe("RefineStep Module", function () {
 
         it("should preserve sourceLocation from original step", async function () {
           // Skip if no API key is set
-          if (!(await isOllamaAvailable())) {
+          if (!(await isLocalLlmAvailable())) {
             this.skip();
           }
 
@@ -306,7 +322,7 @@ describe("RefineStep Module", function () {
 
         it("should use model from config when provided", async function () {
           // Skip if no API key is set
-          if (!(await isOllamaAvailable())) {
+          if (!(await isLocalLlmAvailable())) {
             this.skip();
           }
 
@@ -343,7 +359,7 @@ describe("RefineStep Module", function () {
 
         it("should handle previous steps context", async function () {
           // Skip if no API key is set
-          if (!(await isOllamaAvailable())) {
+          if (!(await isLocalLlmAvailable())) {
             this.skip();
           }
 
@@ -370,7 +386,7 @@ describe("RefineStep Module", function () {
       describe("step validation", function () {
         it("should produce steps that pass schema validation", async function () {
           // Skip if no API key is set
-          if (!(await isOllamaAvailable())) {
+          if (!(await isLocalLlmAvailable())) {
             this.skip();
           }
 

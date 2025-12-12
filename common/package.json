@@ -28,7 +28,6 @@
     "@ai-sdk/anthropic": "^2.0.54",
     "@ai-sdk/google": "^3.0.0-beta.72",
     "@ai-sdk/openai": "^2.0.80",
-    "ollama-ai-provider-v2": "^1.2.0",
     "@apidevtools/json-schema-ref-parser": "^15.1.3",
     "ai": "^5.0.109",
     "ajv": "^8.17.1",
@@ -36,6 +35,7 @@
     "ajv-formats": "^3.0.1",
     "ajv-keywords": "^5.1.0",
     "axios": "^1.13.2",
+    "node-llama-cpp": "^3.9.0",
     "yaml": "^2.8.2",
     "zod": "^4.1.13"
   }
