@@ -1,18 +1,29 @@
-(async () => {
-  const { expect } = await import("chai");
+// Import the refineStep module
+const {
+  refineStep,
+  buildRefinementPrompt,
+  truncateContent,
+  REFINE_STEP_SYSTEM_PROMPT,
+  DEFAULT_MAX_CONTEXT_LENGTH,
+} = require("../src/refineStep");
+const { isOllamaAvailable } = require("../src/ai");
+const { ensureOllamaRunning, MODEL_PULL_TIMEOUT_MS } = require("../src/ollama");
 
-  // Import the refineStep module
-  const {
-    refineStep,
-    buildRefinementPrompt,
-    truncateContent,
-    REFINE_STEP_SYSTEM_PROMPT,
-    DEFAULT_MAX_CONTEXT_LENGTH,
-  } = require("../src/refineStep");
+// Import chai using dynamic import (needed for ESM)
+let expect;
 
-  describe("RefineStep Module", function () {
-    // Increase timeout for real API calls
-    this.timeout(120000);
+describe("RefineStep Module", function () {
+  // Increase timeout for real API calls and container setup
+  this.timeout(MODEL_PULL_TIMEOUT_MS + 60000);
+
+  before(async function () {
+    // Dynamic import for chai ESM
+    const chai = await import("chai");
+    expect = chai.expect;
+    
+    console.log("  Setting up Ollama for tests...");
+    await ensureOllamaRunning();
+  });
 
     describe("truncateContent", function () {
       it("should return content unchanged if within limit", function () {
@@ -219,7 +230,7 @@
       describe("step refinement", function () {
         it("should refine a step with failure context", async function () {
           // Skip if no API key is set
-          if (!process.env.ANTHROPIC_API_KEY) {
+          if (!(await isOllamaAvailable())) {
             this.skip();
           }
 
@@ -246,7 +257,7 @@
 
         it("should preserve stepId from original step", async function () {
           // Skip if no API key is set
-          if (!process.env.ANTHROPIC_API_KEY) {
+          if (!(await isOllamaAvailable())) {
             this.skip();
           }
 
@@ -265,7 +276,7 @@
 
         it("should preserve sourceLocation from original step", async function () {
           // Skip if no API key is set
-          if (!process.env.ANTHROPIC_API_KEY) {
+          if (!(await isOllamaAvailable())) {
             this.skip();
           }
 
@@ -295,7 +306,7 @@
 
         it("should use model from config when provided", async function () {
           // Skip if no API key is set
-          if (!process.env.ANTHROPIC_API_KEY) {
+          if (!(await isOllamaAvailable())) {
             this.skip();
           }
 
@@ -332,7 +343,7 @@
 
         it("should handle previous steps context", async function () {
           // Skip if no API key is set
-          if (!process.env.ANTHROPIC_API_KEY) {
+          if (!(await isOllamaAvailable())) {
             this.skip();
           }
 
@@ -359,7 +370,7 @@
       describe("step validation", function () {
         it("should produce steps that pass schema validation", async function () {
           // Skip if no API key is set
-          if (!process.env.ANTHROPIC_API_KEY) {
+          if (!(await isOllamaAvailable())) {
             this.skip();
           }
 
@@ -379,4 +390,3 @@
       });
     });
   });
-})();

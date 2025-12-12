@@ -51,18 +51,8 @@ const isOllamaAvailable = async (baseUrl) => {
   }
 };
 
-const getDefaultProvider = async (config) => {
-  // Try Ollama first (local, no API key needed)
-  const ollamaBaseUrl = config.integrations?.ollama?.baseUrl;
-  if (await isOllamaAvailable(ollamaBaseUrl)) {
-    return {
-      provider: "ollama",
-      model: "qwen3-vl:2b",
-      apiKey: null,
-      baseURL: ollamaBaseUrl || DEFAULT_OLLAMA_BASE_URL,
-    };
-  }
-  
+const getDefaultProvider = async (config = {}) => {  
+  const ollamaBaseUrl = config?.integrations?.ollama?.baseUrl;
   // Try to detect from environment variables if no model is provided
   if (process.env.ANTHROPIC_API_KEY || config.integrations?.anthropic) {
     return {
@@ -75,6 +65,14 @@ const getDefaultProvider = async (config) => {
       provider: "openai",
       model: "gpt-5-mini",
       apiKey: process.env.OPENAI_API_KEY || config.integrations.openAi.apiKey,
+    };
+  } else if (await isOllamaAvailable(ollamaBaseUrl)) {
+    // Local, no API key needed
+    return {
+      provider: "ollama",
+      model: "qwen3-vl:2b",
+      apiKey: null,
+      baseURL: ollamaBaseUrl || DEFAULT_OLLAMA_BASE_URL,
     };
   } else {
     return { provider: null, model: null, apiKey: null };
