@@ -6,8 +6,7 @@ const {
   REFINE_STEP_SYSTEM_PROMPT,
   DEFAULT_MAX_CONTEXT_LENGTH,
 } = require("../src/refineStep");
-const { isOllamaAvailable } = require("../src/ai");
-const { ensureOllamaRunning, MODEL_PULL_TIMEOUT_MS } = require("../src/ollama");
+const { ensureOllamaRunning, isOllamaAvailable, MODEL_PULL_TIMEOUT_MS } = require("../src/ollama");
 
 // Import chai using dynamic import (needed for ESM)
 let expect;
