@@ -26,7 +26,7 @@ const testRefineStep = async (model) => {
 
 (async () => {
   // get list of models from modelMap
-  const models = Object.keys(modelMap);
+  const models = Object.keys(modelMap).filter((m) => m.startsWith("ollama/"));
   const results = [];
 
   for (const model of models) {

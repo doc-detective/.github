@@ -31,6 +31,10 @@ const modelMap = {
   "ollama/qwen3-vl:8b": "qwen3-vl:8b-instruct-q4_K_M",
   "ollama/qwen3-vl:4b": "qwen3-vl:4b-instruct-q4_K_M",
   "ollama/qwen3-vl:2b": "qwen3-vl:2b-instruct-q4_K_M",
+  "ollama/gemma3:4bq4": "gemma3:4b-it-q4_K_M",
+  "ollama/gemma3:4bq8": "gemma3:4b-it-q8_0",
+  "ollama/gemma3:12bq4": "gemma3:12b-it-q4_K_M",
+  "ollama/gemma3:12bq8": "gemma3:12b-it-q8_0",
 };
 
 const getDefaultProvider = async (config = {}) => {
@@ -325,6 +329,250 @@ const toAiSdkSchema = (schema) => {
 };
 
 /**
+ * Dereferences $ref pointers in a schema by inlining the referenced schemas.
+ * Supports both JSON Schema style (#/definitions/...) and OpenAPI style (#/components/schemas/...).
+ * @param {Object} schema - The schema to dereference.
+ * @param {Object} rootSchema - The root schema containing definitions/components.
+ * @returns {Object} The dereferenced schema.
+ */
+const dereferenceSchema = (schema, rootSchema) => {
+  if (!schema || typeof schema !== "object") {
+    return schema;
+  }
+
+  // Handle arrays
+  if (Array.isArray(schema)) {
+    return schema.map((item) => dereferenceSchema(item, rootSchema));
+  }
+
+  // Handle $ref
+  if (schema.$ref) {
+    const refPath = schema.$ref;
+    let resolved = null;
+
+    // Parse the reference path
+    if (refPath.startsWith("#/")) {
+      const pathParts = refPath.slice(2).split("/");
+      resolved = rootSchema;
+      for (const part of pathParts) {
+        resolved = resolved?.[part];
+        if (!resolved) break;
+      }
+    }
+
+    if (resolved) {
+      // Recursively dereference the resolved schema
+      return dereferenceSchema(resolved, rootSchema);
+    }
+    // If we can't resolve, return an empty object
+    return {};
+  }
+
+  // Recursively process all properties
+  const result = {};
+  for (const [key, value] of Object.entries(schema)) {
+    if (typeof value === "object" && value !== null) {
+      result[key] = dereferenceSchema(value, rootSchema);
+    } else {
+      result[key] = value;
+    }
+  }
+
+  return result;
+};
+
+/**
+ * Simplifies a JSON schema for providers with limited schema support (e.g., Ollama).
+ * - Dereferences $ref pointers
+ * - Merges allOf schemas
+ * - Converts top-level anyOf (discriminated unions) into a single object with all options as optional properties
+ * - Simplifies nested anyOf by preferring object types
+ * - Removes unsupported keywords like pattern, components, etc.
+ * @param {Object} schema - The JSON schema to simplify.
+ * @returns {Object} A simplified schema compatible with basic JSON schema support.
+ */
+const simplifySchemaForOllama = (schema) => {
+  // First, dereference any $ref pointers
+  const dereferenced = dereferenceSchema(schema, schema);
+  
+  // Then simplify the dereferenced schema
+  return simplifySchemaRecursive(dereferenced, true);
+};
+
+/**
+ * Recursively simplifies a schema.
+ * @param {Object} schema - The schema to simplify.
+ * @param {boolean} isTopLevel - Whether this is the top-level schema (affects anyOf handling).
+ * @returns {Object} The simplified schema.
+ */
+const simplifySchemaRecursive = (schema, isTopLevel = false) => {
+  if (!schema || typeof schema !== "object") {
+    return schema;
+  }
+
+  // Handle arrays
+  if (Array.isArray(schema)) {
+    return schema.map((item) => simplifySchemaRecursive(item, false));
+  }
+
+  const simplified = {};
+
+  // Check if this is a top-level discriminated union (anyOf with action types)
+  // These have anyOf where each option has allOf with a required action property
+  const isDiscriminatedUnion =
+    isTopLevel &&
+    schema.anyOf &&
+    Array.isArray(schema.anyOf) &&
+    schema.anyOf.length > 1 &&
+    schema.anyOf.every(
+      (opt) =>
+        opt.allOf ||
+        (opt.required && opt.required.length === 1 && opt.properties)
+    );
+
+  for (const [key, value] of Object.entries(schema)) {
+    // Skip unsupported keywords entirely
+    if (
+      [
+        "$schema",
+        "components",
+        "examples",
+        "dynamicDefaults",
+        "transform",
+        "not",
+        "$id",
+        "$ref",
+        "definitions",
+        "$defs",
+        "pattern",
+      ].includes(key)
+    ) {
+      continue;
+    }
+
+    // Handle top-level anyOf as discriminated union - merge ALL options
+    if (key === "anyOf" && isDiscriminatedUnion) {
+      // Merge all anyOf options into a single schema with all properties optional
+      const mergedProperties = {};
+      
+      for (const option of value) {
+        const simplifiedOption = simplifySchemaRecursive(option, false);
+        
+        if (simplifiedOption.properties) {
+          for (const [propKey, propValue] of Object.entries(simplifiedOption.properties)) {
+            // Don't overwrite if we already have this property (first wins for common props)
+            if (!mergedProperties[propKey]) {
+              mergedProperties[propKey] = propValue;
+            }
+          }
+        }
+      }
+
+      simplified.properties = {
+        ...simplified.properties,
+        ...mergedProperties,
+      };
+      // Don't set required - all action properties should be optional in the merged schema
+      simplified.type = "object";
+      continue;
+    }
+
+    // Handle nested anyOf/oneOf - prefer object types, simplify to single option
+    if (key === "anyOf" || key === "oneOf") {
+      const options = value;
+      
+      // For nested anyOf, prefer object type schemas
+      const objectOption = options.find(
+        (opt) => opt.type === "object" || opt.properties
+      );
+      const selectedOption = objectOption || options[0];
+
+      if (selectedOption) {
+        // Merge the selected option into the parent
+        const simplifiedOption = simplifySchemaRecursive(selectedOption, false);
+        Object.assign(simplified, simplifiedOption);
+      }
+      continue;
+    }
+
+    // Handle allOf - merge all schemas together
+    if (key === "allOf") {
+      for (const subSchema of value) {
+        const simplifiedSub = simplifySchemaRecursive(subSchema, false);
+        // Merge properties
+        if (simplifiedSub.properties) {
+          simplified.properties = {
+            ...simplified.properties,
+            ...simplifiedSub.properties,
+          };
+        }
+        // Merge required arrays (but we'll clear required for discriminated unions later)
+        if (simplifiedSub.required) {
+          simplified.required = [
+            ...new Set([
+              ...(simplified.required || []),
+              ...simplifiedSub.required,
+            ]),
+          ];
+        }
+        // Copy type if not set
+        if (simplifiedSub.type && !simplified.type) {
+          simplified.type = simplifiedSub.type;
+        }
+        // Copy other simple properties
+        for (const [subKey, subValue] of Object.entries(simplifiedSub)) {
+          if (!["properties", "required", "type"].includes(subKey)) {
+            simplified[subKey] = subValue;
+          }
+        }
+      }
+      continue;
+    }
+
+    // Handle patternProperties - convert to additionalProperties
+    if (key === "patternProperties") {
+      // Use the first pattern's schema as additionalProperties
+      const patterns = Object.values(value);
+      if (patterns.length > 0) {
+        simplified.additionalProperties = simplifySchemaRecursive(patterns[0], false);
+      }
+      continue;
+    }
+
+    // Recursively simplify nested objects
+    if (key === "properties" && typeof value === "object") {
+      simplified.properties = {};
+      for (const [propKey, propValue] of Object.entries(value)) {
+        simplified.properties[propKey] = simplifySchemaRecursive(propValue, false);
+      }
+      continue;
+    }
+
+    // Recursively simplify items in arrays
+    if (key === "items") {
+      simplified.items = simplifySchemaRecursive(value, false);
+      continue;
+    }
+
+    // Recursively simplify additionalProperties
+    if (key === "additionalProperties" && typeof value === "object") {
+      simplified.additionalProperties = simplifySchemaRecursive(value, false);
+      continue;
+    }
+
+    // Copy other properties as-is
+    simplified[key] = value;
+  }
+
+  // Ensure type is set for objects with properties
+  if (simplified.properties && !simplified.type) {
+    simplified.type = "object";
+  }
+
+  return simplified;
+};
+
+/**
  * Extracts the API key for a provider from a Doc Detective config object.
  * @param {Object} config - The Doc Detective configuration object.
  * @param {"openai" | "anthropic"} provider - The provider name.
@@ -488,6 +736,7 @@ const generate = async ({
       schemaDescription,
       prompt,
       messages,
+      provider: detected.provider,
     });
   }
 
@@ -510,6 +759,7 @@ const generate = async ({
  * @param {string} [options.schemaDescription] - Description for the schema.
  * @param {string} [options.prompt] - Original prompt for retry context.
  * @param {Array} [options.messages] - Original messages for retry context.
+ * @param {string} [options.provider] - The provider being used (e.g., "ollama", "anthropic").
  * @returns {Promise<Object>} Generation result with validated object.
  */
 const generateWithSchemaValidation = async ({
@@ -519,10 +769,19 @@ const generateWithSchemaValidation = async ({
   schemaDescription,
   prompt,
   messages,
+  provider,
 }) => {
   let lastError = null;
   let lastObject = null;
   let wrappedSchema = false;
+
+  // Store the original schema for validation (before any simplification)
+  const originalSchema = schema;
+
+  // Simplify schema for Ollama which has limited JSON Schema support
+  if (provider === "ollama" && !isZodSchema(schema)) {
+    schema = simplifySchemaForOllama(schema);
+  }
 
   // If JSON schema with allOf/anyOf/oneOf at the top level, wrap it in an object
   if (!isZodSchema(schema) && (schema.allOf || schema.anyOf || schema.oneOf)) {
@@ -577,9 +836,9 @@ const generateWithSchemaValidation = async ({
       const validationObject = wrappedSchema
         ? result.object.object
         : result.object;
-      const validationSchema = wrappedSchema
-        ? schema.properties.object
-        : schema;
+      // Use original schema for validation (before Ollama simplification)
+      // This ensures the output conforms to the full schema requirements
+      const validationSchema = originalSchema;
 
       // Validate the generated object against the schema ourselves
       const validation = validateAgainstSchema(
@@ -631,4 +890,5 @@ module.exports = {
   modelMap,
   DEFAULT_MODEL,
   MAX_SCHEMA_VALIDATION_RETRIES,
+  simplifySchemaForOllama,
 };
