@@ -81,7 +81,7 @@ const getDefaultProvider = async (config = {}) => {
     // Local, no API key needed
     return {
       provider: "ollama",
-      model: "qwen3-vl:2b",
+      model: modelMap["ollama/qwen3-vl:8b"],
       apiKey: null,
       baseURL: ollamaBaseUrl || DEFAULT_OLLAMA_BASE_URL,
     };
