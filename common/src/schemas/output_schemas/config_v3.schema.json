@@ -10419,21 +10419,18 @@
           },
           "title": "OpenAI"
         },
-        "localLlm": {
+        "ollama": {
           "type": "object",
-          "description": "Configuration for local LLM integration using node-llama-cpp. Runs locally and doesn't need an API key.",
+          "description": "Configuration for Ollama integration. Ollama runs locally and doesn't need an API key.",
           "additionalProperties": false,
           "properties": {
-            "modelsDir": {
+            "baseUrl": {
               "type": "string",
-              "description": "Directory to store downloaded GGUF model files. Defaults to the system temp directory."
-            },
-            "defaultModel": {
-              "type": "string",
-              "description": "Default model URI to use (e.g., 'hf:unsloth/Qwen3-VL-8B-Instruct-GGUF:Q4_K_XL'). If not specified, uses the built-in default."
+              "description": "Base URL for the Ollama API.",
+              "default": "http://localhost:11434/api"
             }
           },
-          "title": "Local LLM"
+          "title": "Ollama"
         },
         "google": {
           "type": "object",

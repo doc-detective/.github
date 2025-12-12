@@ -1,11 +1,13 @@
 const { z } = require("zod");
 
 const {
-  ensureModelAvailable,
-  disposeLocalLlm,
-  MODEL_DOWNLOAD_TIMEOUT_MS,
-  DEFAULT_LOCAL_MODEL_SMALL,
-} = require("../src/localLlm");
+  ensureOllamaRunning,
+  stopOllamaContainer,
+  MODEL_PULL_TIMEOUT_MS,
+} = require("../src/ollama");
+
+// Track if we started the container
+let weStartedOllama = false;
 
 // Import chai using dynamic import (needed for ESM)
 let expect;
@@ -15,35 +17,33 @@ const {
   generate,
   detectProvider,
   getApiKey,
-  isLocalLlmAvailable,
+  isOllamaAvailable,
   modelMap,
   DEFAULT_MODEL,
   MAX_SCHEMA_VALIDATION_RETRIES,
 } = require("../src/ai");
 
 describe("AI Module", function () {
-  // Increase timeout for real API calls and model download
-  this.timeout(MODEL_DOWNLOAD_TIMEOUT_MS + 120000);
+  // Increase timeout for real API calls and container setup
+  this.timeout(MODEL_PULL_TIMEOUT_MS + 60000);
 
   before(async function () {
     // Dynamic import for chai ESM
     const chai = await import("chai");
     expect = chai.expect;
     
-    console.log("  Setting up local LLM for tests...");
-    // Ensure the model is downloaded before running tests
-    try {
-      await ensureModelAvailable(DEFAULT_LOCAL_MODEL_SMALL);
-      console.log("  Local LLM model ready.");
-    } catch (error) {
-      console.log("  Warning: Could not set up local LLM:", error.message);
-      console.log("  Some tests will be skipped.");
-    }
+    console.log("  Setting up Ollama for tests...");
+    // Track if we need to start the container
+    const wasAlreadyRunning = await isOllamaAvailable();
+    await ensureOllamaRunning();
+    weStartedOllama = !wasAlreadyRunning;
   });
 
   after(async function () {
-    console.log("  Cleaning up local LLM resources...");
-    await disposeLocalLlm();
+    if (weStartedOllama) {
+      console.log("  Cleaning up Ollama container...");
+      await stopOllamaContainer();
+    }
   });
 
     describe("modelMap", function () {
@@ -59,9 +59,9 @@ describe("AI Module", function () {
         expect(modelMap["openai/gpt-5-nano"]).to.equal("gpt-5-nano");
       });
 
-      it("should contain local model mappings", function () {
-        expect(modelMap["local/qwen3-vl:2b"]).to.equal("hf:unsloth/Qwen3-VL-2B-Instruct-GGUF:Q4_K_M");
-        expect(modelMap["local/qwen3-vl:8b"]).to.equal("hf:unsloth/Qwen3-VL-8B-Instruct-GGUF:Q4_K_XL");
+      it("should contain Ollama model mappings", function () {
+        expect(modelMap["ollama/qwen3-vl:2b"]).to.equal("hf.co/unsloth/Qwen3-VL-2B-Instruct-GGUF:Q4_K_M");
+        expect(modelMap["ollama/qwen3-vl:8b"]).to.equal("hf.co/unsloth/Qwen3-VL-8B-Instruct-GGUF:UD-Q4_K_XL");
       });
 
       it("should contain Google Gemini model mappings", function () {
@@ -106,20 +106,20 @@ describe("AI Module", function () {
         }
       });
 
-      it("should detect local provider for known local models", async function () {
+      it("should detect Ollama provider for known Ollama models", async function () {
         const config = {};
-        const result = await detectProvider(config, "local/qwen3-vl:2b");
-        expect(result.provider).to.equal("local");
-        expect(result.model).to.equal("hf:unsloth/Qwen3-VL-2B-Instruct-GGUF:Q4_K_M");
-        expect(result.modelUri).to.equal("hf:unsloth/Qwen3-VL-2B-Instruct-GGUF:Q4_K_M");
+        const result = await detectProvider(config, "ollama/qwen3-vl:2b");
+        expect(result.provider).to.equal("ollama");
+        expect(result.model).to.equal("hf.co/unsloth/Qwen3-VL-2B-Instruct-GGUF:Q4_K_M");
         expect(result.apiKey).to.be.null;
+        expect(result.baseURL).to.equal("http://localhost:11434/api");
       });
 
-      it("should use custom modelsDir from config for local provider", async function () {
-        const config = { integrations: { localLlm: { modelsDir: "/custom/models/dir" } } };
-        const result = await detectProvider(config, "local/qwen3-vl:2b");
-        expect(result.provider).to.equal("local");
-        expect(result.modelsDir).to.equal("/custom/models/dir");
+      it("should use custom baseUrl from config for Ollama", async function () {
+        const config = { integrations: { ollama: { baseUrl: "http://custom:11434/api" } } };
+        const result = await detectProvider(config, "ollama/qwen3-vl:2b");
+        expect(result.provider).to.equal("ollama");
+        expect(result.baseURL).to.equal("http://custom:11434/api");
       });
 
       it("should detect Anthropic provider and mapped model for known Anthropic models with config API key", async function () {
@@ -221,16 +221,12 @@ describe("AI Module", function () {
         expect((await detectProvider(config, "anthropic/claude-haiku-4.5")).apiKey).to.equal("sk-ant-env");
       });
 
-      it("should fall back to local provider as default when available", async function () {
+      it("should fall back to Ollama as default provider when available", async function () {
         const config = {};
         const result = await detectProvider(config, "unknown-model");
-        // Local LLM should be preferred when available
-        if (await isLocalLlmAvailable()) {
-          expect(result.provider).to.equal("local");
-          expect(result.modelUri).to.be.a("string");
-        } else {
-          expect(result.provider).to.be.null;
-        }
+        // Ollama should be preferred when available
+        expect(result.provider).to.equal("ollama");
+        expect(result.model).to.equal("qwen3-vl:2b");
       });
 
       it("should return null values when model is known but no API key for that provider", async function () {
@@ -244,8 +240,8 @@ describe("AI Module", function () {
     });
 
     describe("DEFAULT_MODEL", function () {
-      it("should be local/qwen3-vl:2b", function () {
-        expect(DEFAULT_MODEL).to.equal("local/qwen3-vl:2b");
+      it("should be ollama/qwen3-vl:2b", function () {
+        expect(DEFAULT_MODEL).to.equal("ollama/qwen3-vl:2b");
       });
     });
 
@@ -275,9 +271,9 @@ describe("AI Module", function () {
           }
         });
 
-        it("should throw error when provider cannot be determined and local LLM not available", async function () {
+        it("should throw error when provider cannot be determined and Ollama not available", async function () {
           // This test verifies error handling when no provider is available
-          // Since local LLM may be running, we need to test with an explicit model that
+          // Since Ollama is running, we need to test with an explicit model that
           // requires an API key that isn't configured
           const originalAnthropicKey = process.env.ANTHROPIC_API_KEY;
           const originalOpenAIKey = process.env.OPENAI_API_KEY;
@@ -304,9 +300,9 @@ describe("AI Module", function () {
       });
 
       describe("text generation", function () {
-        it("should generate text with default model (local LLM)", async function () {
-          // Skip if local LLM is not available
-          if (!(await isLocalLlmAvailable())) {
+        it("should generate text with default model (Ollama)", async function () {
+          // Skip if Ollama is not available
+          if (!(await isOllamaAvailable())) {
             this.skip();
           }
 
@@ -321,16 +317,16 @@ describe("AI Module", function () {
           expect(result.finishReason).to.be.a("string");
         });
 
-        it("should generate text with explicit local model", async function () {
-          // Skip if local LLM is not available
-          if (!(await isLocalLlmAvailable())) {
+        it("should generate text with explicit Ollama model", async function () {
+          // Skip if Ollama is not available
+          if (!(await isOllamaAvailable())) {
             this.skip();
           }
 
           try {
             const result = await generate({
               prompt: "Reply with exactly one word: Yes",
-              model: "local/qwen3-vl:2b",
+              model: "ollama/qwen3-vl:2b",
               maxTokens: 20,
             });
 
@@ -339,15 +335,15 @@ describe("AI Module", function () {
             expect(result.usage).to.be.an("object");
             expect(result.finishReason).to.be.a("string");
           } catch (error) {
-            // Skip if we get an error (model may not be available)
-            if (error.message && error.message.includes("model")) {
+            // Skip if we get an Internal Server Error (model may not be available)
+            if (error.message && error.message.includes("Internal Server Error")) {
               this.skip();
             }
             throw error;
           }
         });
 
-        it("should generate text with OpenAI model (smoke test)", async function () {
+        it("should generate text with OpenAI model", async function () {
           // Skip if no API key is set
           if (!process.env.OPENAI_API_KEY) {
             this.skip();
@@ -355,7 +351,7 @@ describe("AI Module", function () {
 
           const result = await generate({
             prompt: "Say exactly: Hello World",
-            model: "openai/gpt-5-mini",
+            model: "openai/gpt-4o-mini",
             maxTokens: 50,
           });
 
@@ -402,8 +398,8 @@ describe("AI Module", function () {
         });
 
         it("should include system message in generation", async function () {
-          // Skip if local LLM is not available
-          if (!(await isLocalLlmAvailable())) {
+          // Skip if Ollama is not available
+          if (!(await isOllamaAvailable())) {
             this.skip();
           }
 
@@ -436,8 +432,8 @@ describe("AI Module", function () {
         };
 
         it("should generate valid structured output with Zod schema", async function () {
-          // Skip if local LLM is not available
-          if (!(await isLocalLlmAvailable())) {
+          // Skip if Ollama is not available
+          if (!(await isOllamaAvailable())) {
             this.skip();
           }
 
@@ -457,8 +453,8 @@ describe("AI Module", function () {
         });
 
         it("should generate valid structured output with JSON schema", async function () {
-          // Skip if local LLM is not available
-          if (!(await isLocalLlmAvailable())) {
+          // Skip if Ollama is not available
+          if (!(await isOllamaAvailable())) {
             this.skip();
           }
 
@@ -478,8 +474,8 @@ describe("AI Module", function () {
         });
 
         it("should validate generated object against Zod schema", async function () {
-          // Skip if local LLM is not available
-          if (!(await isLocalLlmAvailable())) {
+          // Skip if Ollama is not available
+          if (!(await isOllamaAvailable())) {
             this.skip();
           }
 
@@ -502,8 +498,8 @@ describe("AI Module", function () {
         });
 
         it("should validate generated object against JSON schema", async function () {
-          // Skip if local LLM is not available
-          if (!(await isLocalLlmAvailable())) {
+          // Skip if Ollama is not available
+          if (!(await isOllamaAvailable())) {
             this.skip();
           }
 
@@ -533,15 +529,15 @@ describe("AI Module", function () {
 
       describe("multimodal input with files", function () {
         // 100x100 grid PNG with red, blue, and green squares
-        const GRID_PNG_BASE64 = "iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAYAAABw4pVUAAABvUlEQVR4nO3YUW7DQAwD0b3/pZ0jhEjW2rE5LfT3ANGlE0Bda63LQc26kh/dmMMHbHP4gG0OH7DN4QO2OXzANocP2ObwAdscPmCbyy7Ia/McuICfMllzdxSy+c16i7MQmLMQmLMQmLMQmLMQmLMQmLMQmPNSh42fEJizEJizEJizEJizEJizEJizEJizEJizEJg7fpk6v1zqujGHD9jm8AHbHD5gm8MHbHP4gG0OH7DN4QO2OXzANnf8Mv0yu/9rc/p5Hn+p7y/kzHO85ivLQqYWh85CphaHzkKmFofOQqYWh85CphaHzkKmFofOQqYWh66wEPbsLwQ+9Dem8BNyaHHoLGRqcegsZGpx6CxkanHoLGRqcegsZGpx6CxkanHoLGRqcegKC3FQg39j2hw+YJvDB2xz+IBtDh+wzeEDtjl8wDaHD9jm8AHb3PHLlDm7f73U/3Q3FBLmg/9hLOTPB3mLsxCYsxCYsxCYsxCYsxCYsxCYO1mI46XOd35lwZyFwJyFwJyFwJyFwJyFwJyFwJyFwNzJQhzUwN/UPocP2ObwAdscPmCbwwdsc/iAbQ4fsM3hA7Y5fMAq9wGhbdAbu3rjOQAAAABJRU5ErkJggg==";
+        const GRID_PNG_BASE64 = "iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAYAAABw4pVUAAABvUlEQVR4nO3YUW7DQAwD0b3/pZ0jhEjW2rE5LfT3ANGlE0Bda63LQc26kh/dmMMHbHP4gG0OH7DN4QO2OXzANocP2ObwAdscPmCbyy7Ia/McuICfMllzdxSy+c16i7MQmLMQmLMQmLMQmLMQmLMQmLMQmLMQmPNSh42fEJizEJizEJizEJizEJizEJizEJizEJizEJg7fpk6v1zqujGHD9jm8AHbHD5gm8MHbHP4gG0OH7DN4QO2OXzANnf8Mv0yu/9rc/p5Hn+p7y/kzHO85ivLQqYWh85CphaHzkKmFofOQqYWh85CphaHzkKmFofOQqYWh66wEPbsLwQ+9Dem8BNyaHHoLGRqcegsZGpx6CxkanHoLGRqcegsZGpx6CxkanHoLGRqcegKC3FQg39j2hw+YJvDB2xz+IBtDh+wzeEDtjl8wDaHD9jm8AHb3PHLlDm7f73U/3Q3FBLmg/9hLOTPB3mLsxCYsxCYsxCYsxCYsxCYsxCYO1mI46XOd35lwZyFwJyFwJyFwJyFwJyFwJyFwJyFwNzJQhzUwN/UPocP2ObwAdscPmCbwwdsc/iAbQ4fsM3hA7Y5fMAq9wGhbdAbu3rjOQAAAABJRU5ErkJggg==";
 
         it("should handle image URL input", async function () {
-          // Skip if local LLM is not available
-          if (!(await isLocalLlmAvailable())) {
+          // Skip if Ollama is not available
+          if (!(await isOllamaAvailable())) {
             this.skip();
           }
 
-          // Note: Some local models may have issues with remote URLs.
+          // Note: Some Ollama models may have issues with remote URLs.
           // This test validates the multimodal input construction.
           try {
             const result = await generate({
@@ -558,9 +554,9 @@ describe("AI Module", function () {
             expect(result.text).to.be.a("string");
             expect(result.text.length).to.be.greaterThan(0);
           } catch (error) {
-            // Some local models may not support remote URLs well
-            // Skip if we get an error related to image handling
-            if (error.message && (error.message.includes("image") || error.message.includes("multimodal"))) {
+            // Some Ollama models may not support remote URLs well
+            // Skip if we get a Bad Request error related to image handling
+            if (error.message && error.message.includes("Bad Request")) {
               this.skip();
             }
             throw error;
@@ -568,8 +564,8 @@ describe("AI Module", function () {
         });
 
         it("should handle base64 image data", async function () {
-          // Skip if local LLM is not available
-          if (!(await isLocalLlmAvailable())) {
+          // Skip if Ollama is not available
+          if (!(await isOllamaAvailable())) {
             this.skip();
           }
 
@@ -591,8 +587,8 @@ describe("AI Module", function () {
             expect(result.usage).to.be.an("object");
             expect(result.finishReason).to.be.a("string");
           } catch (error) {
-            // Some local models may have issues with certain image formats
-            if (error.message && (error.message.includes("image") || error.message.includes("multimodal"))) {
+            // Some Ollama models may have issues with certain image formats
+            if (error.message && (error.message.includes("Bad Request") || error.message.includes("Internal Server Error"))) {
               this.skip();
             }
             throw error;
@@ -600,8 +596,8 @@ describe("AI Module", function () {
         });
 
         it("should handle Buffer image data", async function () {
-          // Skip if local LLM is not available
-          if (!(await isLocalLlmAvailable())) {
+          // Skip if Ollama is not available
+          if (!(await isOllamaAvailable())) {
             this.skip();
           }
 
@@ -626,8 +622,8 @@ describe("AI Module", function () {
             expect(result.usage).to.be.an("object");
             expect(result.finishReason).to.be.a("string");
           } catch (error) {
-            // Some local models may have issues with certain image formats
-            if (error.message && (error.message.includes("image") || error.message.includes("multimodal"))) {
+            // Some Ollama models may have issues with certain image formats
+            if (error.message && (error.message.includes("Bad Request") || error.message.includes("Internal Server Error"))) {
               this.skip();
             }
             throw error;
@@ -635,8 +631,8 @@ describe("AI Module", function () {
         });
 
         it("should handle Uint8Array image data", async function () {
-          // Skip if local LLM is not available
-          if (!(await isLocalLlmAvailable())) {
+          // Skip if Ollama is not available
+          if (!(await isOllamaAvailable())) {
             this.skip();
           }
 
@@ -662,8 +658,8 @@ describe("AI Module", function () {
             expect(result.usage).to.be.an("object");
             expect(result.finishReason).to.be.a("string");
           } catch (error) {
-            // Some local models may have issues with certain image formats
-            if (error.message && (error.message.includes("image") || error.message.includes("multimodal"))) {
+            // Some Ollama models may have issues with certain image formats
+            if (error.message && (error.message.includes("Bad Request") || error.message.includes("Internal Server Error"))) {
               this.skip();
             }
             throw error;
@@ -671,8 +667,8 @@ describe("AI Module", function () {
         });
 
         it("should handle multiple images with mixed data types", async function () {
-          // Skip if local LLM is not available
-          if (!(await isLocalLlmAvailable())) {
+          // Skip if Ollama is not available
+          if (!(await isOllamaAvailable())) {
             this.skip();
           }
 
@@ -699,8 +695,8 @@ describe("AI Module", function () {
             expect(result.text).to.be.a("string");
             expect(result.text.length).to.be.greaterThan(0);
           } catch (error) {
-            // Some local models may have issues with certain image formats
-            if (error.message && (error.message.includes("image") || error.message.includes("multimodal"))) {
+            // Some Ollama models may have issues with certain image formats
+            if (error.message && (error.message.includes("Bad Request") || error.message.includes("Internal Server Error"))) {
               this.skip();
             }
             throw error;
@@ -710,8 +706,8 @@ describe("AI Module", function () {
 
       describe("messages array support", function () {
         it("should handle multi-turn conversation", async function () {
-          // Skip if local LLM is not available
-          if (!(await isLocalLlmAvailable())) {
+          // Skip if Ollama is not available
+          if (!(await isOllamaAvailable())) {
             this.skip();
           }
 
@@ -730,16 +726,15 @@ describe("AI Module", function () {
       });
 
       describe("error handling", function () {
-        it("should throw error with invalid model", async function () {
+        it("should throw error with invalid API key", async function () {
           try {
             await generate({
               prompt: "Hello",
-              model: "anthropic/claude-haiku-4.5",
-              config: {},
+              apiKey: "invalid-api-key",
             });
             expect.fail("Should have thrown an error");
           } catch (error) {
-            // Should get an error about missing provider/API key
+            // Should get an authentication error
             expect(error).to.be.an("error");
           }
         });

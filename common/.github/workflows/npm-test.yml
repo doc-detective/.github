@@ -16,7 +16,7 @@ on:
 
 jobs:
   test:
-    timeout-minutes: 30
+    timeout-minutes: 5
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -36,16 +36,6 @@ jobs:
           cache: "npm"
           cache-dependency-path: package-lock.json
           node-version: ${{ matrix.node }}
-      
-      # Cache local LLM models for faster CI runs
-      - name: Cache local LLM models
-        uses: actions/cache@v4
-        with:
-          path: ${{ runner.temp }}/doc-detective/models
-          key: llm-models-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
-          restore-keys: |
-            llm-models-${{ runner.os }}-
-      
       - run: npm ci
       - run: npm run build # Automatically run tests because of the `postbuild` script in package.json
   

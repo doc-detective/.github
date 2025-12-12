@@ -2,17 +2,14 @@ const { generateText, generateObject, jsonSchema } = require("ai");
 const { createOpenAI } = require("@ai-sdk/openai");
 const { createAnthropic } = require("@ai-sdk/anthropic");
 const { createGoogleGenerativeAI } = require("@ai-sdk/google");
+const { createOllama } = require("ollama-ai-provider-v2");
 const { z } = require("zod");
 const Ajv = require("ajv");
 const addFormats = require("ajv-formats");
-const {
-  isLocalLlmAvailable,
-  generateWithLocalLlm,
-  DEFAULT_LOCAL_MODEL,
-  DEFAULT_LOCAL_MODEL_SMALL,
-} = require("./localLlm");
 
-const DEFAULT_MODEL = "local/qwen3-vl:2b";
+const DEFAULT_MODEL = "ollama/qwen3-vl:2b";
+const OLLAMA_AVAILABILITY_TIMEOUT_MS = 500;
+const DEFAULT_OLLAMA_BASE_URL = "http://localhost:11434/api";
 const MAX_SCHEMA_VALIDATION_RETRIES = 3;
 
 /**
@@ -31,13 +28,36 @@ const modelMap = {
   "google/gemini-2.5-flash": "gemini-2.5-flash",
   "google/gemini-2.5-pro": "gemini-2.5-pro",
   "google/gemini-3-pro": "gemini-3-pro-preview",
-  // Local models (node-llama-cpp with GGUF files)
-  "local/qwen3-vl:8b": "hf:unsloth/Qwen3-VL-8B-Instruct-GGUF:Q4_K_XL",
-  "local/qwen3-vl:2b": "hf:unsloth/Qwen3-VL-2B-Instruct-GGUF:Q4_K_M",
+  // Ollama models
+  "ollama/qwen3-vl:8b": "hf.co/unsloth/Qwen3-VL-8B-Instruct-GGUF:UD-Q4_K_XL",
+  "ollama/qwen3-vl:2b": "hf.co/unsloth/Qwen3-VL-2B-Instruct-GGUF:Q4_K_M",
 };
 
-const getDefaultProvider = async (config = {}) => {
-  const localLlmConfig = config?.integrations?.localLlm;
+/**
+ * Checks if Ollama is available at localhost:11434.
+ * @param {string} [baseUrl] - Optional base URL override.
+ * @returns {Promise<boolean>} True if Ollama is available.
+ */
+const isOllamaAvailable = async (baseUrl) => {
+  const url = baseUrl || "http://localhost:11434";
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), OLLAMA_AVAILABILITY_TIMEOUT_MS);
+    
+    const response = await fetch(url, {
+      method: "GET",
+      signal: controller.signal,
+    });
+    
+    clearTimeout(timeoutId);
+    return response.ok;
+  } catch {
+    return false;
+  }
+};
+
+const getDefaultProvider = async (config = {}) => {  
+  const ollamaBaseUrl = config?.integrations?.ollama?.baseUrl;
   // Try to detect from environment variables if no model is provided
   if (process.env.ANTHROPIC_API_KEY || config.integrations?.anthropic) {
     return {
@@ -57,14 +77,13 @@ const getDefaultProvider = async (config = {}) => {
       model: "gemini-2.5-flash",
       apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY || config.integrations.google.apiKey,
     };
-  } else if (await isLocalLlmAvailable()) {
-    // Local LLM via node-llama-cpp, no API key needed
+  } else if (await isOllamaAvailable(ollamaBaseUrl)) {
+    // Local, no API key needed
     return {
-      provider: "local",
-      model: localLlmConfig?.defaultModel || modelMap["local/qwen3-vl:8b"],
-      modelUri: localLlmConfig?.defaultModel || modelMap["local/qwen3-vl:8b"],
-      modelsDir: localLlmConfig?.modelsDir,
+      provider: "ollama",
+      model: modelMap["ollama/qwen3-vl:8b"],
       apiKey: null,
+      baseURL: ollamaBaseUrl || DEFAULT_OLLAMA_BASE_URL,
     };
   } else {
     return { provider: null, model: null, apiKey: null };
@@ -75,21 +94,15 @@ const getDefaultProvider = async (config = {}) => {
  * Detects the provider, model, and API from a model string and environment variables.
  * @param {Object} config - The Doc Detective configuration object.
  * @param {string} model - The model identifier.
- * @returns {Promise<{ provider: "openai" | "anthropic" | "google" | "local" | null, model: string | null, apiKey: string | null, modelUri?: string, modelsDir?: string }>} The detected provider, model, and API key.
+ * @returns {Promise<{ provider: "openai" | "anthropic" | "ollama" | null, model: string | null, apiKey: string | null, baseURL?: string }>} The detected provider, model, and API key.
  */
 const detectProvider = async (config, model) => {
   const detectedModel = modelMap[model] || null;
   if (!detectedModel) return getDefaultProvider(config);
 
-  if (model.startsWith("local/")) {
-    const localLlmConfig = config?.integrations?.localLlm;
-    return {
-      provider: "local",
-      model: detectedModel,
-      modelUri: detectedModel,
-      modelsDir: localLlmConfig?.modelsDir,
-      apiKey: null,
-    };
+  if (model.startsWith("ollama/")) {
+    const ollamaBaseUrl = config.integrations?.ollama?.baseUrl || DEFAULT_OLLAMA_BASE_URL;
+    return { provider: "ollama", model: detectedModel, apiKey: null, baseURL: ollamaBaseUrl };
   }
 
   if (model.startsWith("anthropic/") && (process.env.ANTHROPIC_API_KEY || config.integrations?.anthropic)) {
@@ -112,17 +125,17 @@ const detectProvider = async (config, model) => {
 
 /**
  * Creates a provider instance based on the provider name.
- * Note: For "local" provider, this returns null as local LLM uses a different generation path.
  * @param {Object} options
- * @param {"openai" | "anthropic" | "google" | "local"} options.provider - The provider name.
+ * @param {"openai" | "anthropic" | "ollama"} options.provider - The provider name.
  * @param {string} [options.apiKey] - Optional API key override.
  * @param {string} [options.baseURL] - Optional base URL override.
- * @returns {Function | null} The provider factory function, or null for local provider.
+ * @returns {Function} The provider factory function.
  */
 const createProvider = ({ provider, apiKey, baseURL }) => {
-  if (provider === "local") {
-    // Local LLM uses generateWithLocalLlm directly, not the AI SDK provider pattern
-    return null;
+  if (provider === "ollama") {
+    const options = {};
+    if (baseURL) options.baseURL = baseURL;
+    return createOllama(options);
   }
 
   if (provider === "openai") {
@@ -393,26 +406,11 @@ const generate = async ({
 
   if (!detected.provider) {
     throw new Error(
-      `Cannot determine provider for model "${model}". Please specify a 'provider' option ("openai", "anthropic", "google", or "local").`
+      `Cannot determine provider for model "${model}". Please specify a 'provider' option ("openai" or "anthropic").`
     );
   }
 
-  // Handle local LLM provider separately
-  if (detected.provider === "local") {
-    return generateWithLocalLlm({
-      prompt,
-      messages,
-      files,
-      modelUri: detected.modelUri,
-      modelsDir: detected.modelsDir,
-      system,
-      schema,
-      temperature,
-      maxTokens,
-    });
-  }
-
-  // Create provider instance for cloud providers
+  // Create provider instance
   const providerFactory = createProvider({
     provider: detected.provider,
     apiKey: detected.apiKey,
@@ -619,7 +617,7 @@ module.exports = {
   generate,
   detectProvider,
   getApiKey,
-  isLocalLlmAvailable,
+  isOllamaAvailable,
   modelMap,
   DEFAULT_MODEL,
   MAX_SCHEMA_VALIDATION_RETRIES,
