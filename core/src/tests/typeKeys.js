@@ -3,6 +3,8 @@ const { Key } = require("webdriverio");
 const {
   findElementByCriteria,
 } = require("./findStrategies");
+const { hasScope, getScope } = require("../scopes/registry");
+const { writeToTerminal } = require("../scopes/terminal");
 
 exports.typeKeys = typeKeys;
 
@@ -104,6 +106,42 @@ async function typeKeys({ config, step, driver }) {
     result.status = "SKIPPED";
     result.description = "No keys to type.";
     return result;
+  }
+
+  // If scope is specified, write to terminal scope instead of UI
+  if (step.type.scope) {
+    const scopeName = step.type.scope;
+    
+    // Check if scope exists
+    if (!hasScope(scopeName)) {
+      result.status = "FAIL";
+      result.description = `Scope '${scopeName}' not found`;
+      return result;
+    }
+    
+    // Get the scope
+    const scope = getScope(scopeName);
+    
+    if (scope.type !== 'terminal') {
+      result.status = "FAIL";
+      result.description = `Scope '${scopeName}' is not a terminal scope`;
+      return result;
+    }
+    
+    try {
+      // Join all keys into a single string
+      const text = step.type.keys.join('');
+      
+      // Write to terminal
+      await writeToTerminal(scopeName, text, config);
+      
+      result.description = `Typed keys to scope '${scopeName}'`;
+      return result;
+    } catch (error) {
+      result.status = "FAIL";
+      result.description = `Failed to type to scope '${scopeName}': ${error.message}`;
+      return result;
+    }
   }
 
   // Find element to type into if any criteria are specified

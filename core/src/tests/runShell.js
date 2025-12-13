@@ -6,11 +6,18 @@ const {
 } = require("../utils");
 const fs = require("fs");
 const path = require("path");
+const {
+  hasScope,
+  getScope,
+  validateScopeName,
+} = require("../scopes/registry");
+const { createTerminalScope } = require("../scopes/terminal");
+const { waitForConditions } = require("../scopes/waitUntil");
 
 exports.runShell = runShell;
 
 // Run a shell command.
-async function runShell({ config, step }) {
+async function runShell({ config, step, test }) {
   // Promisify and execute command
   const result = {
     status: "PASS",
@@ -48,7 +55,91 @@ async function runShell({ config, step }) {
     timeout: step.runShell.timeout || 60000,
   };
 
-  // Execute command
+  // Check for scope and waitUntil
+  const hasWaitUntil = step.runShell.waitUntil && 
+    (step.runShell.waitUntil.stdio?.stdout || step.runShell.waitUntil.stdio?.stderr);
+  const scopeName = step.runShell.scope;
+  
+  // Validate scope name if provided
+  if (scopeName) {
+    const validation = validateScopeName(scopeName);
+    if (!validation.valid) {
+      result.status = "FAIL";
+      result.description = validation.error;
+      return result;
+    }
+  }
+  
+  // Warning: waitUntil without scope will cleanup immediately
+  if (hasWaitUntil && !scopeName) {
+    log(config, "warn", "Using waitUntil without scope - the session will be cleaned up immediately after conditions are met. Consider using a scope for long-running processes.");
+  }
+
+  // If using scope, create or reuse terminal scope
+  if (scopeName) {
+    try {
+      let scope;
+      
+      // Check if scope already exists
+      if (hasScope(scopeName)) {
+        scope = getScope(scopeName);
+        log(config, "debug", `Reusing existing scope: ${scopeName}`);
+        
+        // For existing scopes, we don't execute a new command, just return
+        result.description = `Reused existing scope: ${scopeName}`;
+        return result;
+      }
+      
+      // Create new terminal scope
+      const testId = test?.testId || 'unknown';
+      scope = await createTerminalScope(
+        scopeName,
+        step.runShell.command,
+        {
+          workingDirectory: step.runShell.workingDirectory,
+          testId: testId,
+        },
+        config
+      );
+      
+      // If waitUntil is specified, wait for conditions
+      if (hasWaitUntil) {
+        try {
+          await waitForConditions({
+            scope: scope,
+            conditions: step.runShell.waitUntil.stdio,
+            timeout: 30000, // 30 second timeout for waitUntil
+            config: config
+          });
+          
+          result.description = `Created scope '${scopeName}' and conditions met. Process continues running.`;
+          
+          // Collect output from buffer for result
+          if (scope.stdoutBuffer) {
+            result.outputs.stdio.stdout = scope.stdoutBuffer.join('\n');
+          }
+          if (scope.stderrBuffer) {
+            result.outputs.stdio.stderr = scope.stderrBuffer.join('\n');
+          }
+        } catch (error) {
+          result.status = "FAIL";
+          result.description = `Scope '${scopeName}' created but waitUntil conditions not met: ${error.message}`;
+          return result;
+        }
+      } else {
+        result.description = `Created scope '${scopeName}'. Process continues running.`;
+      }
+      
+      return result;
+      
+    } catch (error) {
+      result.status = "FAIL";
+      result.description = `Failed to create scope '${scopeName}': ${error.message}`;
+      return result;
+    }
+  }
+
+  // Original behavior: execute command and wait for completion
   const timeout = step.runShell.timeout;
   const options = {};
   if (step.runShell.workingDirectory)
