@@ -173,12 +173,14 @@ async function writeToTerminal(name, text, config) {
   let processedText = text;
   
   // Replace escape sequences
+  // Process \\\\ first to avoid double-escaping issues
+  processedText = processedText.replace(/\\\\/g, '\x00'); // Temporary placeholder
   processedText = processedText
     .replace(/\\n/g, '\n')
     .replace(/\\t/g, '\t')
     .replace(/\\r/g, '\r')
-    .replace(/\\x([0-9A-Fa-f]{2})/g, (match, hex) => String.fromCharCode(parseInt(hex, 16)))
-    .replace(/\\\\/g, '\\'); // Must be last to avoid double-escaping
+    .replace(/\\x([0-9A-Fa-f]{2})/g, (match, hex) => String.fromCharCode(parseInt(hex, 16)));
+  processedText = processedText.replace(/\x00/g, '\\'); // Replace placeholder with single backslash
   
   log(config, "debug", `Writing to terminal scope '${name}': ${JSON.stringify(processedText)}`);
   

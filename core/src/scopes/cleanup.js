@@ -133,7 +133,9 @@ function setupCleanupHandlers(config = { logLevel: 'info' }) {
     // The other handlers should have already done the cleanup
     const allScopes = getAllScopes();
     if (allScopes.size > 0) {
-      console.log(`Warning: ${allScopes.size} scope(s) still in registry at exit`);
+      // Use stderr.write since console.log may not work during exit
+      // and the config object may not be available
+      process.stderr.write(`Warning: ${allScopes.size} scope(s) still in registry at exit\n`);
     }
   });
   

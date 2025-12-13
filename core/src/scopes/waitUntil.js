@@ -7,13 +7,22 @@ exports.waitForConditions = waitForConditions;
 
 /**
  * Checks if a pattern string represents a regex pattern.
- * Regex patterns must start and end with '/'.
+ * Regex patterns must start and end with '/' and the last '/' must be at the end or followed only by flags.
+ * Valid flags are: g, i, m, u, y, s
  * 
  * @param {string} pattern - The pattern to check
  * @returns {boolean} True if pattern is a regex
  */
 function isRegexPattern(pattern) {
-  return typeof pattern === 'string' && pattern.startsWith('/') && pattern.includes('/') && pattern.lastIndexOf('/') > 0;
+  if (typeof pattern !== 'string') return false;
+  // Must start with / and have at least one more / 
+  if (!pattern.startsWith('/') || pattern.length < 2) return false;
+  // Find the last /
+  const lastSlashIndex = pattern.lastIndexOf('/');
+  if (lastSlashIndex === 0) return false;
+  // Everything after the last / must be valid regex flags (or empty)
+  const afterLastSlash = pattern.substring(lastSlashIndex + 1);
+  return /^[gimuysd]*$/.test(afterLastSlash);
 }
 
 /**
