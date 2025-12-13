@@ -12,7 +12,7 @@ main();
  */
 async function main() {
   const json = {
-    input: "dev/doc-content.dita",
+    input: "dev/doc-content.md",    
     logLevel: "debug",
     runOn: [
       {

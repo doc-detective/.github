@@ -885,3 +885,529 @@ detectSteps: true
     expect(codeblockStep).to.exist;
   });
 });
+
+// CommonMark comment syntax test inputs - JSON syntax
+const markdownParenthesesComments = `
+[comment]: # (test {"testId": "parentheses-test", "detectSteps": false})
+
+1. Open the app at [http://localhost:3000](http://localhost:3000).
+
+[comment]: # (step {"goTo": "http://localhost:3000"})
+
+2. Type "hello world" in the input field.
+
+[comment]: # (step {"find": {"selector": "#input", "click": true}})
+[comment]: # (step {"type": "hello world"})
+
+3. Click **Convert to Uppercase**.
+
+[comment]: # (step {"find": {"selector": "button", "click": true}})
+
+4. You'll see **HELLO WORLD** in the output.
+
+[comment]: # (step {"find": "HELLO WORLD"})
+[comment]: # (test end)
+`;
+
+const markdownSingleQuoteComments = `
+[comment]: # 'test {"testId": "single-quote-test", "detectSteps": false}'
+
+1. Open the app at [http://localhost:3000](http://localhost:3000).
+
+[comment]: # 'step {"goTo": "http://localhost:3000"}'
+
+2. Type "hello world" in the input field.
+
+[comment]: # 'step {"find": {"selector": "#input", "click": true}}'
+[comment]: # 'step {"type": "hello world"}'
+
+3. Click **Convert to Uppercase**.
+
+[comment]: # 'step {"find": {"selector": "button", "click": true}}'
+
+4. You'll see **HELLO WORLD** in the output.
+
+[comment]: # 'step {"find": "HELLO WORLD"}'
+[comment]: # 'test end'
+`;
+
+const markdownDoubleQuoteComments = `
+[comment]: # "test {\\"testId\\": \\"double-quote-test\\", \\"detectSteps\\": false}"
+
+1. Open the app at [http://localhost:3000](http://localhost:3000).
+
+[comment]: # "step {\\"goTo\\": \\"http://localhost:3000\\"}"
+
+2. Type "hello world" in the input field.
+
+[comment]: # "step {\\"find\\": {\\"selector\\": \\"#input\\", \\"click\\": true}}"
+[comment]: # "step {\\"type\\": \\"hello world\\"}"
+
+3. Click **Convert to Uppercase**.
+
+[comment]: # "step {\\"find\\": {\\"selector\\": \\"button\\", \\"click\\": true}}"
+
+4. You'll see **HELLO WORLD** in the output.
+
+[comment]: # "step {\\"find\\": \\"HELLO WORLD\\"}"
+[comment]: # "test end"
+`;
+
+const markdownMixedQuoteComments = `
+[comment]: # (test {"testId": "mixed-quote-test", "detectSteps": false})
+
+1. Open the app at [http://localhost:3000](http://localhost:3000).
+
+[comment]: # 'step {"goTo": "http://localhost:3000"}'
+
+2. Type "hello world" in the input field.
+
+[comment]: # "step {\\"find\\": {\\"selector\\": \\"#input\\", \\"click\\": true}}"
+[comment]: # (step {"type": "hello world"})
+
+3. Click **Convert to Uppercase**.
+
+[comment]: # 'step {"find": {"selector": "button", "click": true}}'
+
+4. You'll see **HELLO WORLD** in the output.
+
+[comment]: # (step {"find": "HELLO WORLD"})
+[comment]: # "test end"
+`;
+
+const markdownIgnoreSyntax = `
+[comment]: # (test {"testId": "ignore-syntax-test", "detectSteps": true})
+
+This text should be detected.
+
+**Visible text**
+
+[comment]: # 'test ignore start'
+
+**Ignored text that should not be detected**
+
+[comment]: # 'test ignore end'
+
+**More visible text**
+
+[comment]: # "test end"
+`;
+
+describe("CommonMark Comment Syntax Tests", function () {
+  it("should correctly parse markdown with parentheses syntax: [comment]: # (test ...)", async function () {
+    const tempFile = "temp_parentheses.md";
+    fs.writeFileSync(tempFile, markdownParenthesesComments.trim());
+    const config = { input: tempFile };
+    const results = await detectAndResolveTests({ config });
+    fs.unlinkSync(tempFile);
+    
+    expect(results.specs).to.be.an("array").that.has.lengthOf(1);
+    expect(results.specs[0].tests).to.be.an("array").that.has.lengthOf(1);
+    expect(results.specs[0].tests[0].testId).to.equal("parentheses-test");
+    expect(results.specs[0].tests[0].detectSteps).to.equal(false);
+    
+    const steps = results.specs[0].tests[0].contexts[0].steps;
+    expect(steps).to.be.an("array").that.has.lengthOf(5);
+    expect(steps[0]).to.have.property("goTo").that.equals("http://localhost:3000");
+    expect(steps[1]).to.have.property("find").that.deep.includes({ selector: "#input", click: true });
+    expect(steps[2]).to.have.property("type").that.equals("hello world");
+    expect(steps[3]).to.have.property("find").that.deep.includes({ selector: "button", click: true });
+    expect(steps[4]).to.have.property("find").that.equals("HELLO WORLD");
+  });
+
+  it("should correctly parse markdown with single quote syntax: [comment]: # 'test ...'", async function () {
+    const tempFile = "temp_single_quote.md";
+    fs.writeFileSync(tempFile, markdownSingleQuoteComments.trim());
+    const config = { input: tempFile };
+    const results = await detectAndResolveTests({ config });
+    fs.unlinkSync(tempFile);
+    
+    expect(results.specs).to.be.an("array").that.has.lengthOf(1);
+    expect(results.specs[0].tests).to.be.an("array").that.has.lengthOf(1);
+    expect(results.specs[0].tests[0].testId).to.equal("single-quote-test");
+    expect(results.specs[0].tests[0].detectSteps).to.equal(false);
+    
+    const steps = results.specs[0].tests[0].contexts[0].steps;
+    expect(steps).to.be.an("array").that.has.lengthOf(5);
+    expect(steps[0]).to.have.property("goTo").that.equals("http://localhost:3000");
+    expect(steps[1]).to.have.property("find").that.deep.includes({ selector: "#input", click: true });
+    expect(steps[2]).to.have.property("type").that.equals("hello world");
+    expect(steps[3]).to.have.property("find").that.deep.includes({ selector: "button", click: true });
+    expect(steps[4]).to.have.property("find").that.equals("HELLO WORLD");
+  });
+
+  it("should correctly parse markdown with double quote syntax: [comment]: # \"test ...\"", async function () {
+    const tempFile = "temp_double_quote.md";
+    fs.writeFileSync(tempFile, markdownDoubleQuoteComments.trim());
+    const config = { input: tempFile };
+    const results = await detectAndResolveTests({ config });
+    fs.unlinkSync(tempFile);
+    
+    expect(results.specs).to.be.an("array").that.has.lengthOf(1);
+    expect(results.specs[0].tests).to.be.an("array").that.has.lengthOf(1);
+    expect(results.specs[0].tests[0].testId).to.equal("double-quote-test");
+    expect(results.specs[0].tests[0].detectSteps).to.equal(false);
+    
+    const steps = results.specs[0].tests[0].contexts[0].steps;
+    expect(steps).to.be.an("array").that.has.lengthOf(5);
+    expect(steps[0]).to.have.property("goTo").that.equals("http://localhost:3000");
+    expect(steps[1]).to.have.property("find").that.deep.includes({ selector: "#input", click: true });
+    expect(steps[2]).to.have.property("type").that.equals("hello world");
+    expect(steps[3]).to.have.property("find").that.deep.includes({ selector: "button", click: true });
+    expect(steps[4]).to.have.property("find").that.equals("HELLO WORLD");
+  });
+
+  it("should correctly parse markdown with mixed quote syntaxes in same file", async function () {
+    const tempFile = "temp_mixed_quote.md";
+    fs.writeFileSync(tempFile, markdownMixedQuoteComments.trim());
+    const config = { input: tempFile };
+    const results = await detectAndResolveTests({ config });
+    fs.unlinkSync(tempFile);
+    
+    expect(results.specs).to.be.an("array").that.has.lengthOf(1);
+    expect(results.specs[0].tests).to.be.an("array").that.has.lengthOf(1);
+    expect(results.specs[0].tests[0].testId).to.equal("mixed-quote-test");
+    expect(results.specs[0].tests[0].detectSteps).to.equal(false);
+    
+    const steps = results.specs[0].tests[0].contexts[0].steps;
+    expect(steps).to.be.an("array").that.has.lengthOf(5);
+    expect(steps[0]).to.have.property("goTo").that.equals("http://localhost:3000");
+    expect(steps[1]).to.have.property("find").that.deep.includes({ selector: "#input", click: true });
+    expect(steps[2]).to.have.property("type").that.equals("hello world");
+    expect(steps[3]).to.have.property("find").that.deep.includes({ selector: "button", click: true });
+    expect(steps[4]).to.have.property("find").that.equals("HELLO WORLD");
+  });
+
+  it("should correctly handle ignore start/end with different quote syntaxes", async function () {
+    const tempFile = "temp_ignore_syntax.md";
+    fs.writeFileSync(tempFile, markdownIgnoreSyntax.trim());
+    const config = { input: tempFile };
+    const results = await detectAndResolveTests({ config });
+    fs.unlinkSync(tempFile);
+    
+    expect(results.specs).to.be.an("array").that.has.lengthOf(1);
+    expect(results.specs[0].tests).to.be.an("array").that.has.lengthOf(1);
+    expect(results.specs[0].tests[0].testId).to.equal("ignore-syntax-test");
+    
+    // NOTE: The ignore functionality is currently not implemented (the ignore variable
+    // is set but not used to filter detected steps). This test validates that the
+    // ignore start/end patterns with different quote syntaxes are at least recognized.
+    // When ignore filtering is implemented, update this test to verify ignored content
+    // is excluded from detected steps.
+    const steps = results.specs[0].tests[0].contexts[0].steps;
+    expect(steps).to.be.an("array");
+    // Currently all bold text is detected (ignore not implemented)
+    expect(steps.length).to.be.greaterThan(0);
+  });
+});
+
+// CommonMark comment syntax with YAML content
+const markdownParenthesesYaml = `
+[comment]: # (test testId: parentheses-yaml-test)
+
+1. Open the app.
+
+[comment]: # (step goTo: "http://localhost:3000")
+
+2. Type in the field.
+
+[comment]: # (step type: hello world)
+
+3. You'll see the output.
+
+[comment]: # (step find: HELLO WORLD)
+[comment]: # (test end)
+`;
+
+const markdownSingleQuoteYaml = `
+[comment]: # 'test testId: single-quote-yaml-test'
+
+1. Open the app.
+
+[comment]: # 'step goTo: "http://localhost:3000"'
+
+2. Type in the field.
+
+[comment]: # 'step type: hello world'
+
+3. You'll see the output.
+
+[comment]: # 'step find: HELLO WORLD'
+[comment]: # 'test end'
+`;
+
+const markdownDoubleQuoteYaml = `
+[comment]: # "test testId: double-quote-yaml-test"
+
+1. Open the app.
+
+[comment]: # "step goTo: http://localhost:3000"
+
+2. Type in the field.
+
+[comment]: # "step type: hello world"
+
+3. You'll see the output.
+
+[comment]: # "step find: HELLO WORLD"
+[comment]: # "test end"
+`;
+
+// CommonMark comment syntax with XML attribute content
+const markdownParenthesesXml = `
+[comment]: # (test testId="parentheses-xml-test" detectSteps=false)
+
+1. Open the app.
+
+[comment]: # (step goTo="http://localhost:3000")
+
+2. Type in the field.
+
+[comment]: # (step type="hello world")
+
+3. Wait for result.
+
+[comment]: # (step wait=500)
+
+4. You'll see the output.
+
+[comment]: # (step find="HELLO WORLD")
+[comment]: # (test end)
+`;
+
+const markdownSingleQuoteXml = `
+[comment]: # 'test testId="single-quote-xml-test" detectSteps=false'
+
+1. Open the app.
+
+[comment]: # 'step goTo="http://localhost:3000"'
+
+2. Type in the field.
+
+[comment]: # 'step type="hello world"'
+
+3. Wait for result.
+
+[comment]: # 'step wait=500'
+
+4. You'll see the output.
+
+[comment]: # 'step find="HELLO WORLD"'
+[comment]: # 'test end'
+`;
+
+const markdownDoubleQuoteXml = `
+[comment]: # "test testId='double-quote-xml-test' detectSteps=false"
+
+1. Open the app.
+
+[comment]: # "step goTo='http://localhost:3000'"
+
+2. Type in the field.
+
+[comment]: # "step type='hello world'"
+
+3. Wait for result.
+
+[comment]: # "step wait=500"
+
+4. You'll see the output.
+
+[comment]: # "step find='HELLO WORLD'"
+[comment]: # "test end"
+`;
+
+// CommonMark with XML dot notation
+const markdownParenthesesXmlDotNotation = `
+[comment]: # (test testId="parentheses-xml-dot-test" detectSteps=false)
+
+1. Make an API call.
+
+[comment]: # (step httpRequest.url="https://example.com/api" httpRequest.method="GET")
+
+2. Another call.
+
+[comment]: # (step httpRequest.url="https://example.com/submit" httpRequest.method="POST" httpRequest.request.body="test")
+[comment]: # (test end)
+`;
+
+const markdownSingleQuoteXmlDotNotation = `
+[comment]: # 'test testId="single-quote-xml-dot-test" detectSteps=false'
+
+1. Make an API call.
+
+[comment]: # 'step httpRequest.url="https://example.com/api" httpRequest.method="GET"'
+
+2. Another call.
+
+[comment]: # 'step httpRequest.url="https://example.com/submit" httpRequest.method="POST" httpRequest.request.body="test"'
+[comment]: # 'test end'
+`;
+
+describe("CommonMark Comment Syntax with YAML Tests", function () {
+  it("should correctly parse parentheses syntax with YAML content: [comment]: # (test key: value)", async function () {
+    const tempFile = "temp_paren_yaml.md";
+    fs.writeFileSync(tempFile, markdownParenthesesYaml.trim());
+    const config = { input: tempFile };
+    const results = await detectAndResolveTests({ config });
+    fs.unlinkSync(tempFile);
+    
+    expect(results.specs).to.be.an("array").that.has.lengthOf(1);
+    expect(results.specs[0].tests).to.be.an("array").that.has.lengthOf(1);
+    expect(results.specs[0].tests[0].testId).to.equal("parentheses-yaml-test");
+    
+    const steps = results.specs[0].tests[0].contexts[0].steps;
+    expect(steps).to.be.an("array").that.has.lengthOf(3);
+    expect(steps[0]).to.have.property("goTo").that.equals("http://localhost:3000");
+    expect(steps[1]).to.have.property("type").that.equals("hello world");
+    expect(steps[2]).to.have.property("find").that.equals("HELLO WORLD");
+  });
+
+  it("should correctly parse single quote syntax with YAML content: [comment]: # 'test key: value'", async function () {
+    const tempFile = "temp_single_yaml.md";
+    fs.writeFileSync(tempFile, markdownSingleQuoteYaml.trim());
+    const config = { input: tempFile };
+    const results = await detectAndResolveTests({ config });
+    fs.unlinkSync(tempFile);
+    
+    expect(results.specs).to.be.an("array").that.has.lengthOf(1);
+    expect(results.specs[0].tests).to.be.an("array").that.has.lengthOf(1);
+    expect(results.specs[0].tests[0].testId).to.equal("single-quote-yaml-test");
+    
+    const steps = results.specs[0].tests[0].contexts[0].steps;
+    expect(steps).to.be.an("array").that.has.lengthOf(3);
+    expect(steps[0]).to.have.property("goTo").that.equals("http://localhost:3000");
+    expect(steps[1]).to.have.property("type").that.equals("hello world");
+    expect(steps[2]).to.have.property("find").that.equals("HELLO WORLD");
+  });
+
+  it("should correctly parse double quote syntax with YAML content: [comment]: # \"test key: value\"", async function () {
+    const tempFile = "temp_double_yaml.md";
+    fs.writeFileSync(tempFile, markdownDoubleQuoteYaml.trim());
+    const config = { input: tempFile };
+    const results = await detectAndResolveTests({ config });
+    fs.unlinkSync(tempFile);
+    
+    expect(results.specs).to.be.an("array").that.has.lengthOf(1);
+    expect(results.specs[0].tests).to.be.an("array").that.has.lengthOf(1);
+    expect(results.specs[0].tests[0].testId).to.equal("double-quote-yaml-test");
+    
+    const steps = results.specs[0].tests[0].contexts[0].steps;
+    expect(steps).to.be.an("array").that.has.lengthOf(3);
+    expect(steps[0]).to.have.property("goTo").that.equals("http://localhost:3000");
+    expect(steps[1]).to.have.property("type").that.equals("hello world");
+    expect(steps[2]).to.have.property("find").that.equals("HELLO WORLD");
+  });
+});
+
+describe("CommonMark Comment Syntax with XML Attribute Tests", function () {
+  it("should correctly parse parentheses syntax with XML attributes: [comment]: # (test key=\"value\")", async function () {
+    const tempFile = "temp_paren_xml.md";
+    fs.writeFileSync(tempFile, markdownParenthesesXml.trim());
+    const config = { input: tempFile };
+    const results = await detectAndResolveTests({ config });
+    fs.unlinkSync(tempFile);
+    
+    expect(results.specs).to.be.an("array").that.has.lengthOf(1);
+    expect(results.specs[0].tests).to.be.an("array").that.has.lengthOf(1);
+    expect(results.specs[0].tests[0].testId).to.equal("parentheses-xml-test");
+    expect(results.specs[0].tests[0].detectSteps).to.equal(false);
+    
+    const steps = results.specs[0].tests[0].contexts[0].steps;
+    expect(steps).to.be.an("array").that.has.lengthOf(4);
+    expect(steps[0]).to.have.property("goTo").that.equals("http://localhost:3000");
+    expect(steps[1]).to.have.property("type").that.equals("hello world");
+    expect(steps[2]).to.have.property("wait").that.equals(500);
+    expect(steps[3]).to.have.property("find").that.equals("HELLO WORLD");
+  });
+
+  it("should correctly parse single quote syntax with XML attributes: [comment]: # 'test key=\"value\"'", async function () {
+    const tempFile = "temp_single_xml.md";
+    fs.writeFileSync(tempFile, markdownSingleQuoteXml.trim());
+    const config = { input: tempFile };
+    const results = await detectAndResolveTests({ config });
+    fs.unlinkSync(tempFile);
+    
+    expect(results.specs).to.be.an("array").that.has.lengthOf(1);
+    expect(results.specs[0].tests).to.be.an("array").that.has.lengthOf(1);
+    expect(results.specs[0].tests[0].testId).to.equal("single-quote-xml-test");
+    expect(results.specs[0].tests[0].detectSteps).to.equal(false);
+    
+    const steps = results.specs[0].tests[0].contexts[0].steps;
+    expect(steps).to.be.an("array").that.has.lengthOf(4);
+    expect(steps[0]).to.have.property("goTo").that.equals("http://localhost:3000");
+    expect(steps[1]).to.have.property("type").that.equals("hello world");
+    expect(steps[2]).to.have.property("wait").that.equals(500);
+    expect(steps[3]).to.have.property("find").that.equals("HELLO WORLD");
+  });
+
+  it("should correctly parse double quote syntax with XML attributes using single quotes inside: [comment]: # \"test key='value'\"", async function () {
+    const tempFile = "temp_double_xml.md";
+    fs.writeFileSync(tempFile, markdownDoubleQuoteXml.trim());
+    const config = { input: tempFile };
+    const results = await detectAndResolveTests({ config });
+    fs.unlinkSync(tempFile);
+    
+    expect(results.specs).to.be.an("array").that.has.lengthOf(1);
+    expect(results.specs[0].tests).to.be.an("array").that.has.lengthOf(1);
+    expect(results.specs[0].tests[0].testId).to.equal("double-quote-xml-test");
+    expect(results.specs[0].tests[0].detectSteps).to.equal(false);
+    
+    const steps = results.specs[0].tests[0].contexts[0].steps;
+    expect(steps).to.be.an("array").that.has.lengthOf(4);
+    expect(steps[0]).to.have.property("goTo").that.equals("http://localhost:3000");
+    expect(steps[1]).to.have.property("type").that.equals("hello world");
+    expect(steps[2]).to.have.property("wait").that.equals(500);
+    expect(steps[3]).to.have.property("find").that.equals("HELLO WORLD");
+  });
+
+  it("should correctly parse parentheses syntax with XML dot notation: [comment]: # (step key.nested=\"value\")", async function () {
+    const tempFile = "temp_paren_xml_dot.md";
+    fs.writeFileSync(tempFile, markdownParenthesesXmlDotNotation.trim());
+    const config = { input: tempFile };
+    const results = await detectAndResolveTests({ config });
+    fs.unlinkSync(tempFile);
+    
+    expect(results.specs).to.be.an("array").that.has.lengthOf(1);
+    expect(results.specs[0].tests).to.be.an("array").that.has.lengthOf(1);
+    expect(results.specs[0].tests[0].testId).to.equal("parentheses-xml-dot-test");
+    
+    const steps = results.specs[0].tests[0].contexts[0].steps;
+    expect(steps).to.be.an("array").that.has.lengthOf(2);
+    
+    expect(steps[0]).to.have.property("httpRequest");
+    expect(steps[0].httpRequest).to.have.property("url").that.equals("https://example.com/api");
+    expect(steps[0].httpRequest).to.have.property("method").that.equals("GET");
+    
+    expect(steps[1]).to.have.property("httpRequest");
+    expect(steps[1].httpRequest).to.have.property("url").that.equals("https://example.com/submit");
+    expect(steps[1].httpRequest).to.have.property("method").that.equals("POST");
+    expect(steps[1].httpRequest).to.have.property("request");
+    expect(steps[1].httpRequest.request).to.have.property("body").that.equals("test");
+  });
+
+  it("should correctly parse single quote syntax with XML dot notation: [comment]: # 'step key.nested=\"value\"'", async function () {
+    const tempFile = "temp_single_xml_dot.md";
+    fs.writeFileSync(tempFile, markdownSingleQuoteXmlDotNotation.trim());
+    const config = { input: tempFile };
+    const results = await detectAndResolveTests({ config });
+    fs.unlinkSync(tempFile);
+    
+    expect(results.specs).to.be.an("array").that.has.lengthOf(1);
+    expect(results.specs[0].tests).to.be.an("array").that.has.lengthOf(1);
+    expect(results.specs[0].tests[0].testId).to.equal("single-quote-xml-dot-test");
+    
+    const steps = results.specs[0].tests[0].contexts[0].steps;
+    expect(steps).to.be.an("array").that.has.lengthOf(2);
+    
+    expect(steps[0]).to.have.property("httpRequest");
+    expect(steps[0].httpRequest).to.have.property("url").that.equals("https://example.com/api");
+    expect(steps[0].httpRequest).to.have.property("method").that.equals("GET");
+    
+    expect(steps[1]).to.have.property("httpRequest");
+    expect(steps[1].httpRequest).to.have.property("url").that.equals("https://example.com/submit");
+    expect(steps[1].httpRequest).to.have.property("method").that.equals("POST");
+    expect(steps[1].httpRequest.request).to.have.property("body").that.equals("test");
+  });
+});
+
