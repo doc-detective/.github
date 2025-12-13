@@ -370,7 +370,8 @@ async function renderAnnotation({
  */
 async function getElementBounds({ config, find, driver, pixelDensity }) {
   try {
-    const findStep = typeof find === "string" ? { find } : { find };
+    // Create a step object with the find property for findElement
+    const findStep = { find };
     const findResult = await findElement({
       config,
       step: findStep,
