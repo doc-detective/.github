@@ -283,6 +283,27 @@ async function saveScreenshot({ config, step, driver }) {
     }
   }
 
+  // Apply annotations if specified
+  if (step.screenshot.annotations && Array.isArray(step.screenshot.annotations)) {
+    const { annotateScreenshot } = require("./annotateScreenshot");
+    const targetPath = existFilePath || filePath;
+
+    const annotationResult = await annotateScreenshot({
+      config,
+      filePath: targetPath,
+      annotations: step.screenshot.annotations,
+      driver,
+    });
+
+    if (!annotationResult.success) {
+      result.status = "FAIL";
+      result.description = `Annotation failed: ${annotationResult.error}`;
+      return result;
+    }
+
+    result.description += ` Added ${step.screenshot.annotations.length} annotation(s).`;
+  }
+
   // If file already exists
   // If overwrite is true, replace old file with new file
   // If overwrite is aboveVariation, compare files and replace if variance is greater than threshold
