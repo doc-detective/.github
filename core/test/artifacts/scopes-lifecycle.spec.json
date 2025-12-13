@@ -5,6 +5,7 @@
     {
       "testId": "scope-basic-lifecycle",
       "description": "Create a scope with sleep command and terminate it",
+      "contexts": [],
       "steps": [
         {
           "runShell": {
@@ -20,6 +21,7 @@
     {
       "testId": "scope-waituntil-stdout",
       "description": "Test waitUntil with stdout condition",
+      "contexts": [],
       "steps": [
         {
           "runShell": {
@@ -40,6 +42,7 @@
     {
       "testId": "scope-waituntil-regex",
       "description": "Test waitUntil with regex pattern",
+      "contexts": [],
       "steps": [
         {
           "runShell": {
@@ -60,6 +63,7 @@
     {
       "testId": "terminate-nonexistent-scope",
       "description": "Test terminating a scope that doesn't exist (should not fail)",
+      "contexts": [],
       "steps": [
         {
           "terminateScope": "nonexistent-scope"

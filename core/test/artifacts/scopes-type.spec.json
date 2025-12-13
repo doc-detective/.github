@@ -4,16 +4,16 @@
   "tests": [
     {
       "testId": "type-to-scope",
-      "description": "Type input to a scope running an interactive command",
+      "description": "Type input to a scope running read command",
+      "contexts": [],
       "steps": [
         {
-          "runCode": {
-            "language": "python",
-            "code": "import sys\nprint('Enter your name:', flush=True)\nname = input()\nprint(f'Hello {name}!', flush=True)\nimport time\ntime.sleep(5)",
-            "scope": "python-interactive",
+          "runShell": {
+            "command": "read -p 'Enter name: ' name && echo \"Hello $name\" && sleep 5",
+            "scope": "shell-interactive",
             "waitUntil": {
               "stdio": {
-                "stdout": "Enter your name:"
+                "stdout": "Enter name:"
               }
             }
           }
@@ -21,11 +21,11 @@
         {
           "type": {
             "keys": "TestUser\n",
-            "scope": "python-interactive"
+            "scope": "shell-interactive"
           }
         },
         {
-          "terminateScope": "python-interactive"
+          "terminateScope": "shell-interactive"
         }
       ]
     }
