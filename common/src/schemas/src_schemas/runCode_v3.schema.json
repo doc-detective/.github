@@ -29,6 +29,10 @@
             "description": "Code to run.",
             "type": "string"
           },
+          "scope": {
+            "type": "string",
+            "description": "Named scope to create or interact with. Creates a new terminal scope for long-running/parallel processes, or references an existing scope."
+          },
           "args": {
             "type": "array",
             "description": "Arguments for the command.",

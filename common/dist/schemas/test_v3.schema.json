@@ -1754,6 +1754,10 @@
                                           }
                                         ]
                                       },
+                                      "scope": {
+                                        "type": "string",
+                                        "description": "Named scope to interact with. References a terminal scope created by a previous step. If the specified scope doesn't exist, the step fails."
+                                      },
                                       "inputDelay": {
                                         "type": "number",
                                         "description": "Delay in milliseconds between each key press during a recording",
@@ -1860,6 +1864,10 @@
                                               }
                                             }
                                           ]
+                                        },
+                                        "scope": {
+                                          "type": "string",
+                                          "description": "Named scope to interact with. References a terminal scope created by a previous step. If the specified scope doesn't exist, the step fails."
                                         },
                                         "inputDelay": {
                                           "type": "number",
@@ -2403,6 +2411,10 @@
                                             }
                                           ]
                                         },
+                                        "scope": {
+                                          "type": "string",
+                                          "description": "Named scope to interact with. References a terminal scope created by a previous step. If the specified scope doesn't exist, the step fails."
+                                        },
                                         "inputDelay": {
                                           "type": "number",
                                           "description": "Delay in milliseconds between each key press during a recording",
@@ -2509,6 +2521,10 @@
                                                 }
                                               }
                                             ]
+                                          },
+                                          "scope": {
+                                            "type": "string",
+                                            "description": "Named scope to interact with. References a terminal scope created by a previous step. If the specified scope doesn't exist, the step fails."
                                           },
                                           "inputDelay": {
                                             "type": "number",
@@ -4318,6 +4334,10 @@
                             "type": "string",
                             "description": "Command to perform in the machine's default shell."
                           },
+                          "scope": {
+                            "type": "string",
+                            "description": "Named scope to create or interact with. Creates a new terminal scope for long-running/parallel processes, or references an existing scope."
+                          },
                           "args": {
                             "type": "array",
                             "description": "Arguments for the command.",
@@ -4407,6 +4427,10 @@
                             "command": {
                               "type": "string",
                               "description": "Command to perform in the machine's default shell."
+                            },
+                            "scope": {
+                              "type": "string",
+                              "description": "Named scope to create or interact with. Creates a new terminal scope for long-running/parallel processes, or references an existing scope."
                             },
                             "args": {
                               "type": "array",
@@ -4626,6 +4650,10 @@
                             "description": "Code to run.",
                             "type": "string"
                           },
+                          "scope": {
+                            "type": "string",
+                            "description": "Named scope to create or interact with. Creates a new terminal scope for long-running/parallel processes, or references an existing scope."
+                          },
                           "args": {
                             "type": "array",
                             "description": "Arguments for the command.",
@@ -4716,6 +4744,10 @@
                             "code": {
                               "description": "Code to run.",
                               "type": "string"
+                            },
+                            "scope": {
+                              "type": "string",
+                              "description": "Named scope to create or interact with. Creates a new terminal scope for long-running/parallel processes, or references an existing scope."
                             },
                             "args": {
                               "type": "array",
@@ -4941,6 +4973,10 @@
                               }
                             ]
                           },
+                          "scope": {
+                            "type": "string",
+                            "description": "Named scope to interact with. References a terminal scope created by a previous step. If the specified scope doesn't exist, the step fails."
+                          },
                           "inputDelay": {
                             "type": "number",
                             "description": "Delay in milliseconds between each key press during a recording",
@@ -5047,6 +5083,10 @@
                                   }
                                 }
                               ]
+                            },
+                            "scope": {
+                              "type": "string",
+                              "description": "Named scope to interact with. References a terminal scope created by a previous step. If the specified scope doesn't exist, the step fails."
                             },
                             "inputDelay": {
                               "type": "number",
@@ -9231,6 +9271,10 @@
                                                 }
                                               ]
                                             },
+                                            "scope": {
+                                              "type": "string",
+                                              "description": "Named scope to interact with. References a terminal scope created by a previous step. If the specified scope doesn't exist, the step fails."
+                                            },
                                             "inputDelay": {
                                               "type": "number",
                                               "description": "Delay in milliseconds between each key press during a recording",
@@ -9337,6 +9381,10 @@
                                                     }
                                                   }
                                                 ]
+                                              },
+                                              "scope": {
+                                                "type": "string",
+                                                "description": "Named scope to interact with. References a terminal scope created by a previous step. If the specified scope doesn't exist, the step fails."
                                               },
                                               "inputDelay": {
                                                 "type": "number",
@@ -9880,6 +9928,10 @@
                                                   }
                                                 ]
                                               },
+                                              "scope": {
+                                                "type": "string",
+                                                "description": "Named scope to interact with. References a terminal scope created by a previous step. If the specified scope doesn't exist, the step fails."
+                                              },
                                               "inputDelay": {
                                                 "type": "number",
                                                 "description": "Delay in milliseconds between each key press during a recording",
@@ -9986,6 +10038,10 @@
                                                       }
                                                     }
                                                   ]
+                                                },
+                                                "scope": {
+                                                  "type": "string",
+                                                  "description": "Named scope to interact with. References a terminal scope created by a previous step. If the specified scope doesn't exist, the step fails."
                                                 },
                                                 "inputDelay": {
                                                   "type": "number",
@@ -11795,6 +11851,10 @@
                                   "type": "string",
                                   "description": "Command to perform in the machine's default shell."
                                 },
+                                "scope": {
+                                  "type": "string",
+                                  "description": "Named scope to create or interact with. Creates a new terminal scope for long-running/parallel processes, or references an existing scope."
+                                },
                                 "args": {
                                   "type": "array",
                                   "description": "Arguments for the command.",
@@ -11884,6 +11944,10 @@
                                   "command": {
                                     "type": "string",
                                     "description": "Command to perform in the machine's default shell."
+                                  },
+                                  "scope": {
+                                    "type": "string",
+                                    "description": "Named scope to create or interact with. Creates a new terminal scope for long-running/parallel processes, or references an existing scope."
                                   },
                                   "args": {
                                     "type": "array",
@@ -12103,6 +12167,10 @@
                                   "description": "Code to run.",
                                   "type": "string"
                                 },
+                                "scope": {
+                                  "type": "string",
+                                  "description": "Named scope to create or interact with. Creates a new terminal scope for long-running/parallel processes, or references an existing scope."
+                                },
                                 "args": {
                                   "type": "array",
                                   "description": "Arguments for the command.",
@@ -12193,6 +12261,10 @@
                                   "code": {
                                     "description": "Code to run.",
                                     "type": "string"
+                                  },
+                                  "scope": {
+                                    "type": "string",
+                                    "description": "Named scope to create or interact with. Creates a new terminal scope for long-running/parallel processes, or references an existing scope."
                                   },
                                   "args": {
                                     "type": "array",
@@ -12418,6 +12490,10 @@
                                     }
                                   ]
                                 },
+                                "scope": {
+                                  "type": "string",
+                                  "description": "Named scope to interact with. References a terminal scope created by a previous step. If the specified scope doesn't exist, the step fails."
+                                },
                                 "inputDelay": {
                                   "type": "number",
                                   "description": "Delay in milliseconds between each key press during a recording",
@@ -12524,6 +12600,10 @@
                                         }
                                       }
                                     ]
+                                  },
+                                  "scope": {
+                                    "type": "string",
+                                    "description": "Named scope to interact with. References a terminal scope created by a previous step. If the specified scope doesn't exist, the step fails."
                                   },
                                   "inputDelay": {
                                     "type": "number",
