@@ -8,7 +8,7 @@ const AdmZip = require("adm-zip");
 // Internal constants - not exposed to users
 const POLLING_INTERVAL_MS = 5000;
 const POLLING_TIMEOUT_MS = 300000; // 5 minutes
-const SCENARIO_NAME = "Doc Detective";
+const DEFAULT_SCENARIO_NAME = "Doc Detective";
 const SCENARIO_DESCRIPTION = "Normalized DITA output for Doc Detective testing";
 
 /**
@@ -68,25 +68,6 @@ async function getPublishingScenarioParameters(client, scenarioId) {
   return response.data;
 }
 
-/**
- * Creates a new publishing scenario in Heretto.
- * @param {Object} client - Configured axios instance
- * @returns {Promise<Object>} Created scenario object
- */
-async function createPublishingScenario(client) {
-  const scenarioConfig = {
-    name: SCENARIO_NAME,
-    description: SCENARIO_DESCRIPTION,
-    outputFormat: "dita",
-    engine: "dita-ot",
-    parameters: {
-      transtype: "dita",
-    },
-  };
-  const response = await client.post("/publishing-scenarios", scenarioConfig);
-  return response.data;
-}
-
 // TODO: Remove scenario creation. Users have to create it manually with specific settings.
 /**
  * Finds an existing "Doc Detective" scenario or creates one if missing.
@@ -95,13 +76,13 @@ async function createPublishingScenario(client) {
  * @param {Object} config - Doc Detective config for logging
  * @returns {Promise<Object|null>} Scenario object or null if creation failed
  */
-async function findScenario(client, log, config) {
+async function findScenario(client, log, config, scenarioName) {
   try {
     const scenarios = await getPublishingScenarios(client);
-    const foundScenario = scenarios.find((s) => s.name === SCENARIO_NAME);
+    const foundScenario = scenarios.find((s) => s.name === scenarioName);
 
     if (!foundScenario) {
-      log(config, "error", `No existing "${SCENARIO_NAME}" scenario found.`);
+      log(config, "error", `No existing "${scenarioName}" scenario found.`);
       return null;
     }
 
@@ -127,7 +108,7 @@ async function findScenario(client, log, config) {
       log(
         config,
         "error",
-        `Existing "${SCENARIO_NAME}" scenario has incorrect "transtype" parameter settings. Make sure it is set to "dita".`
+        `Existing "${DEFAULT_SCENARIO_NAME}" scenario has incorrect "transtype" parameter settings. Make sure it is set to "dita".`
       );
       return null;
     }
@@ -140,7 +121,7 @@ async function findScenario(client, log, config) {
       log(
         config,
         "error",
-        `Existing "${SCENARIO_NAME}" scenario has incorrect "tool-kit-name" parameter settings".`
+        `Existing "${DEFAULT_SCENARIO_NAME}" scenario has incorrect "tool-kit-name" parameter settings".`
       );
       return null;
     }
@@ -153,7 +134,7 @@ async function findScenario(client, log, config) {
       log(
         config,
         "error",
-        `Existing "${SCENARIO_NAME}" scenario has incorrect "file_uuid_picker" parameter settings. Make sure it has a valid value.`
+        `Existing "${DEFAULT_SCENARIO_NAME}" scenario has incorrect "file_uuid_picker" parameter settings. Make sure it has a valid value.`
       );
       return null;
     }
@@ -161,7 +142,7 @@ async function findScenario(client, log, config) {
     log(
       config,
       "debug",
-      `Found existing "${SCENARIO_NAME}" scenario: ${foundScenario.id}`
+      `Found existing "${DEFAULT_SCENARIO_NAME}" scenario: ${foundScenario.id}`
     );
     return { scenarioId: foundScenario.id, fileId: fileUuidPickerParam.value };
   } catch (error) {
@@ -352,7 +333,7 @@ async function loadHerettoContent(herettoConfig, log, config) {
     const client = createApiClient(herettoConfig);
 
     // Find or create the Doc Detective publishing scenario
-    const scenario = await findScenario(client, log, config);
+    const scenario = await findScenario(client, log, config, herettoConfig.scenarioName);
     if (!scenario) {
       log(
         config,
@@ -432,5 +413,5 @@ module.exports = {
   // Export constants for testing
   POLLING_INTERVAL_MS,
   POLLING_TIMEOUT_MS,
-  SCENARIO_NAME,
+  DEFAULT_SCENARIO_NAME,
 };
