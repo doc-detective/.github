@@ -286,11 +286,11 @@ async function saveScreenshot({ config, step, driver }) {
   // Apply annotations if specified
   if (step.screenshot.annotations && Array.isArray(step.screenshot.annotations)) {
     const { annotateScreenshot } = require("./annotateScreenshot");
-    const targetPath = existFilePath || filePath;
-
+    
+    // Always annotate the newly captured screenshot (filePath)
     const annotationResult = await annotateScreenshot({
       config,
-      filePath: targetPath,
+      filePath: filePath,
       annotations: step.screenshot.annotations,
       driver,
     });

@@ -20,10 +20,11 @@ async function annotateScreenshot({ config, filePath, annotations, driver }) {
     const ctx = nodeCanvas.getContext("2d");
     ctx.drawImage(image, 0, 0);
 
-    // Create Fabric.js canvas using the node-canvas
-    const fabricCanvas = new fabric.Canvas(nodeCanvas);
-    fabricCanvas.setWidth(width);
-    fabricCanvas.setHeight(height);
+    // Create Fabric.js StaticCanvas for server-side rendering
+    const fabricCanvas = new fabric.StaticCanvas(nodeCanvas, {
+      width: width,
+      height: height,
+    });
 
     // Get pixel density for scaling
     const pixelDensity = await driver.execute(() => window.devicePixelRatio);
@@ -54,7 +55,10 @@ async function annotateScreenshot({ config, filePath, annotations, driver }) {
       }
     }
 
-    // Render canvas to buffer
+    // Render Fabric canvas back to node canvas
+    fabricCanvas.renderAll();
+
+    // Get buffer from node canvas
     const buffer = nodeCanvas.toBuffer("image/png");
 
     // Write buffer to file (overwriting original)
