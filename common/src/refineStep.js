@@ -57,7 +57,9 @@ const buildRefinementPrompt = ({
   const sections = [];
 
   // Current step
-  sections.push("## Step to Refine\n```json\n" + JSON.stringify(step, null, 2) + "\n```");
+  sections.push(
+    "## Step to Refine\n```json\n" + JSON.stringify(step, null, 2) + "\n```"
+  );
 
   // Failure message if present
   if (failureMessage) {
@@ -66,15 +68,23 @@ const buildRefinementPrompt = ({
 
   // Source content if present
   if (sourceContent) {
-    const truncatedSource = truncateContent(sourceContent, Math.floor(maxContextLength / 3));
+    const truncatedSource = truncateContent(
+      sourceContent,
+      Math.floor(maxContextLength / 3)
+    );
     sections.push("## Source Documentation\n" + truncatedSource);
   }
 
   // Previous steps if present
   if (previousSteps && previousSteps.length > 0) {
     const stepsJson = JSON.stringify(previousSteps, null, 2);
-    const truncatedSteps = truncateContent(stepsJson, Math.floor(maxContextLength / 4));
-    sections.push("## Previously Executed Steps\n```json\n" + truncatedSteps + "\n```");
+    const truncatedSteps = truncateContent(
+      stepsJson,
+      Math.floor(maxContextLength / 4)
+    );
+    sections.push(
+      "## Previously Executed Steps\n```json\n" + truncatedSteps + "\n```"
+    );
   }
 
   // Additional context
@@ -82,37 +92,61 @@ const buildRefinementPrompt = ({
     const contextSections = [];
 
     if (context.dom) {
-      const truncatedDom = truncateContent(context.dom, Math.floor(maxContextLength / 3));
-      contextSections.push("### Browser DOM\n```html\n" + truncatedDom + "\n```");
+      const truncatedDom = truncateContent(
+        context.dom,
+        Math.floor(maxContextLength / 3)
+      );
+      contextSections.push(
+        "### Browser DOM\n```html\n" + truncatedDom + "\n```"
+      );
     }
 
     if (context.element) {
       const truncatedElement = truncateContent(
-        typeof context.element === "string" ? context.element : JSON.stringify(context.element, null, 2),
+        typeof context.element === "string"
+          ? context.element
+          : JSON.stringify(context.element, null, 2),
         Math.floor(maxContextLength / 4)
       );
-      contextSections.push("### Target Element\n```\n" + truncatedElement + "\n```");
+      contextSections.push(
+        "### Target Element\n```\n" + truncatedElement + "\n```"
+      );
     }
 
     if (context.cliOutput) {
-      const truncatedCli = truncateContent(context.cliOutput, Math.floor(maxContextLength / 4));
+      const truncatedCli = truncateContent(
+        context.cliOutput,
+        Math.floor(maxContextLength / 4)
+      );
       contextSections.push("### CLI Output\n```\n" + truncatedCli + "\n```");
     }
 
     if (context.httpResponse) {
-      const responseStr = typeof context.httpResponse === "string" 
-        ? context.httpResponse 
-        : JSON.stringify(context.httpResponse, null, 2);
-      const truncatedHttp = truncateContent(responseStr, Math.floor(maxContextLength / 4));
-      contextSections.push("### HTTP Response\n```json\n" + truncatedHttp + "\n```");
+      const responseStr =
+        typeof context.httpResponse === "string"
+          ? context.httpResponse
+          : JSON.stringify(context.httpResponse, null, 2);
+      const truncatedHttp = truncateContent(
+        responseStr,
+        Math.floor(maxContextLength / 4)
+      );
+      contextSections.push(
+        "### HTTP Response\n```json\n" + truncatedHttp + "\n```"
+      );
     }
 
     if (context.accessibility) {
-      const accessStr = typeof context.accessibility === "string"
-        ? context.accessibility
-        : JSON.stringify(context.accessibility, null, 2);
-      const truncatedAccess = truncateContent(accessStr, Math.floor(maxContextLength / 4));
-      contextSections.push("### Accessibility Tree\n```\n" + truncatedAccess + "\n```");
+      const accessStr =
+        typeof context.accessibility === "string"
+          ? context.accessibility
+          : JSON.stringify(context.accessibility, null, 2);
+      const truncatedAccess = truncateContent(
+        accessStr,
+        Math.floor(maxContextLength / 4)
+      );
+      contextSections.push(
+        "### Accessibility Tree\n```\n" + truncatedAccess + "\n```"
+      );
     }
 
     if (contextSections.length > 0) {
@@ -120,7 +154,14 @@ const buildRefinementPrompt = ({
     }
   }
 
-  sections.push("## Task\nRefine the step above to make it pass based on the provided context. Return only the refined step object.");
+  sections.push(
+    "## Task\nRefine the step above to make it pass based on the provided context. Return only the refined step object.",
+    "## Guidelines",
+    "- Maintain the original intent of the step while fixing issues.",
+    "- For element-related steps, locate elements using properties in the following order of precedence: elementText (element display text) > elementAria (element ARIA label) > elementId (id attribute) > elementTestId (data-testid attribute) > elementAttributes (arbitrary attributes) > elementClass > selector.",
+    "- Avoid finding elements by selector if other properties can be used.",
+    "- Ensure all required fields are present and valid."
+  );
 
   return sections.join("\n\n");
 };
@@ -230,9 +271,11 @@ const refineStep = async ({
   const refinedStep = postProcessStep(result.object, step);
 
   // Validate the step against the schema
-  const validation = validate({schemaKey: "step_v3", object: refinedStep});
+  const validation = validate({ schemaKey: "step_v3", object: refinedStep });
   if (!validation.valid) {
-    throw new Error(`Refined step failed validation: ${JSON.stringify(validation.errors)}`);
+    throw new Error(
+      `Refined step failed validation: ${JSON.stringify(validation.errors)}`
+    );
   }
 
   return refinedStep;
