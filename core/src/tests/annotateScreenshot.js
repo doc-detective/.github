@@ -3,6 +3,11 @@ const { findElement } = require("./findElement");
 const { log } = require("../utils");
 const fs = require("fs");
 
+// Constants for default dimensions and positioning
+const DEFAULT_SIZE = 100;
+const DEFAULT_CALLOUT_OFFSET_X = 100;
+const DEFAULT_CALLOUT_OFFSET_Y = 80;
+
 exports.annotateScreenshot = annotateScreenshot;
 
 async function annotateScreenshot({ config, filePath, annotations, driver }) {
@@ -377,8 +382,8 @@ function renderRectangle(ctx, rectangle, basePosition, pixelDensity) {
 
   const x = basePosition.x;
   const y = basePosition.y;
-  const width = (config.width || basePosition.width || 100) * pixelDensity;
-  const height = (config.height || basePosition.height || 100) * pixelDensity;
+  const width = (config.width || basePosition.width || DEFAULT_SIZE) * pixelDensity;
+  const height = (config.height || basePosition.height || DEFAULT_SIZE) * pixelDensity;
   const rx = config.rx * pixelDensity;
   const ry = config.ry * pixelDensity;
 
@@ -504,8 +509,8 @@ function renderCallout(ctx, callout, basePosition, pixelDensity) {
     textY = basePosition.y + callout.textPosition.y * pixelDensity;
   } else {
     // Auto-position above and to the left of target
-    textX = targetX - 100 * pixelDensity;
-    textY = targetY - 80 * pixelDensity;
+    textX = targetX - DEFAULT_CALLOUT_OFFSET_X * pixelDensity;
+    textY = targetY - DEFAULT_CALLOUT_OFFSET_Y * pixelDensity;
   }
 
   // Draw text box
@@ -587,8 +592,8 @@ function renderHighlight(ctx, highlight, basePosition, pixelDensity) {
   ctx.fillRect(
     basePosition.x,
     basePosition.y,
-    basePosition.width || 100 * pixelDensity,
-    basePosition.height || 100 * pixelDensity
+    basePosition.width || DEFAULT_SIZE * pixelDensity,
+    basePosition.height || DEFAULT_SIZE * pixelDensity
   );
   ctx.restore();
 }
@@ -607,8 +612,8 @@ function renderBlur(ctx, blur, basePosition, pixelDensity) {
   ctx.fillRect(
     basePosition.x,
     basePosition.y,
-    (config.width || basePosition.width || 100) * pixelDensity,
-    (config.height || basePosition.height || 100) * pixelDensity
+    (config.width || basePosition.width || DEFAULT_SIZE) * pixelDensity,
+    (config.height || basePosition.height || DEFAULT_SIZE) * pixelDensity
   );
   ctx.restore();
 }
