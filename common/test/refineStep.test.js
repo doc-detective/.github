@@ -21,7 +21,10 @@ describe("RefineStep Module", function () {
     expect = chai.expect;
     
     console.log("  Setting up Ollama for tests...");
-    await ensureOllamaRunning();
+    const isOllamaRunning = await ensureOllamaRunning();
+    if (!isOllamaRunning) {
+      console.warn("Warning: Ollama is not available. Some tests may be skipped.");
+    }
   });
 
     describe("truncateContent", function () {

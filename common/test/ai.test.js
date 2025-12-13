@@ -35,13 +35,16 @@ describe("AI Module", function () {
     console.log("  Setting up Ollama for tests...");
     // Track if we need to start the container
     const wasAlreadyRunning = await isOllamaAvailable();
-    await ensureOllamaRunning();
+    const isOllamaRunning = await ensureOllamaRunning();
+    if (!isOllamaRunning) {
+      console.warn("Warning: Ollama is not available. Some tests may be skipped.");
+    }
     weStartedOllama = !wasAlreadyRunning;
   });
 
   after(async function () {
     if (weStartedOllama) {
-      console.log("  Cleaning up Ollama container...");
+      console.log("Cleaning up Ollama container...");
       await stopOllamaContainer();
     }
   });

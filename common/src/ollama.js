@@ -72,6 +72,13 @@ const detectGpuType = () => {
  * @returns {Promise<void>}
  */
 const startOllamaContainer = async () => {
+  // Check if Docker is installed
+  try {
+    execSync("docker --version", { stdio: "ignore" });
+  } catch {
+    throw new Error("Docker is not installed or not in PATH");
+  }
+
   const gpuType = detectGpuType();
   console.log(`    Detected GPU type: ${gpuType}`);
 
@@ -161,16 +168,21 @@ const stopOllamaContainer = async () => {
  */
 const ensureOllamaRunning = async (model = DEFAULT_OLLAMA_MODEL) => {
   if (await isOllamaAvailable()) {
-    console.log("    Ollama is already running.");
+    console.log("Ollama is already running.");
     return true;
   }
 
-  console.log("    Ollama not detected, starting Docker container...");
+  console.log("Ollama not detected, starting Docker container...");
   
   // Clean up any existing container first
   await stopOllamaContainer();
   
+  try {
   await startOllamaContainer();
+  } catch (error) {
+    console.error(`Failed to start Ollama container: ${error.message}`);
+    return false;
+  }
 
   const available = await waitForOllama();
   if (!available) {
