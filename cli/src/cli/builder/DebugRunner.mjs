@@ -28,16 +28,6 @@ import {
 const { refineStep, detectProvider } = require('doc-detective-common');
 
 /**
- * Check if an AI provider is available via environment variables or config
- * @param {Object} [config={}] - Optional configuration object
- * @returns {boolean} True if an AI provider is available
- */
-function isAiAvailable(config = {}) {
-  const detected = detectProvider(config, null);
-  return detected.provider !== null && detected.apiKey !== null;
-}
-
-/**
  * Truncate a string to a maximum number of grapheme clusters (user-perceived characters).
  * Uses Intl.Segmenter if available (Node 16+), otherwise falls back to Array.from for code-point safety.
  * @param {string} str - The string to truncate
@@ -126,7 +116,6 @@ const DebugRunner = ({ test, testIndex, onComplete, onCancel }) => {
   const [isExecuting, setIsExecuting] = useState(false);
   
   // AI refinement state
-  const [aiAvailable] = useState(() => isAiAvailable());
   const [aiRefinedStep, setAiRefinedStep] = useState(null);
   const [aiRefineError, setAiRefineError] = useState(null);
   
@@ -217,7 +206,13 @@ const DebugRunner = ({ test, testIndex, onComplete, onCancel }) => {
 
   // Attempt AI refinement of a failed step
   const attemptAiRefinement = useCallback(async (step, failureMessage) => {
-    if (!aiAvailable) return;
+    // Check if AI provider is actually available (detectProvider is async)
+    const detectedProvider = await detectProvider();
+    if (!detectedProvider.provider) {
+      // No AI provider available, skip refinement
+      setPhase('stepResult');
+      return;
+    }
     
     setAiRefinedStep(null);
     setAiRefineError(null);
@@ -226,7 +221,6 @@ const DebugRunner = ({ test, testIndex, onComplete, onCancel }) => {
     try {
       // Get previous steps for context
       const previousSteps = (localTest.steps || []).slice(0, currentStepIndex);
-      const detectedProvider = await detectProvider();
 
       // Try to get the current browser DOM for context
       let dom = null;
@@ -276,7 +270,7 @@ const DebugRunner = ({ test, testIndex, onComplete, onCancel }) => {
       setAiRefineError(error.message || 'AI refinement failed');
       setPhase('aiRefineResult');
     }
-  }, [aiAvailable, localTest.steps, currentStepIndex, runner]);
+  }, [localTest.steps, currentStepIndex, runner]);
 
   // Execute current step
   const executeStep = useCallback(async () => {
@@ -320,12 +314,8 @@ const DebugRunner = ({ test, testIndex, onComplete, onCancel }) => {
         }, 1500);
       } else {
         setResults((prev) => ({ ...prev, failed: prev.failed + 1 }));
-        // If AI is available, attempt automatic refinement
-        if (aiAvailable) {
-          attemptAiRefinement(step, result.description || 'Step failed');
-        } else {
-          setPhase('stepResult');
-        }
+        // Attempt automatic AI refinement (will check provider availability internally)
+        attemptAiRefinement(step, result.description || 'Step failed');
       }
     } catch (error) {
       setStepResult({
@@ -333,16 +323,12 @@ const DebugRunner = ({ test, testIndex, onComplete, onCancel }) => {
         description: error.message || 'Step execution failed',
       });
       setResults((prev) => ({ ...prev, failed: prev.failed + 1 }));
-      // If AI is available, attempt automatic refinement
-      if (aiAvailable) {
-        attemptAiRefinement(steps[currentStepIndex], error.message || 'Step execution failed');
-      } else {
-        setPhase('stepResult');
-      }
+      // Attempt automatic AI refinement (will check provider availability internally)
+      attemptAiRefinement(steps[currentStepIndex], error.message || 'Step execution failed');
     } finally {
       setIsExecuting(false);
     }
-  }, [runStep, runner, localTest.steps, currentStepIndex, aiAvailable, attemptAiRefinement]);
+  }, [runStep, runner, localTest.steps, currentStepIndex, attemptAiRefinement]);
 
   // Add goTo step at the specified index
   const addGoToStep = useCallback((url, insertIndex) => {
