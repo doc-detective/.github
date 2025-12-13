@@ -404,7 +404,7 @@ async function loadHerettoContent(herettoConfig, log, config) {
     const outputPath = await downloadAndExtractOutput(
       client,
       scenario.fileId,
-      completedJob.id,
+      job.jobId,
       herettoConfig.name,
       log,
       config
