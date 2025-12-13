@@ -36,6 +36,7 @@
     "appium-geckodriver": "^2.1.2",
     "appium-safari-driver": "^4.1.2",
     "axios": "^1.13.2",
+    "canvas": "^2.11.2",
     "doc-detective-common": "^3.6.0",
     "doc-detective-resolver": "^3.6.1",
     "dotenv": "^17.2.3",

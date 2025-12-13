@@ -283,6 +283,27 @@ async function saveScreenshot({ config, step, driver }) {
     }
   }
 
+  // Apply annotations after cropping but before comparison
+  if (step.screenshot.annotate && Array.isArray(step.screenshot.annotate)) {
+    const { annotateScreenshot } = require("./annotateScreenshot");
+    const targetPath = filePath;
+
+    const annotationResult = await annotateScreenshot({
+      config,
+      filePath: targetPath,
+      annotations: step.screenshot.annotate,
+      driver,
+    });
+
+    if (!annotationResult.success) {
+      result.status = "FAIL";
+      result.description = `Annotation failed: ${annotationResult.error}`;
+      return result;
+    }
+
+    result.description += ` Added ${step.screenshot.annotate.length} annotation(s).`;
+  }
+
   // If file already exists
   // If overwrite is true, replace old file with new file
   // If overwrite is aboveVariation, compare files and replace if variance is greater than threshold

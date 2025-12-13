@@ -68,6 +68,13 @@
                 "$ref": "#/components/schemas/crop_element"
               }
             ]
+          },
+          "annotate": {
+            "type": "array",
+            "description": "Array of annotations to draw on the screenshot after capture.",
+            "items": {
+              "$ref": "annotation_v3.schema.json#"
+            }
           }
         },
         "title": "Capture screenshot (detailed)"

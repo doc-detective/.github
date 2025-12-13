@@ -1,0 +1,199 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "annotation",
+  "description": "An annotation to draw on a screenshot.",
+  "type": "object",
+  "required": ["type"],
+  "anyOf": [
+    {
+      "properties": {
+        "type": { "const": "rectangle" }
+      },
+      "required": ["type"]
+    },
+    {
+      "properties": {
+        "type": { "const": "circle" }
+      },
+      "required": ["type"]
+    },
+    {
+      "properties": {
+        "type": { "const": "arrow" }
+      },
+      "required": ["type"]
+    },
+    {
+      "properties": {
+        "type": { "const": "line" }
+      },
+      "required": ["type"]
+    },
+    {
+      "properties": {
+        "type": { "const": "text" }
+      },
+      "required": ["type", "text"]
+    },
+    {
+      "properties": {
+        "type": { "const": "callout" }
+      },
+      "required": ["type", "text"]
+    },
+    {
+      "properties": {
+        "type": { "const": "highlight" }
+      },
+      "required": ["type"]
+    },
+    {
+      "properties": {
+        "type": { "const": "blur" }
+      },
+      "required": ["type"]
+    }
+  ],
+  "properties": {
+    "type": {
+      "type": "string",
+      "description": "The type of annotation to draw.",
+      "enum": ["rectangle", "circle", "arrow", "line", "text", "callout", "highlight", "blur"]
+    },
+    "find": {
+      "description": "Element to position the annotation relative to. Uses the same finding strategies as the find action.",
+      "$ref": "find_v3.schema.json#"
+    },
+    "position": {
+      "type": "string",
+      "description": "Position relative to the found element. Only used when `find` is specified.",
+      "enum": ["top", "bottom", "left", "right", "center", "top-left", "top-right", "bottom-left", "bottom-right"],
+      "default": "center"
+    },
+    "x": {
+      "type": "number",
+      "description": "X coordinate in pixels. If `find` is specified, this is an offset from the element position."
+    },
+    "y": {
+      "type": "number",
+      "description": "Y coordinate in pixels. If `find` is specified, this is an offset from the element position."
+    },
+    "width": {
+      "type": "number",
+      "description": "Width of the annotation in pixels. For rectangles, circles (diameter), and highlights.",
+      "minimum": 1
+    },
+    "height": {
+      "type": "number",
+      "description": "Height of the annotation in pixels. For rectangles and highlights.",
+      "minimum": 1
+    },
+    "radius": {
+      "type": "number",
+      "description": "Radius for circles in pixels.",
+      "minimum": 1
+    },
+    "endX": {
+      "type": "number",
+      "description": "End X coordinate for arrows and lines."
+    },
+    "endY": {
+      "type": "number",
+      "description": "End Y coordinate for arrows and lines."
+    },
+    "text": {
+      "type": "string",
+      "description": "Text content for text and callout annotations."
+    },
+    "textPosition": {
+      "type": "string",
+      "description": "Position of the text box for callout annotations relative to the target.",
+      "enum": ["top", "bottom", "left", "right", "top-left", "top-right", "bottom-left", "bottom-right"]
+    },
+    "color": {
+      "type": "string",
+      "description": "Color of the annotation. Accepts CSS color values (hex, rgb, named colors).",
+      "default": "#FF0000"
+    },
+    "backgroundColor": {
+      "type": "string",
+      "description": "Background/fill color for shapes and text boxes. Accepts CSS color values."
+    },
+    "strokeWidth": {
+      "type": "number",
+      "description": "Width of the stroke/border in pixels.",
+      "default": 2,
+      "minimum": 0
+    },
+    "fontSize": {
+      "type": "number",
+      "description": "Font size in pixels for text annotations.",
+      "default": 16,
+      "minimum": 1
+    },
+    "fontFamily": {
+      "type": "string",
+      "description": "Font family for text annotations.",
+      "default": "Arial"
+    },
+    "opacity": {
+      "type": "number",
+      "description": "Opacity of the annotation (0-1).",
+      "default": 1,
+      "minimum": 0,
+      "maximum": 1
+    },
+    "padding": {
+      "type": "number",
+      "description": "Padding around the element for element-based annotations.",
+      "default": 0,
+      "minimum": 0
+    }
+  },
+  "examples": [
+    {
+      "type": "rectangle",
+      "find": "#login-button",
+      "color": "#FF0000",
+      "strokeWidth": 2
+    },
+    {
+      "type": "circle",
+      "find": ".icon",
+      "radius": 30,
+      "color": "#00FF00"
+    },
+    {
+      "type": "arrow",
+      "x": 100,
+      "y": 100,
+      "endX": 200,
+      "endY": 200,
+      "color": "#0000FF"
+    },
+    {
+      "type": "text",
+      "text": "Click here",
+      "x": 150,
+      "y": 50,
+      "fontSize": 20,
+      "color": "#000000"
+    },
+    {
+      "type": "callout",
+      "find": "#submit-button",
+      "text": "Submit your form",
+      "textPosition": "top",
+      "color": "#FF6600"
+    },
+    {
+      "type": "highlight",
+      "find": ".important-text",
+      "backgroundColor": "rgba(255, 255, 0, 0.3)"
+    },
+    {
+      "type": "blur",
+      "find": ".sensitive-data"
+    }
+  ]
+}
