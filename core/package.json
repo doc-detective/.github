@@ -40,7 +40,6 @@
     "doc-detective-common": "^3.6.0",
     "doc-detective-resolver": "^3.6.1",
     "dotenv": "^17.2.3",
-    "fabric": "^6.0.0",
     "geckodriver": "^6.1.0",
     "jq-web": "^0.6.2",
     "json-schema-faker": "^0.5.9",

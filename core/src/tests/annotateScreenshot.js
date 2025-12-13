@@ -1,4 +1,3 @@
-const { fabric } = require("fabric");
 const { createCanvas, loadImage } = require("canvas");
 const { findElement } = require("./findElement");
 const { log } = require("../utils");
@@ -15,16 +14,10 @@ async function annotateScreenshot({ config, filePath, annotations, driver }) {
     const width = image.width;
     const height = image.height;
 
-    // Create a node-canvas
-    const nodeCanvas = createCanvas(width, height);
-    const ctx = nodeCanvas.getContext("2d");
+    // Create a canvas and draw the image
+    const canvas = createCanvas(width, height);
+    const ctx = canvas.getContext("2d");
     ctx.drawImage(image, 0, 0);
-
-    // Create Fabric.js StaticCanvas for server-side rendering
-    const fabricCanvas = new fabric.StaticCanvas(nodeCanvas, {
-      width: width,
-      height: height,
-    });
 
     // Get pixel density for scaling
     const pixelDensity = await driver.execute(() => window.devicePixelRatio);
@@ -35,7 +28,7 @@ async function annotateScreenshot({ config, filePath, annotations, driver }) {
       try {
         await renderAnnotation({
           config,
-          fabricCanvas,
+          ctx,
           annotation,
           driver,
           pixelDensity,
@@ -55,13 +48,8 @@ async function annotateScreenshot({ config, filePath, annotations, driver }) {
       }
     }
 
-    // Render Fabric canvas back to node canvas
-    fabricCanvas.renderAll();
-
-    // Get buffer from node canvas
-    const buffer = nodeCanvas.toBuffer("image/png");
-
-    // Write buffer to file (overwriting original)
+    // Save canvas to file
+    const buffer = canvas.toBuffer("image/png");
     fs.writeFileSync(filePath, buffer);
 
     log(
@@ -79,7 +67,7 @@ async function annotateScreenshot({ config, filePath, annotations, driver }) {
 
 async function renderAnnotation({
   config,
-  fabricCanvas,
+  ctx,
   annotation,
   driver,
   pixelDensity,
@@ -154,31 +142,21 @@ async function renderAnnotation({
 
   // Render annotation based on type
   if (annotation.arrow) {
-    renderArrow(fabricCanvas, annotation.arrow, basePosition, pixelDensity);
+    renderArrow(ctx, annotation.arrow, basePosition, pixelDensity);
   } else if (annotation.text) {
-    renderText(fabricCanvas, annotation.text, basePosition, pixelDensity);
+    renderText(ctx, annotation.text, basePosition, pixelDensity);
   } else if (annotation.rectangle) {
-    renderRectangle(
-      fabricCanvas,
-      annotation.rectangle,
-      basePosition,
-      pixelDensity
-    );
+    renderRectangle(ctx, annotation.rectangle, basePosition, pixelDensity);
   } else if (annotation.circle) {
-    renderCircle(fabricCanvas, annotation.circle, basePosition, pixelDensity);
+    renderCircle(ctx, annotation.circle, basePosition, pixelDensity);
   } else if (annotation.line) {
-    renderLine(fabricCanvas, annotation.line, basePosition, pixelDensity);
+    renderLine(ctx, annotation.line, basePosition, pixelDensity);
   } else if (annotation.callout) {
-    renderCallout(fabricCanvas, annotation.callout, basePosition, pixelDensity);
+    renderCallout(ctx, annotation.callout, basePosition, pixelDensity);
   } else if (annotation.highlight) {
-    renderHighlight(
-      fabricCanvas,
-      annotation.highlight,
-      basePosition,
-      pixelDensity
-    );
+    renderHighlight(ctx, annotation.highlight, basePosition, pixelDensity);
   } else if (annotation.blur) {
-    renderBlur(fabricCanvas, annotation.blur, basePosition, pixelDensity);
+    renderBlur(ctx, annotation.blur, basePosition, pixelDensity);
   }
 }
 
@@ -264,7 +242,7 @@ function applyPositionKeyword(
   }
 }
 
-function renderArrow(fabricCanvas, arrow, basePosition, pixelDensity) {
+function renderArrow(ctx, arrow, basePosition, pixelDensity) {
   const defaults = {
     color: "#FF0000",
     strokeWidth: 3,
@@ -279,39 +257,32 @@ function renderArrow(fabricCanvas, arrow, basePosition, pixelDensity) {
   const toX = basePosition.x + (arrow.to?.x || 0) * pixelDensity;
   const toY = basePosition.y + (arrow.to?.y || 0) * pixelDensity;
 
-  // Calculate angle for arrowhead
+  // Draw line
+  ctx.strokeStyle = config.color;
+  ctx.lineWidth = config.strokeWidth;
+  ctx.beginPath();
+  ctx.moveTo(fromX, fromY);
+  ctx.lineTo(toX, toY);
+  ctx.stroke();
+
+  // Draw arrowhead
   const angle = Math.atan2(toY - fromY, toX - fromX);
-
-  // Create arrow line
-  const line = new fabric.Line([fromX, fromY, toX, toY], {
-    stroke: config.color,
-    strokeWidth: config.strokeWidth,
-    selectable: false,
-    evented: false,
-  });
-
-  // Create arrowhead triangle
   const headLength = config.headSize;
-  const headAngle = Math.PI / 6; // 30 degrees
 
-  const arrowHead = new fabric.Triangle({
-    left: toX,
-    top: toY,
-    originX: "center",
-    originY: "center",
-    width: headLength,
-    height: headLength,
-    fill: config.color,
-    angle: (angle * 180) / Math.PI + 90,
-    selectable: false,
-    evented: false,
-  });
-
-  fabricCanvas.add(line);
-  fabricCanvas.add(arrowHead);
+  ctx.save();
+  ctx.translate(toX, toY);
+  ctx.rotate(angle);
+  ctx.fillStyle = config.color;
+  ctx.beginPath();
+  ctx.moveTo(0, 0);
+  ctx.lineTo(-headLength, -headLength / 2);
+  ctx.lineTo(-headLength, headLength / 2);
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
 }
 
-function renderText(fabricCanvas, text, basePosition, pixelDensity) {
+function renderText(ctx, text, basePosition, pixelDensity) {
   const defaults = {
     fontSize: 16,
     fontFamily: "Arial",
@@ -323,26 +294,76 @@ function renderText(fabricCanvas, text, basePosition, pixelDensity) {
 
   const config = { ...defaults, ...text };
 
-  const textObj = new fabric.Textbox(config.content, {
-    left: basePosition.x,
-    top: basePosition.y,
-    fontSize: config.fontSize * pixelDensity,
-    fontFamily: config.fontFamily,
-    fill: config.color,
-    backgroundColor: config.backgroundColor,
-    padding: config.padding * pixelDensity,
-    width: config.maxWidth
-      ? config.maxWidth * pixelDensity
-      : 200 * pixelDensity,
-    opacity: config.opacity,
-    selectable: false,
-    evented: false,
+  ctx.save();
+  ctx.font = `${config.fontSize * pixelDensity}px ${config.fontFamily}`;
+  ctx.fillStyle = config.color;
+  ctx.globalAlpha = config.opacity;
+
+  // Measure text
+  const maxWidth = config.maxWidth
+    ? config.maxWidth * pixelDensity
+    : 200 * pixelDensity;
+  const lines = wrapText(ctx, config.content, maxWidth);
+  const lineHeight = config.fontSize * pixelDensity * 1.2;
+  const textHeight = lines.length * lineHeight;
+  const padding = config.padding * pixelDensity;
+
+  // Calculate text box dimensions
+  let maxLineWidth = 0;
+  lines.forEach((line) => {
+    const metrics = ctx.measureText(line);
+    if (metrics.width > maxLineWidth) {
+      maxLineWidth = metrics.width;
+    }
   });
 
-  fabricCanvas.add(textObj);
+  // Draw background
+  ctx.fillStyle = config.backgroundColor;
+  ctx.fillRect(
+    basePosition.x - padding,
+    basePosition.y - padding,
+    maxLineWidth + padding * 2,
+    textHeight + padding * 2
+  );
+
+  // Draw text
+  ctx.fillStyle = config.color;
+  lines.forEach((line, i) => {
+    ctx.fillText(
+      line,
+      basePosition.x,
+      basePosition.y + (i + 1) * lineHeight - lineHeight / 4
+    );
+  });
+
+  ctx.restore();
 }
 
-function renderRectangle(fabricCanvas, rectangle, basePosition, pixelDensity) {
+function wrapText(ctx, text, maxWidth) {
+  const words = text.split(" ");
+  const lines = [];
+  let currentLine = "";
+
+  words.forEach((word) => {
+    const testLine = currentLine + (currentLine ? " " : "") + word;
+    const metrics = ctx.measureText(testLine);
+
+    if (metrics.width > maxWidth && currentLine) {
+      lines.push(currentLine);
+      currentLine = word;
+    } else {
+      currentLine = testLine;
+    }
+  });
+
+  if (currentLine) {
+    lines.push(currentLine);
+  }
+
+  return lines.length > 0 ? lines : [text];
+}
+
+function renderRectangle(ctx, rectangle, basePosition, pixelDensity) {
   const defaults = {
     fill: "transparent",
     stroke: "#FF0000",
@@ -354,25 +375,49 @@ function renderRectangle(fabricCanvas, rectangle, basePosition, pixelDensity) {
 
   const config = { ...defaults, ...rectangle };
 
-  const rect = new fabric.Rect({
-    left: basePosition.x,
-    top: basePosition.y,
-    width: (config.width || basePosition.width || 100) * pixelDensity,
-    height: (config.height || basePosition.height || 100) * pixelDensity,
-    fill: config.fill,
-    stroke: config.stroke,
-    strokeWidth: config.strokeWidth * pixelDensity,
-    opacity: config.opacity,
-    rx: config.rx * pixelDensity,
-    ry: config.ry * pixelDensity,
-    selectable: false,
-    evented: false,
-  });
+  const x = basePosition.x;
+  const y = basePosition.y;
+  const width = (config.width || basePosition.width || 100) * pixelDensity;
+  const height = (config.height || basePosition.height || 100) * pixelDensity;
+  const rx = config.rx * pixelDensity;
+  const ry = config.ry * pixelDensity;
 
-  fabricCanvas.add(rect);
+  ctx.save();
+  ctx.globalAlpha = config.opacity;
+
+  // Draw rounded rectangle
+  ctx.beginPath();
+  if (rx > 0 || ry > 0) {
+    const r = Math.max(rx, ry);
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + width - r, y);
+    ctx.quadraticCurveTo(x + width, y, x + width, y + r);
+    ctx.lineTo(x + width, y + height - r);
+    ctx.quadraticCurveTo(x + width, y + height, x + width - r, y + height);
+    ctx.lineTo(x + r, y + height);
+    ctx.quadraticCurveTo(x, y + height, x, y + height - r);
+    ctx.lineTo(x, y + r);
+    ctx.quadraticCurveTo(x, y, x + r, y);
+  } else {
+    ctx.rect(x, y, width, height);
+  }
+  ctx.closePath();
+
+  if (config.fill !== "transparent") {
+    ctx.fillStyle = config.fill;
+    ctx.fill();
+  }
+
+  if (config.strokeWidth > 0) {
+    ctx.strokeStyle = config.stroke;
+    ctx.lineWidth = config.strokeWidth * pixelDensity;
+    ctx.stroke();
+  }
+
+  ctx.restore();
 }
 
-function renderCircle(fabricCanvas, circle, basePosition, pixelDensity) {
+function renderCircle(ctx, circle, basePosition, pixelDensity) {
   const defaults = {
     radius: 30,
     fill: "transparent",
@@ -383,24 +428,33 @@ function renderCircle(fabricCanvas, circle, basePosition, pixelDensity) {
 
   const config = { ...defaults, ...circle };
 
-  const circleObj = new fabric.Circle({
-    left: basePosition.x,
-    top: basePosition.y,
-    radius: config.radius * pixelDensity,
-    fill: config.fill,
-    stroke: config.stroke,
-    strokeWidth: config.strokeWidth * pixelDensity,
-    opacity: config.opacity,
-    originX: "center",
-    originY: "center",
-    selectable: false,
-    evented: false,
-  });
+  ctx.save();
+  ctx.globalAlpha = config.opacity;
 
-  fabricCanvas.add(circleObj);
+  ctx.beginPath();
+  ctx.arc(
+    basePosition.x,
+    basePosition.y,
+    config.radius * pixelDensity,
+    0,
+    2 * Math.PI
+  );
+
+  if (config.fill !== "transparent") {
+    ctx.fillStyle = config.fill;
+    ctx.fill();
+  }
+
+  if (config.strokeWidth > 0) {
+    ctx.strokeStyle = config.stroke;
+    ctx.lineWidth = config.strokeWidth * pixelDensity;
+    ctx.stroke();
+  }
+
+  ctx.restore();
 }
 
-function renderLine(fabricCanvas, line, basePosition, pixelDensity) {
+function renderLine(ctx, line, basePosition, pixelDensity) {
   const defaults = {
     color: "#000000",
     strokeWidth: 2,
@@ -413,20 +467,23 @@ function renderLine(fabricCanvas, line, basePosition, pixelDensity) {
   const toX = basePosition.x + (line.to?.x || 0) * pixelDensity;
   const toY = basePosition.y + (line.to?.y || 0) * pixelDensity;
 
-  const lineObj = new fabric.Line([fromX, fromY, toX, toY], {
-    stroke: config.color,
-    strokeWidth: config.strokeWidth * pixelDensity,
-    strokeDashArray: config.dashArray
-      ? config.dashArray.map((v) => v * pixelDensity)
-      : undefined,
-    selectable: false,
-    evented: false,
-  });
+  ctx.save();
+  ctx.strokeStyle = config.color;
+  ctx.lineWidth = config.strokeWidth * pixelDensity;
 
-  fabricCanvas.add(lineObj);
+  if (config.dashArray) {
+    ctx.setLineDash(config.dashArray.map((v) => v * pixelDensity));
+  }
+
+  ctx.beginPath();
+  ctx.moveTo(fromX, fromY);
+  ctx.lineTo(toX, toY);
+  ctx.stroke();
+
+  ctx.restore();
 }
 
-function renderCallout(fabricCanvas, callout, basePosition, pixelDensity) {
+function renderCallout(ctx, callout, basePosition, pixelDensity) {
   const defaults = {
     fontSize: 14,
     color: "#000000",
@@ -451,55 +508,72 @@ function renderCallout(fabricCanvas, callout, basePosition, pixelDensity) {
     textY = targetY - 80 * pixelDensity;
   }
 
-  // Create text box
-  const textObj = new fabric.Textbox(config.content, {
-    left: textX,
-    top: textY,
-    fontSize: config.fontSize * pixelDensity,
-    fontFamily: "Arial",
-    fill: config.color,
-    backgroundColor: config.backgroundColor,
-    padding: 8 * pixelDensity,
-    width: config.maxWidth
-      ? config.maxWidth * pixelDensity
-      : 150 * pixelDensity,
-    selectable: false,
-    evented: false,
+  // Draw text box
+  ctx.save();
+  ctx.font = `${config.fontSize * pixelDensity}px Arial`;
+
+  const maxWidth = config.maxWidth
+    ? config.maxWidth * pixelDensity
+    : 150 * pixelDensity;
+  const lines = wrapText(ctx, config.content, maxWidth);
+  const lineHeight = config.fontSize * pixelDensity * 1.2;
+  const textHeight = lines.length * lineHeight;
+  const padding = 8 * pixelDensity;
+
+  let maxLineWidth = 0;
+  lines.forEach((line) => {
+    const metrics = ctx.measureText(line);
+    if (metrics.width > maxLineWidth) {
+      maxLineWidth = metrics.width;
+    }
   });
 
-  fabricCanvas.add(textObj);
+  const boxWidth = maxLineWidth + padding * 2;
+  const boxHeight = textHeight + padding * 2;
 
-  // Create arrow from text to target
-  const textCenterX = textX + textObj.width / 2;
-  const textCenterY = textY + textObj.height / 2;
+  // Draw background
+  ctx.fillStyle = config.backgroundColor;
+  ctx.fillRect(textX, textY, boxWidth, boxHeight);
 
+  // Draw text
+  ctx.fillStyle = config.color;
+  lines.forEach((line, i) => {
+    ctx.fillText(
+      line,
+      textX + padding,
+      textY + padding + (i + 1) * lineHeight - lineHeight / 4
+    );
+  });
+
+  // Draw arrow from text to target
+  const textCenterX = textX + boxWidth / 2;
+  const textCenterY = textY + boxHeight / 2;
+
+  ctx.strokeStyle = config.arrowColor;
+  ctx.lineWidth = 2 * pixelDensity;
+  ctx.beginPath();
+  ctx.moveTo(textCenterX, textCenterY);
+  ctx.lineTo(targetX, targetY);
+  ctx.stroke();
+
+  // Draw arrowhead
   const angle = Math.atan2(targetY - textCenterY, targetX - textCenterX);
+  const headLength = 10 * pixelDensity;
 
-  const line = new fabric.Line([textCenterX, textCenterY, targetX, targetY], {
-    stroke: config.arrowColor,
-    strokeWidth: 2 * pixelDensity,
-    selectable: false,
-    evented: false,
-  });
+  ctx.translate(targetX, targetY);
+  ctx.rotate(angle);
+  ctx.fillStyle = config.arrowColor;
+  ctx.beginPath();
+  ctx.moveTo(0, 0);
+  ctx.lineTo(-headLength, -headLength / 2);
+  ctx.lineTo(-headLength, headLength / 2);
+  ctx.closePath();
+  ctx.fill();
 
-  const arrowHead = new fabric.Triangle({
-    left: targetX,
-    top: targetY,
-    originX: "center",
-    originY: "center",
-    width: 10 * pixelDensity,
-    height: 10 * pixelDensity,
-    fill: config.arrowColor,
-    angle: (angle * 180) / Math.PI + 90,
-    selectable: false,
-    evented: false,
-  });
-
-  fabricCanvas.add(line);
-  fabricCanvas.add(arrowHead);
+  ctx.restore();
 }
 
-function renderHighlight(fabricCanvas, highlight, basePosition, pixelDensity) {
+function renderHighlight(ctx, highlight, basePosition, pixelDensity) {
   const defaults = {
     color: "#FFFF00",
     opacity: 0.3,
@@ -507,21 +581,19 @@ function renderHighlight(fabricCanvas, highlight, basePosition, pixelDensity) {
 
   const config = { ...defaults, ...highlight };
 
-  const rect = new fabric.Rect({
-    left: basePosition.x,
-    top: basePosition.y,
-    width: basePosition.width || 100 * pixelDensity,
-    height: basePosition.height || 100 * pixelDensity,
-    fill: config.color,
-    opacity: config.opacity,
-    selectable: false,
-    evented: false,
-  });
-
-  fabricCanvas.add(rect);
+  ctx.save();
+  ctx.fillStyle = config.color;
+  ctx.globalAlpha = config.opacity;
+  ctx.fillRect(
+    basePosition.x,
+    basePosition.y,
+    basePosition.width || 100 * pixelDensity,
+    basePosition.height || 100 * pixelDensity
+  );
+  ctx.restore();
 }
 
-function renderBlur(fabricCanvas, blur, basePosition, pixelDensity) {
+function renderBlur(ctx, blur, basePosition, pixelDensity) {
   const defaults = {
     intensity: 10,
   };
@@ -530,15 +602,13 @@ function renderBlur(fabricCanvas, blur, basePosition, pixelDensity) {
 
   // For blur, we use a semi-transparent overlay as a visual indicator
   // True pixel blur would require Sharp preprocessing
-  const rect = new fabric.Rect({
-    left: basePosition.x,
-    top: basePosition.y,
-    width: (config.width || basePosition.width || 100) * pixelDensity,
-    height: (config.height || basePosition.height || 100) * pixelDensity,
-    fill: "rgba(200, 200, 200, 0.8)",
-    selectable: false,
-    evented: false,
-  });
-
-  fabricCanvas.add(rect);
+  ctx.save();
+  ctx.fillStyle = "rgba(200, 200, 200, 0.8)";
+  ctx.fillRect(
+    basePosition.x,
+    basePosition.y,
+    (config.width || basePosition.width || 100) * pixelDensity,
+    (config.height || basePosition.height || 100) * pixelDensity
+  );
+  ctx.restore();
 }
