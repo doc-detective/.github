@@ -1,4 +1,6 @@
 #!/usr/bin/env node
+// This script is intended for GitHub Actions automation only.
+// It performs destructive operations (git checkout, git clean) and should not be run locally.
 
 const { execSync } = require("child_process");
 const fs = require("fs");
@@ -19,6 +21,12 @@ function execCommand(command, options = {}) {
 }
 
 function main() {
+  // Prevent accidental local execution
+  if (!process.env.CI) {
+    console.error("Error: This script is intended for CI/CD environments only.");
+    process.exit(1);
+  }
+
   // Clean git state
   execCommand("git checkout -- .");
   execCommand("git clean -fd");

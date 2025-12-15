@@ -157,7 +157,8 @@ const TestEditor = ({
   // Add step view
   if (view === 'addStep') {
     // Create new step with step editor (it will prompt for type)
-    const newStep = createDefaultStep();
+    // Default to goTo step as a reasonable starting point
+    const newStep = createDefaultStep('goTo');
 
     return React.createElement(StepEditor, {
       step: newStep,
