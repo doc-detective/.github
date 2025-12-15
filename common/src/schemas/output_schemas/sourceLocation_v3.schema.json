@@ -5,6 +5,18 @@
   "type": "object",
   "readOnly": true,
   "additionalProperties": false,
+  "required": [
+    "file",
+    "startLine",
+    "endLine",
+    "startColumn",
+    "endColumn",
+    "startOffset",
+    "endOffset",
+    "originalText",
+    "isInline",
+    "isAutoDetected"
+  ],
   "properties": {
     "file": {
       "type": "string",
@@ -75,6 +87,21 @@
       "readOnly": true
     }
   },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "isInline": {
+            "const": true
+          }
+        },
+        "required": ["isInline"]
+      },
+      "then": {
+        "required": ["commentFormat"]
+      }
+    }
+  ],
   "examples": [
     {
       "file": "/path/to/docs/getting-started.md",
@@ -100,7 +127,7 @@
       "originalText": "[example link](https://example.com)",
       "isInline": true,
       "isAutoDetected": true,
-      "commentFormat": "htmlComment"
+      "commentFormat": "linkReference"
     }
   ]
 }

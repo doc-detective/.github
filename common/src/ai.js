@@ -592,9 +592,9 @@ const getApiKey = (config, provider) => {
 
   if (
     provider === "openai" &&
-    (process.env.OPENAI_API_KEY || config.integrations.openai)
+    (process.env.OPENAI_API_KEY || config.integrations?.openAi)
   ) {
-    return process.env.OPENAI_API_KEY || config.integrations.openai.apiKey;
+    return process.env.OPENAI_API_KEY || config.integrations.openAi.apiKey;
   }
 
   if (
