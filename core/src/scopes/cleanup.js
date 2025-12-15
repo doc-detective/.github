@@ -101,30 +101,46 @@ function setupCleanupHandlers(config = { logLevel: 'info' }) {
     await cleanupAllScopes(config);
   };
   
+  // Helper to run cleanup and then exit reliably
+  const exitWithCleanup = (code, reason) => {
+    // Start cleanup and ensure we exit afterwards. Use finally-style behavior
+    // and a fallback timeout to avoid hanging indefinitely.
+    (async () => {
+      try {
+        await handleExit(reason);
+      } catch (err) {
+        log(config, 'error', `Error during cleanup: ${err.stack || err}`);
+      } finally {
+        // allow stdio to flush then exit
+        setImmediate(() => process.exit(code));
+        // force exit after 5s if something prevents exit
+        setTimeout(() => process.exit(code), 5000).unref();
+      }
+    })();
+  };
+
   // SIGINT (Ctrl+C)
-  process.on('SIGINT', async () => {
-    await handleExit('SIGINT');
-    process.exit(130); // 128 + SIGINT signal number
+  process.on('SIGINT', () => {
+    log(config, 'info', 'Received SIGINT, cleaning up...');
+    exitWithCleanup(130, 'SIGINT'); // 128 + SIGINT
   });
-  
+
   // SIGTERM
-  process.on('SIGTERM', async () => {
-    await handleExit('SIGTERM');
-    process.exit(143); // 128 + SIGTERM signal number
+  process.on('SIGTERM', () => {
+    log(config, 'info', 'Received SIGTERM, cleaning up...');
+    exitWithCleanup(143, 'SIGTERM'); // 128 + SIGTERM
   });
-  
+
   // Uncaught exceptions
-  process.on('uncaughtException', async (error) => {
-    log(config, "error", `Uncaught exception: ${error.message}`);
-    await handleExit('uncaughtException');
-    process.exit(1);
+  process.on('uncaughtException', (error) => {
+    log(config, 'error', `Uncaught exception: ${error && error.stack ? error.stack : error}`);
+    exitWithCleanup(1, 'uncaughtException');
   });
-  
+
   // Unhandled promise rejections
-  process.on('unhandledRejection', async (reason, promise) => {
-    log(config, "error", `Unhandled rejection: ${reason}`);
-    await handleExit('unhandledRejection');
-    process.exit(1);
+  process.on('unhandledRejection', (reason) => {
+    log(config, 'error', `Unhandled rejection: ${reason}`);
+    exitWithCleanup(1, 'unhandledRejection');
   });
   
   // Normal exit

@@ -175,10 +175,10 @@ function updateRefPaths(schema) {
     }
     if (key === "$ref" && !value.startsWith("#")) {
       // File name of the referenced schema
-      valueFile = value.split("#")[0];
+      const valueFile = value.split("#")[0];
       // Attribute path in the referenced schema
-      valueAttribute = value.split("#")[1];
-      valuePath = path.resolve(`${__dirname}/build/${valueFile}`);
+      const valueAttribute = value.split("#")[1];
+      const valuePath = path.resolve(`${__dirname}/build/${valueFile}`);
       schema[key] = `${valuePath}#${valueAttribute}`;
       // console.log({value, valueFile, valueAttribute, final: schema[key]})
     }

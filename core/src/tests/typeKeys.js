@@ -68,6 +68,20 @@ const specialKeyMap = {
   $ZANKAKU_HANDKAKU$: Key.ZenkakuHankaku,
 };
 
+// Mapping of special keys to terminal control sequences for terminal scopes
+const specialKeyTerminalMap = {
+  $ENTER$: '\r',
+  $RETURN$: '\r',
+  $TAB$: '\t',
+  $BACKSPACE$: '\x7f',
+  $ESCAPE$: '\x1b',
+  $SPACE$: ' ',
+  $ARROW_UP$: '\x1b[A',
+  $ARROW_DOWN$: '\x1b[B',
+  $ARROW_RIGHT$: '\x1b[C',
+  $ARROW_LEFT$: '\x1b[D',
+};
+
 // Type a sequence of keys in the active element.
 async function typeKeys({ config, step, driver }) {
   let result = { status: "PASS", description: "Typed keys." };
@@ -129,12 +143,23 @@ async function typeKeys({ config, step, driver }) {
     }
     
     try {
-      // Join all keys into a single string
-      const text = step.type.keys.join('');
-      
+      // Build text for terminal by expanding special keys and splitting normal text
+      let keysToWrite = [];
+
+      step.type.keys.forEach((key) => {
+        if (key.startsWith("$") && key.endsWith("$") && specialKeyTerminalMap[key]) {
+          keysToWrite.push(specialKeyTerminalMap[key]);
+        } else {
+          // Split into individual characters
+          keysToWrite = keysToWrite.concat(key.split(""));
+        }
+      });
+
+      const text = keysToWrite.join("");
+
       // Write to terminal
       await writeToTerminal(scopeName, text, config);
-      
+
       result.description = `Typed keys to scope '${scopeName}'`;
       return result;
     } catch (error) {

@@ -73,40 +73,32 @@ function matchesCondition(output, condition) {
  * Waits for stdout/stderr conditions to be met by listening to streams.
  * 
  * @param {object} options - Wait options
- * @param {object} options.scope - The scope object with streams
- * @param {object} options.conditions - Conditions to wait for
- * @param {string} options.conditions.stdout - Stdout condition (optional)
- * @param {string} options.conditions.stderr - Stderr condition (optional)
- * @param {number} options.timeout - Timeout in milliseconds (default 30000)
- * @param {object} options.config - Config for logging
- * @returns {Promise<object>} Resolves with {met: true} or rejects with timeout error
- */
-async function waitForConditions({ scope, conditions, timeout = 30000, config }) {
-  // If no conditions specified, resolve immediately
-  if (!conditions || (!conditions.stdout && !conditions.stderr)) {
-    return { met: true };
-  }
-  
-  return new Promise((resolve, reject) => {
+    const stdoutListener = (chunk) => {
+      // append incoming chunk to buffer and test against the accumulated buffer
+      const full = scope.stdoutBuffer.join('\n');
+      if (matchesCondition(full, conditions.stdout)) {
+        stdoutMet = true;
+        log(config, "info", `Stdout condition met: ${conditions.stdout}`);
+        
+        if (stderrMet) {
+          cleanup();
+          resolve({ met: true });
+        }
     let stdoutMet = !conditions.stdout || conditions.stdout === '';
     let stderrMet = !conditions.stderr || conditions.stderr === '';
     let timeoutId;
     
-    // Check if already met from buffer
-    if (!stdoutMet && scope.stdoutBuffer) {
-      const stdoutContent = scope.stdoutBuffer.join('\n');
-      if (matchesCondition(stdoutContent, conditions.stdout)) {
-        stdoutMet = true;
-        log(config, "debug", `Stdout condition already met in buffer: ${conditions.stdout}`);
-      }
-    }
-    
-    if (!stderrMet && scope.stderrBuffer) {
-      const stderrContent = scope.stderrBuffer.join('\n');
-      if (matchesCondition(stderrContent, conditions.stderr)) {
+    const stderrListener = (chunk) => {
+      // append incoming chunk to buffer and test against the accumulated buffer
+      const full = scope.stderrBuffer.join('\n');
+      if (matchesCondition(full, conditions.stderr)) {
         stderrMet = true;
-        log(config, "debug", `Stderr condition already met in buffer: ${conditions.stderr}`);
-      }
+        log(config, "info", `Stderr condition met: ${conditions.stderr}`);
+        
+        if (stdoutMet) {
+          cleanup();
+          resolve({ met: true });
+        }
     }
     
     // Check if all conditions already met

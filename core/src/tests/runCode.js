@@ -153,7 +153,7 @@ if (require.main === module) {
       language: "python",
     },
   };
-  runCode(config, step)
+  runCode({ config, step })
     .then((result) => {
       console.log(result);
     })
