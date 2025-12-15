@@ -117,6 +117,8 @@ async function dereferenceSchemas() {
       schema = await parser.dereference(schema);
       // Delete $id attributes
       schema = deleteDollarIds(schema);
+      // Delete components section (no longer needed after dereferencing)
+      schema = deleteComponents(schema);
 
       // Write to file
       fs.writeFileSync(outputFilePath, JSON.stringify(schema, null, 2));
@@ -201,6 +203,21 @@ function deleteDollarIds(schema) {
     if (key === "$id") {
       delete schema[key];
     }
+  }
+  return schema;
+}
+
+/**
+ * Removes the `components` property from a dereferenced JSON schema object.
+ * After dereferencing, the components section contains unreferenced definitions
+ * and can be safely removed to reduce schema size.
+ *
+ * @param {object} schema - The dereferenced JSON schema object to process.
+ * @returns {object} The schema object with the `components` property deleted.
+ */
+function deleteComponents(schema) {
+  if (schema && typeof schema === "object" && schema.components) {
+    delete schema.components;
   }
   return schema;
 }

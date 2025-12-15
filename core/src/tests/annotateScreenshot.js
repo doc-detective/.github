@@ -382,8 +382,8 @@ function renderRectangle(ctx, rectangle, basePosition, pixelDensity) {
 
   const x = basePosition.x;
   const y = basePosition.y;
-  const width = (config.width || basePosition.width || DEFAULT_SIZE) * pixelDensity;
-  const height = (config.height || basePosition.height || DEFAULT_SIZE) * pixelDensity;
+  const width = (config.width ?? basePosition.width ?? DEFAULT_SIZE) * pixelDensity;
+  const height = (config.height ?? basePosition.height ?? DEFAULT_SIZE) * pixelDensity;
   const rx = config.rx * pixelDensity;
   const ry = config.ry * pixelDensity;
 
@@ -592,8 +592,8 @@ function renderHighlight(ctx, highlight, basePosition, pixelDensity) {
   ctx.fillRect(
     basePosition.x,
     basePosition.y,
-    basePosition.width || DEFAULT_SIZE * pixelDensity,
-    basePosition.height || DEFAULT_SIZE * pixelDensity
+    basePosition.width ?? DEFAULT_SIZE * pixelDensity,
+    basePosition.height ?? DEFAULT_SIZE * pixelDensity
   );
   ctx.restore();
 }
@@ -612,8 +612,8 @@ function renderBlur(ctx, blur, basePosition, pixelDensity) {
   ctx.fillRect(
     basePosition.x,
     basePosition.y,
-    (config.width || basePosition.width || DEFAULT_SIZE) * pixelDensity,
-    (config.height || basePosition.height || DEFAULT_SIZE) * pixelDensity
+    (config.width ?? basePosition.width ?? DEFAULT_SIZE) * pixelDensity,
+    (config.height ?? basePosition.height ?? DEFAULT_SIZE) * pixelDensity
   );
   ctx.restore();
 }

@@ -21,18 +21,6 @@
       "title": "Wait (boolean)"
     }
   ],
-  "components": {
-    "schemas": {
-      "string": {
-        "title": "Wait (environment variable)",
-        "type": "string",
-        "pattern": "(\\$[A-Za-z0-9_]+)",
-        "transform": [
-          "trim"
-        ]
-      }
-    }
-  },
   "examples": [
     5000,
     "$WAIT_DURATION",

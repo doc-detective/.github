@@ -87,18 +87,6 @@
       "title": "OpenAPI request headers"
     }
   },
-  "components": {
-    "schemas": {
-      "operationId": {
-        "type": "string",
-        "description": "ID of the operation to use for the request."
-      },
-      "descriptionPath": {
-        "type": "string",
-        "description": "URL or local path to the OpenAPI description."
-      }
-    }
-  },
   "examples": [
     {
       "descriptionPath": "https://petstore.swagger.io/v2/swagger.json"

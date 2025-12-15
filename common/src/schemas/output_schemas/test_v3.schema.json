@@ -5626,6 +5626,10 @@
                                     "elementAria": {
                                       "type": "string",
                                       "description": "Computed accessible name of the element per ARIA specification. Supports exact match or regex pattern using /pattern/ syntax."
+                                    },
+                                    "elementId": {
+                                      "type": "string",
+                                      "description": "ID attribute of the element to find. Supports exact match or regex pattern using /pattern/ syntax."
                                     }
                                   }
                                 },
@@ -5806,6 +5810,10 @@
                                 "rectangle": {
                                   "type": "object",
                                   "description": "Configuration for rectangle annotations.",
+                                  "required": [
+                                    "width",
+                                    "height"
+                                  ],
                                   "properties": {
                                     "width": {
                                       "type": "number",
@@ -5857,6 +5865,9 @@
                                 "circle": {
                                   "type": "object",
                                   "description": "Configuration for circle annotations.",
+                                  "required": [
+                                    "radius"
+                                  ],
                                   "properties": {
                                     "radius": {
                                       "type": "number",
@@ -6032,8 +6043,18 @@
                                 },
                                 "highlight": {
                                   "type": "object",
-                                  "description": "Configuration for highlight annotations (semi-transparent overlay).",
+                                  "description": "Configuration for highlight annotations (semi-transparent overlay). Requires either a 'find' element (uses element's bounding box) or explicit 'width' and 'height' properties with a 'position'.",
                                   "properties": {
+                                    "width": {
+                                      "type": "number",
+                                      "description": "Width of the highlight area in pixels. Optional if 'find' is specified.",
+                                      "minimum": 1
+                                    },
+                                    "height": {
+                                      "type": "number",
+                                      "description": "Height of the highlight area in pixels. Optional if 'find' is specified.",
+                                      "minimum": 1
+                                    },
                                     "color": {
                                       "type": "string",
                                       "description": "Highlight color (hex, rgb, or named color).",
@@ -6050,7 +6071,7 @@
                                 },
                                 "blur": {
                                   "type": "object",
-                                  "description": "Configuration for blur annotations (for redacting sensitive information).",
+                                  "description": "Configuration for blur annotations (for redacting sensitive information). Note: Current implementation uses a semi-transparent overlay rather than true pixel blur. Requires 'width' and 'height' unless a 'find' element is specified (which provides dimensions automatically).",
                                   "properties": {
                                     "intensity": {
                                       "type": "number",
@@ -6213,6 +6234,10 @@
                                   "rectangle_properties": {
                                     "type": "object",
                                     "description": "Configuration for rectangle annotations.",
+                                    "required": [
+                                      "width",
+                                      "height"
+                                    ],
                                     "properties": {
                                       "width": {
                                         "type": "number",
@@ -6264,6 +6289,9 @@
                                   "circle_properties": {
                                     "type": "object",
                                     "description": "Configuration for circle annotations.",
+                                    "required": [
+                                      "radius"
+                                    ],
                                     "properties": {
                                       "radius": {
                                         "type": "number",
@@ -6439,8 +6467,18 @@
                                   },
                                   "highlight_properties": {
                                     "type": "object",
-                                    "description": "Configuration for highlight annotations (semi-transparent overlay).",
+                                    "description": "Configuration for highlight annotations (semi-transparent overlay). Requires either a 'find' element (uses element's bounding box) or explicit 'width' and 'height' properties with a 'position'.",
                                     "properties": {
+                                      "width": {
+                                        "type": "number",
+                                        "description": "Width of the highlight area in pixels. Optional if 'find' is specified.",
+                                        "minimum": 1
+                                      },
+                                      "height": {
+                                        "type": "number",
+                                        "description": "Height of the highlight area in pixels. Optional if 'find' is specified.",
+                                        "minimum": 1
+                                      },
                                       "color": {
                                         "type": "string",
                                         "description": "Highlight color (hex, rgb, or named color).",
@@ -6457,7 +6495,7 @@
                                   },
                                   "blur_properties": {
                                     "type": "object",
-                                    "description": "Configuration for blur annotations (for redacting sensitive information).",
+                                    "description": "Configuration for blur annotations (for redacting sensitive information). Note: Current implementation uses a semi-transparent overlay rather than true pixel blur. Requires 'width' and 'height' unless a 'find' element is specified (which provides dimensions automatically).",
                                     "properties": {
                                       "intensity": {
                                         "type": "number",
@@ -6989,6 +7027,10 @@
                                       "elementAria": {
                                         "type": "string",
                                         "description": "Computed accessible name of the element per ARIA specification. Supports exact match or regex pattern using /pattern/ syntax."
+                                      },
+                                      "elementId": {
+                                        "type": "string",
+                                        "description": "ID attribute of the element to find. Supports exact match or regex pattern using /pattern/ syntax."
                                       }
                                     }
                                   },
@@ -7169,6 +7211,10 @@
                                   "rectangle": {
                                     "type": "object",
                                     "description": "Configuration for rectangle annotations.",
+                                    "required": [
+                                      "width",
+                                      "height"
+                                    ],
                                     "properties": {
                                       "width": {
                                         "type": "number",
@@ -7220,6 +7266,9 @@
                                   "circle": {
                                     "type": "object",
                                     "description": "Configuration for circle annotations.",
+                                    "required": [
+                                      "radius"
+                                    ],
                                     "properties": {
                                       "radius": {
                                         "type": "number",
@@ -7395,8 +7444,18 @@
                                   },
                                   "highlight": {
                                     "type": "object",
-                                    "description": "Configuration for highlight annotations (semi-transparent overlay).",
+                                    "description": "Configuration for highlight annotations (semi-transparent overlay). Requires either a 'find' element (uses element's bounding box) or explicit 'width' and 'height' properties with a 'position'.",
                                     "properties": {
+                                      "width": {
+                                        "type": "number",
+                                        "description": "Width of the highlight area in pixels. Optional if 'find' is specified.",
+                                        "minimum": 1
+                                      },
+                                      "height": {
+                                        "type": "number",
+                                        "description": "Height of the highlight area in pixels. Optional if 'find' is specified.",
+                                        "minimum": 1
+                                      },
                                       "color": {
                                         "type": "string",
                                         "description": "Highlight color (hex, rgb, or named color).",
@@ -7413,7 +7472,7 @@
                                   },
                                   "blur": {
                                     "type": "object",
-                                    "description": "Configuration for blur annotations (for redacting sensitive information).",
+                                    "description": "Configuration for blur annotations (for redacting sensitive information). Note: Current implementation uses a semi-transparent overlay rather than true pixel blur. Requires 'width' and 'height' unless a 'find' element is specified (which provides dimensions automatically).",
                                     "properties": {
                                       "intensity": {
                                         "type": "number",
@@ -7576,6 +7635,10 @@
                                     "rectangle_properties": {
                                       "type": "object",
                                       "description": "Configuration for rectangle annotations.",
+                                      "required": [
+                                        "width",
+                                        "height"
+                                      ],
                                       "properties": {
                                         "width": {
                                           "type": "number",
@@ -7627,6 +7690,9 @@
                                     "circle_properties": {
                                       "type": "object",
                                       "description": "Configuration for circle annotations.",
+                                      "required": [
+                                        "radius"
+                                      ],
                                       "properties": {
                                         "radius": {
                                           "type": "number",
@@ -7802,8 +7868,18 @@
                                     },
                                     "highlight_properties": {
                                       "type": "object",
-                                      "description": "Configuration for highlight annotations (semi-transparent overlay).",
+                                      "description": "Configuration for highlight annotations (semi-transparent overlay). Requires either a 'find' element (uses element's bounding box) or explicit 'width' and 'height' properties with a 'position'.",
                                       "properties": {
+                                        "width": {
+                                          "type": "number",
+                                          "description": "Width of the highlight area in pixels. Optional if 'find' is specified.",
+                                          "minimum": 1
+                                        },
+                                        "height": {
+                                          "type": "number",
+                                          "description": "Height of the highlight area in pixels. Optional if 'find' is specified.",
+                                          "minimum": 1
+                                        },
                                         "color": {
                                           "type": "string",
                                           "description": "Highlight color (hex, rgb, or named color).",
@@ -7820,7 +7896,7 @@
                                     },
                                     "blur_properties": {
                                       "type": "object",
-                                      "description": "Configuration for blur annotations (for redacting sensitive information).",
+                                      "description": "Configuration for blur annotations (for redacting sensitive information). Note: Current implementation uses a semi-transparent overlay rather than true pixel blur. Requires 'width' and 'height' unless a 'find' element is specified (which provides dimensions automatically).",
                                       "properties": {
                                         "intensity": {
                                           "type": "number",
@@ -15487,6 +15563,10 @@
                                           "elementAria": {
                                             "type": "string",
                                             "description": "Computed accessible name of the element per ARIA specification. Supports exact match or regex pattern using /pattern/ syntax."
+                                          },
+                                          "elementId": {
+                                            "type": "string",
+                                            "description": "ID attribute of the element to find. Supports exact match or regex pattern using /pattern/ syntax."
                                           }
                                         }
                                       },
@@ -15667,6 +15747,10 @@
                                       "rectangle": {
                                         "type": "object",
                                         "description": "Configuration for rectangle annotations.",
+                                        "required": [
+                                          "width",
+                                          "height"
+                                        ],
                                         "properties": {
                                           "width": {
                                             "type": "number",
@@ -15718,6 +15802,9 @@
                                       "circle": {
                                         "type": "object",
                                         "description": "Configuration for circle annotations.",
+                                        "required": [
+                                          "radius"
+                                        ],
                                         "properties": {
                                           "radius": {
                                             "type": "number",
@@ -15893,8 +15980,18 @@
                                       },
                                       "highlight": {
                                         "type": "object",
-                                        "description": "Configuration for highlight annotations (semi-transparent overlay).",
+                                        "description": "Configuration for highlight annotations (semi-transparent overlay). Requires either a 'find' element (uses element's bounding box) or explicit 'width' and 'height' properties with a 'position'.",
                                         "properties": {
+                                          "width": {
+                                            "type": "number",
+                                            "description": "Width of the highlight area in pixels. Optional if 'find' is specified.",
+                                            "minimum": 1
+                                          },
+                                          "height": {
+                                            "type": "number",
+                                            "description": "Height of the highlight area in pixels. Optional if 'find' is specified.",
+                                            "minimum": 1
+                                          },
                                           "color": {
                                             "type": "string",
                                             "description": "Highlight color (hex, rgb, or named color).",
@@ -15911,7 +16008,7 @@
                                       },
                                       "blur": {
                                         "type": "object",
-                                        "description": "Configuration for blur annotations (for redacting sensitive information).",
+                                        "description": "Configuration for blur annotations (for redacting sensitive information). Note: Current implementation uses a semi-transparent overlay rather than true pixel blur. Requires 'width' and 'height' unless a 'find' element is specified (which provides dimensions automatically).",
                                         "properties": {
                                           "intensity": {
                                             "type": "number",
@@ -16074,6 +16171,10 @@
                                         "rectangle_properties": {
                                           "type": "object",
                                           "description": "Configuration for rectangle annotations.",
+                                          "required": [
+                                            "width",
+                                            "height"
+                                          ],
                                           "properties": {
                                             "width": {
                                               "type": "number",
@@ -16125,6 +16226,9 @@
                                         "circle_properties": {
                                           "type": "object",
                                           "description": "Configuration for circle annotations.",
+                                          "required": [
+                                            "radius"
+                                          ],
                                           "properties": {
                                             "radius": {
                                               "type": "number",
@@ -16300,8 +16404,18 @@
                                         },
                                         "highlight_properties": {
                                           "type": "object",
-                                          "description": "Configuration for highlight annotations (semi-transparent overlay).",
+                                          "description": "Configuration for highlight annotations (semi-transparent overlay). Requires either a 'find' element (uses element's bounding box) or explicit 'width' and 'height' properties with a 'position'.",
                                           "properties": {
+                                            "width": {
+                                              "type": "number",
+                                              "description": "Width of the highlight area in pixels. Optional if 'find' is specified.",
+                                              "minimum": 1
+                                            },
+                                            "height": {
+                                              "type": "number",
+                                              "description": "Height of the highlight area in pixels. Optional if 'find' is specified.",
+                                              "minimum": 1
+                                            },
                                             "color": {
                                               "type": "string",
                                               "description": "Highlight color (hex, rgb, or named color).",
@@ -16318,7 +16432,7 @@
                                         },
                                         "blur_properties": {
                                           "type": "object",
-                                          "description": "Configuration for blur annotations (for redacting sensitive information).",
+                                          "description": "Configuration for blur annotations (for redacting sensitive information). Note: Current implementation uses a semi-transparent overlay rather than true pixel blur. Requires 'width' and 'height' unless a 'find' element is specified (which provides dimensions automatically).",
                                           "properties": {
                                             "intensity": {
                                               "type": "number",
@@ -16850,6 +16964,10 @@
                                             "elementAria": {
                                               "type": "string",
                                               "description": "Computed accessible name of the element per ARIA specification. Supports exact match or regex pattern using /pattern/ syntax."
+                                            },
+                                            "elementId": {
+                                              "type": "string",
+                                              "description": "ID attribute of the element to find. Supports exact match or regex pattern using /pattern/ syntax."
                                             }
                                           }
                                         },
@@ -17030,6 +17148,10 @@
                                         "rectangle": {
                                           "type": "object",
                                           "description": "Configuration for rectangle annotations.",
+                                          "required": [
+                                            "width",
+                                            "height"
+                                          ],
                                           "properties": {
                                             "width": {
                                               "type": "number",
@@ -17081,6 +17203,9 @@
                                         "circle": {
                                           "type": "object",
                                           "description": "Configuration for circle annotations.",
+                                          "required": [
+                                            "radius"
+                                          ],
                                           "properties": {
                                             "radius": {
                                               "type": "number",
@@ -17256,8 +17381,18 @@
                                         },
                                         "highlight": {
                                           "type": "object",
-                                          "description": "Configuration for highlight annotations (semi-transparent overlay).",
+                                          "description": "Configuration for highlight annotations (semi-transparent overlay). Requires either a 'find' element (uses element's bounding box) or explicit 'width' and 'height' properties with a 'position'.",
                                           "properties": {
+                                            "width": {
+                                              "type": "number",
+                                              "description": "Width of the highlight area in pixels. Optional if 'find' is specified.",
+                                              "minimum": 1
+                                            },
+                                            "height": {
+                                              "type": "number",
+                                              "description": "Height of the highlight area in pixels. Optional if 'find' is specified.",
+                                              "minimum": 1
+                                            },
                                             "color": {
                                               "type": "string",
                                               "description": "Highlight color (hex, rgb, or named color).",
@@ -17274,7 +17409,7 @@
                                         },
                                         "blur": {
                                           "type": "object",
-                                          "description": "Configuration for blur annotations (for redacting sensitive information).",
+                                          "description": "Configuration for blur annotations (for redacting sensitive information). Note: Current implementation uses a semi-transparent overlay rather than true pixel blur. Requires 'width' and 'height' unless a 'find' element is specified (which provides dimensions automatically).",
                                           "properties": {
                                             "intensity": {
                                               "type": "number",
@@ -17437,6 +17572,10 @@
                                           "rectangle_properties": {
                                             "type": "object",
                                             "description": "Configuration for rectangle annotations.",
+                                            "required": [
+                                              "width",
+                                              "height"
+                                            ],
                                             "properties": {
                                               "width": {
                                                 "type": "number",
@@ -17488,6 +17627,9 @@
                                           "circle_properties": {
                                             "type": "object",
                                             "description": "Configuration for circle annotations.",
+                                            "required": [
+                                              "radius"
+                                            ],
                                             "properties": {
                                               "radius": {
                                                 "type": "number",
@@ -17663,8 +17805,18 @@
                                           },
                                           "highlight_properties": {
                                             "type": "object",
-                                            "description": "Configuration for highlight annotations (semi-transparent overlay).",
+                                            "description": "Configuration for highlight annotations (semi-transparent overlay). Requires either a 'find' element (uses element's bounding box) or explicit 'width' and 'height' properties with a 'position'.",
                                             "properties": {
+                                              "width": {
+                                                "type": "number",
+                                                "description": "Width of the highlight area in pixels. Optional if 'find' is specified.",
+                                                "minimum": 1
+                                              },
+                                              "height": {
+                                                "type": "number",
+                                                "description": "Height of the highlight area in pixels. Optional if 'find' is specified.",
+                                                "minimum": 1
+                                              },
                                               "color": {
                                                 "type": "string",
                                                 "description": "Highlight color (hex, rgb, or named color).",
@@ -17681,7 +17833,7 @@
                                           },
                                           "blur_properties": {
                                             "type": "object",
-                                            "description": "Configuration for blur annotations (for redacting sensitive information).",
+                                            "description": "Configuration for blur annotations (for redacting sensitive information). Note: Current implementation uses a semi-transparent overlay rather than true pixel blur. Requires 'width' and 'height' unless a 'find' element is specified (which provides dimensions automatically).",
                                             "properties": {
                                               "intensity": {
                                                 "type": "number",
@@ -20083,192 +20235,6 @@
     }
   ],
   "additionalProperties": false,
-  "components": {
-    "schemas": {
-      "openApi": {
-        "type": "array",
-        "items": {
-          "allOf": [
-            {
-              "version": "1.0.0",
-              "$schema": "http://json-schema.org/draft-07/schema#",
-              "title": "openApi",
-              "type": "object",
-              "description": "OpenAPI description and configuration.",
-              "additionalProperties": false,
-              "anyOf": [
-                {
-                  "required": [
-                    "descriptionPath"
-                  ]
-                },
-                {
-                  "required": [
-                    "operationId"
-                  ]
-                }
-              ],
-              "properties": {
-                "name": {
-                  "type": "string",
-                  "description": "Name of the OpenAPI description, as defined in your configuration."
-                },
-                "descriptionPath": {
-                  "type": "string",
-                  "description": "URL or local path to the OpenAPI description."
-                },
-                "definition": {
-                  "type": "object",
-                  "readOnly": true,
-                  "description": "OpenAPI definition object loaded from the `descriptionPath`. This is a resolved version of the OpenAPI description and should not be user-defined.",
-                  "additionalProperties": true,
-                  "title": "OpenAPI definition"
-                },
-                "operationId": {
-                  "type": "string",
-                  "description": "ID of the operation to use for the request."
-                },
-                "server": {
-                  "type": "string",
-                  "description": "Server to use for example requests. Only valid if `useExample` is `request` or `both`. If not specified but an example is used for the request, uses the first server defined in the OpenAPI description."
-                },
-                "validateAgainstSchema": {
-                  "type": "string",
-                  "description": "Validates the request and/or response against the schema in the OpenAPI description. If the request or response doesn't match the schema, the step fails.",
-                  "enum": [
-                    "request",
-                    "response",
-                    "both",
-                    "none"
-                  ],
-                  "default": "both"
-                },
-                "mockResponse": {
-                  "type": "boolean",
-                  "description": "If `true`, doesn't make the HTTP request, but instead uses the response example or schema from the OpenAPI description as the response data. Useful for creating tests when an API isn't fully implemented yet. If `statusCode` isn't specified, uses the first defined response code."
-                },
-                "statusCode": {
-                  "type": "integer",
-                  "description": "Response code to use for validation, examples, and status code checking. If the response code doesn't match, the step fails. `statusCodes` overrides this value when specified."
-                },
-                "useExample": {
-                  "type": [
-                    "string"
-                  ],
-                  "description": "Uses the example from the OpenAPI description as the request and response data. If the request or response has multiple examples, specify `exampleKey`. If `statusCode` isn't specified, uses the first defined response code. `requestData`, `requestParams`, and `requestHeaders` override portions of request examples when specified. `responseData` overrides portions of response examples when specified.",
-                  "enum": [
-                    "request",
-                    "response",
-                    "both",
-                    "none"
-                  ],
-                  "default": "none"
-                },
-                "exampleKey": {
-                  "type": "string",
-                  "description": "Key of the example to use from the `examples` property in the OpenAPI description. If an `examples` key isn't specified or isn't available for a given parameter or object, the `example` property value is used.",
-                  "default": ""
-                },
-                "headers": {
-                  "type": "object",
-                  "description": "Request headers to add to requests. For example, to set `Authorization` headers for all requests from the specified OpenAPI document. If specified in both a config and a step, the step value overrides the config value.",
-                  "additionalProperties": {
-                    "type": "string"
-                  },
-                  "title": "OpenAPI request headers"
-                }
-              },
-              "components": {
-                "schemas": {
-                  "operationId": {
-                    "type": "string",
-                    "description": "ID of the operation to use for the request."
-                  },
-                  "descriptionPath": {
-                    "type": "string",
-                    "description": "URL or local path to the OpenAPI description."
-                  }
-                }
-              },
-              "examples": [
-                {
-                  "descriptionPath": "https://petstore.swagger.io/v2/swagger.json"
-                },
-                {
-                  "name": "Reqres",
-                  "operationId": "getUserById"
-                },
-                {
-                  "descriptionPath": "https://api.example.com/openapi.json",
-                  "operationId": "getUserById"
-                },
-                {
-                  "descriptionPath": "https://api.example.com/openapi.json",
-                  "operationId": "createUser",
-                  "useExample": "both"
-                },
-                {
-                  "descriptionPath": "https://api.example.com/openapi.json",
-                  "operationId": "createUser",
-                  "useExample": "both",
-                  "exampleKey": "example1"
-                },
-                {
-                  "descriptionPath": "https://api.example.com/openapi.json",
-                  "operationId": "createUser",
-                  "useExample": "both",
-                  "exampleKey": "example1",
-                  "statusCode": 201
-                },
-                {
-                  "descriptionPath": "https://api.example.com/openapi.json",
-                  "operationId": "createUser",
-                  "useExample": "both",
-                  "exampleKey": "example1",
-                  "statusCode": 201,
-                  "validateAgainstSchema": "none"
-                },
-                {
-                  "descriptionPath": "https://api.example.com/openapi.json",
-                  "operationId": "createUser",
-                  "useExample": "both",
-                  "exampleKey": "example1",
-                  "statusCode": 201,
-                  "validateAgainstSchema": "none",
-                  "mockResponse": true
-                },
-                {
-                  "descriptionPath": "https://api.example.com/openapi.json",
-                  "operationId": "createUser",
-                  "useExample": "both",
-                  "exampleKey": "example1",
-                  "statusCode": 201,
-                  "validateAgainstSchema": "none",
-                  "mockResponse": true,
-                  "headers": {
-                    "Authorization": "Bearer 12345"
-                  }
-                }
-              ]
-            },
-            {
-              "type": "object",
-              "not": {
-                "required": [
-                  "operationId"
-                ]
-              },
-              "required": [
-                "name",
-                "descriptionPath"
-              ],
-              "title": "OpenAPI description (test)"
-            }
-          ]
-        }
-      }
-    }
-  },
   "examples": [
     {
       "steps": [
