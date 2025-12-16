@@ -1,0 +1,225 @@
+{
+  "specId": "screenshot-annotations",
+  "tests": [
+    {
+      "testId": "test-annotations",
+      "description": "Test screenshot annotations with various types",
+      "steps": [
+        {
+          "goTo": "http://localhost:8092/index.html"
+        },
+        {
+          "stepId": "annotation-arrow",
+          "screenshot": {
+            "path": "annotation-arrow.png",
+            "directory": "test/artifacts/annotations",
+            "maxVariation": 0.1,
+            "annotations": [
+              {
+                "find": {
+                  "selector": "#text-input"
+                },
+                "position": "center",
+                "arrow": {
+                  "from": { "x": 0, "y": -50 },
+                  "to": { "x": 0, "y": 0 },
+                  "color": "#FF0000",
+                  "strokeWidth": 4,
+                  "headSize": 15
+                }
+              }
+            ]
+          }
+        },
+        {
+          "stepId": "annotation-text",
+          "screenshot": {
+            "path": "annotation-text.png",
+            "directory": "test/artifacts/annotations",
+            "maxVariation": 0.1,
+            "annotations": [
+              {
+                "position": "top-right",
+                "text": {
+                  "content": "Important Notice",
+                  "fontSize": 18,
+                  "color": "#FFFFFF",
+                  "backgroundColor": "#0000FF",
+                  "padding": 10,
+                  "maxWidth": 200,
+                  "opacity": 0.9
+                }
+              }
+            ]
+          }
+        },
+        {
+          "stepId": "annotation-rectangle",
+          "screenshot": {
+            "path": "annotation-rectangle.png",
+            "directory": "test/artifacts/annotations",
+            "maxVariation": 0.1,
+            "annotations": [
+              {
+                "find": {
+                  "selector": "#password-input"
+                },
+                "rectangle": {
+                  "stroke": "#00FF00",
+                  "strokeWidth": 3,
+                  "fill": "rgba(0, 255, 0, 0.2)",
+                  "rx": 5,
+                  "ry": 5
+                }
+              }
+            ]
+          }
+        },
+        {
+          "stepId": "annotation-circle",
+          "screenshot": {
+            "path": "annotation-circle.png",
+            "directory": "test/artifacts/annotations",
+            "maxVariation": 0.1,
+            "annotations": [
+              {
+                "find": {
+                  "elementText": "Submit Button"
+                },
+                "position": "center",
+                "circle": {
+                  "radius": 40,
+                  "stroke": "#FF00FF",
+                  "strokeWidth": 3,
+                  "fill": "transparent"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "stepId": "annotation-line",
+          "screenshot": {
+            "path": "annotation-line.png",
+            "directory": "test/artifacts/annotations",
+            "maxVariation": 0.1,
+            "annotations": [
+              {
+                "position": { "x": 50, "y": 50 },
+                "line": {
+                  "from": { "x": 0, "y": 0 },
+                  "to": { "x": 100, "y": 100 },
+                  "color": "#0000FF",
+                  "strokeWidth": 3,
+                  "dashArray": [5, 5]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "stepId": "annotation-highlight",
+          "screenshot": {
+            "path": "annotation-highlight.png",
+            "directory": "test/artifacts/annotations",
+            "maxVariation": 0.1,
+            "annotations": [
+              {
+                "find": {
+                  "selector": "h1"
+                },
+                "highlight": {
+                  "color": "#FFFF00",
+                  "opacity": 0.4
+                }
+              }
+            ]
+          }
+        },
+        {
+          "stepId": "annotation-blur",
+          "screenshot": {
+            "path": "annotation-blur.png",
+            "directory": "test/artifacts/annotations",
+            "maxVariation": 0.1,
+            "annotations": [
+              {
+                "find": {
+                  "selector": "#password-input"
+                },
+                "blur": {
+                  "intensity": 15
+                }
+              }
+            ]
+          }
+        },
+        {
+          "stepId": "annotation-callout",
+          "screenshot": {
+            "path": "annotation-callout.png",
+            "directory": "test/artifacts/annotations",
+            "maxVariation": 0.1,
+            "annotations": [
+              {
+                "find": {
+                  "selector": "#text-input"
+                },
+                "position": "center",
+                "callout": {
+                  "content": "Enter your username here",
+                  "target": { "x": 0, "y": 0 },
+                  "fontSize": 14,
+                  "color": "#000000",
+                  "backgroundColor": "#FFFFCC",
+                  "arrowColor": "#000000",
+                  "maxWidth": 150
+                }
+              }
+            ]
+          }
+        },
+        {
+          "stepId": "annotation-multiple",
+          "screenshot": {
+            "path": "annotation-multiple.png",
+            "directory": "test/artifacts/annotations",
+            "maxVariation": 0.1,
+            "annotations": [
+              {
+                "find": {
+                  "selector": "#text-input"
+                },
+                "position": "center",
+                "arrow": {
+                  "from": { "x": 0, "y": -50 },
+                  "to": { "x": 0, "y": 0 },
+                  "color": "#FF0000",
+                  "strokeWidth": 3
+                }
+              },
+              {
+                "find": {
+                  "selector": "#password-input"
+                },
+                "rectangle": {
+                  "stroke": "#00FF00",
+                  "strokeWidth": 2
+                }
+              },
+              {
+                "position": "top-right",
+                "text": {
+                  "content": "Test Page",
+                  "fontSize": 16,
+                  "color": "#000000",
+                  "backgroundColor": "#FFFFFF"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

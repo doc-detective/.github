@@ -3,117 +3,6 @@
   "title": "step",
   "description": "A step in a test.",
   "type": "object",
-  "components": {
-    "schemas": {
-      "common": {
-        "type": "object",
-        "dynamicDefaults": {
-          "stepId": "uuid"
-        },
-        "properties": {
-          "$schema": {
-            "description": "JSON Schema for this object.",
-            "type": "string",
-            "enum": [
-              "https://raw.githubusercontent.com/doc-detective/common/refs/heads/main/dist/schemas/step_v3.schema.json"
-            ]
-          },
-          "stepId": {
-            "type": "string",
-            "description": "ID of the step."
-          },
-          "description": {
-            "type": "string",
-            "description": "Description of the step."
-          },
-          "unsafe": {
-            "type": "boolean",
-            "description": "Whether or not the step may be unsafe. Unsafe steps may perform actions that could modify the system or environment in unexpected ways. Unsafe steps are only performed within Docker containers or if unsafe steps are enabled with the `allowUnsafeSteps` config property or the `--allow-unsafe` flag.",
-            "default": false
-          },
-          "outputs": {
-            "type": "object",
-            "description": "Outputs from step processes and user-defined expressions. Use the `outputs` object to reference outputs in subsequent steps. If a user-defined output matches the key for a step-defined output, the user-defined output takes precedence.",
-            "default": {},
-            "patternProperties": {
-              "^[A-Za-z0-9_]+$": {
-                "type": "string",
-                "description": "Runtime expression for a user-defined output value."
-              }
-            },
-            "title": "Outputs (step)"
-          },
-          "variables": {
-            "type": "object",
-            "description": "Environment variables to set from user-defined expressions.",
-            "default": {},
-            "patternProperties": {
-              "^[A-Za-z0-9_]+$": {
-                "type": "string",
-                "description": "Runtime expression for a user-defined output value."
-              }
-            },
-            "title": "Variables (step)"
-          },
-          "breakpoint": {
-            "type": "boolean",
-            "description": "Whether or not this step should act as a breakpoint when debugging is enabled. When `true`, execution will pause at this step when debug mode is enabled.",
-            "default": false
-          }
-        },
-        "title": "Common"
-      },
-      "$schema": {
-        "description": "JSON Schema for this object.",
-        "type": "string",
-        "enum": [
-          "https://raw.githubusercontent.com/doc-detective/common/refs/heads/main/dist/schemas/step_v3.schema.json"
-        ]
-      },
-      "stepId": {
-        "type": "string",
-        "description": "ID of the step."
-      },
-      "description": {
-        "type": "string",
-        "description": "Description of the step."
-      },
-      "unsafe": {
-        "type": "boolean",
-        "description": "Whether or not the step may be unsafe. Unsafe steps may perform actions that could modify the system or environment in unexpected ways. Unsafe steps are only performed within Docker containers or if unsafe steps are enabled with the `allowUnsafeSteps` config property or the `--allow-unsafe` flag.",
-        "default": false
-      },
-      "outputs": {
-        "type": "object",
-        "description": "Outputs from step processes and user-defined expressions. Use the `outputs` object to reference outputs in subsequent steps. If a user-defined output matches the key for a step-defined output, the user-defined output takes precedence.",
-        "default": {},
-        "patternProperties": {
-          "^[A-Za-z0-9_]+$": {
-            "type": "string",
-            "description": "Runtime expression for a user-defined output value."
-          }
-        },
-        "title": "Outputs (step)"
-      },
-      "variables": {
-        "type": "object",
-        "description": "Environment variables to set from user-defined expressions.",
-        "default": {},
-        "patternProperties": {
-          "^[A-Za-z0-9_]+$": {
-            "type": "string",
-            "description": "Runtime expression for a user-defined output value."
-          }
-        },
-        "title": "Variables (step)"
-      },
-      "breakpoint": {
-        "type": "boolean",
-        "description": "Whether or not this step should act as a breakpoint when debugging is enabled. When `true`, execution will pause at this step when debug mode is enabled.",
-        "default": false
-      }
-    }
-  },
   "anyOf": [
     {
       "allOf": [
@@ -5027,6 +4916,10 @@
                               "elementAria": {
                                 "type": "string",
                                 "description": "Computed accessible name of the element per ARIA specification. Supports exact match or regex pattern using /pattern/ syntax."
+                              },
+                              "elementId": {
+                                "type": "string",
+                                "description": "ID attribute of the element to find. Supports exact match or regex pattern using /pattern/ syntax."
                               }
                             }
                           },
@@ -5206,16 +5099,16 @@
                           },
                           "rectangle": {
                             "type": "object",
-                            "description": "Configuration for rectangle annotations.",
+                            "description": "Configuration for rectangle annotations. When used with 'find', width and height are derived from the element's bounding box. When positioning freely (using 'position'), width and height must be specified.",
                             "properties": {
                               "width": {
                                 "type": "number",
-                                "description": "Width of the rectangle in pixels.",
+                                "description": "Width of the rectangle in pixels. Optional if 'find' is specified (uses element's bounding box).",
                                 "minimum": 1
                               },
                               "height": {
                                 "type": "number",
-                                "description": "Height of the rectangle in pixels.",
+                                "description": "Height of the rectangle in pixels. Optional if 'find' is specified (uses element's bounding box).",
                                 "minimum": 1
                               },
                               "fill": {
@@ -5258,6 +5151,9 @@
                           "circle": {
                             "type": "object",
                             "description": "Configuration for circle annotations.",
+                            "required": [
+                              "radius"
+                            ],
                             "properties": {
                               "radius": {
                                 "type": "number",
@@ -5433,8 +5329,18 @@
                           },
                           "highlight": {
                             "type": "object",
-                            "description": "Configuration for highlight annotations (semi-transparent overlay).",
+                            "description": "Configuration for highlight annotations (semi-transparent overlay). Requires either a 'find' element (uses element's bounding box) or explicit 'width' and 'height' properties with a 'position'.",
                             "properties": {
+                              "width": {
+                                "type": "number",
+                                "description": "Width of the highlight area in pixels. Optional if 'find' is specified.",
+                                "minimum": 1
+                              },
+                              "height": {
+                                "type": "number",
+                                "description": "Height of the highlight area in pixels. Optional if 'find' is specified.",
+                                "minimum": 1
+                              },
                               "color": {
                                 "type": "string",
                                 "description": "Highlight color (hex, rgb, or named color).",
@@ -5451,7 +5357,7 @@
                           },
                           "blur": {
                             "type": "object",
-                            "description": "Configuration for blur annotations (for redacting sensitive information).",
+                            "description": "Configuration for blur annotations (for redacting sensitive information). Note: Current implementation uses a semi-transparent overlay rather than true pixel blur. Requires 'width' and 'height' unless a 'find' element is specified (which provides dimensions automatically).",
                             "properties": {
                               "intensity": {
                                 "type": "number",
@@ -5613,16 +5519,16 @@
                             },
                             "rectangle_properties": {
                               "type": "object",
-                              "description": "Configuration for rectangle annotations.",
+                              "description": "Configuration for rectangle annotations. When used with 'find', width and height are derived from the element's bounding box. When positioning freely (using 'position'), width and height must be specified.",
                               "properties": {
                                 "width": {
                                   "type": "number",
-                                  "description": "Width of the rectangle in pixels.",
+                                  "description": "Width of the rectangle in pixels. Optional if 'find' is specified (uses element's bounding box).",
                                   "minimum": 1
                                 },
                                 "height": {
                                   "type": "number",
-                                  "description": "Height of the rectangle in pixels.",
+                                  "description": "Height of the rectangle in pixels. Optional if 'find' is specified (uses element's bounding box).",
                                   "minimum": 1
                                 },
                                 "fill": {
@@ -5665,6 +5571,9 @@
                             "circle_properties": {
                               "type": "object",
                               "description": "Configuration for circle annotations.",
+                              "required": [
+                                "radius"
+                              ],
                               "properties": {
                                 "radius": {
                                   "type": "number",
@@ -5840,8 +5749,18 @@
                             },
                             "highlight_properties": {
                               "type": "object",
-                              "description": "Configuration for highlight annotations (semi-transparent overlay).",
+                              "description": "Configuration for highlight annotations (semi-transparent overlay). Requires either a 'find' element (uses element's bounding box) or explicit 'width' and 'height' properties with a 'position'.",
                               "properties": {
+                                "width": {
+                                  "type": "number",
+                                  "description": "Width of the highlight area in pixels. Optional if 'find' is specified.",
+                                  "minimum": 1
+                                },
+                                "height": {
+                                  "type": "number",
+                                  "description": "Height of the highlight area in pixels. Optional if 'find' is specified.",
+                                  "minimum": 1
+                                },
                                 "color": {
                                   "type": "string",
                                   "description": "Highlight color (hex, rgb, or named color).",
@@ -5858,7 +5777,7 @@
                             },
                             "blur_properties": {
                               "type": "object",
-                              "description": "Configuration for blur annotations (for redacting sensitive information).",
+                              "description": "Configuration for blur annotations (for redacting sensitive information). Note: Current implementation uses a semi-transparent overlay rather than true pixel blur. Requires 'width' and 'height' unless a 'find' element is specified (which provides dimensions automatically).",
                               "properties": {
                                 "intensity": {
                                   "type": "number",
@@ -6390,6 +6309,10 @@
                                 "elementAria": {
                                   "type": "string",
                                   "description": "Computed accessible name of the element per ARIA specification. Supports exact match or regex pattern using /pattern/ syntax."
+                                },
+                                "elementId": {
+                                  "type": "string",
+                                  "description": "ID attribute of the element to find. Supports exact match or regex pattern using /pattern/ syntax."
                                 }
                               }
                             },
@@ -6569,16 +6492,16 @@
                             },
                             "rectangle": {
                               "type": "object",
-                              "description": "Configuration for rectangle annotations.",
+                              "description": "Configuration for rectangle annotations. When used with 'find', width and height are derived from the element's bounding box. When positioning freely (using 'position'), width and height must be specified.",
                               "properties": {
                                 "width": {
                                   "type": "number",
-                                  "description": "Width of the rectangle in pixels.",
+                                  "description": "Width of the rectangle in pixels. Optional if 'find' is specified (uses element's bounding box).",
                                   "minimum": 1
                                 },
                                 "height": {
                                   "type": "number",
-                                  "description": "Height of the rectangle in pixels.",
+                                  "description": "Height of the rectangle in pixels. Optional if 'find' is specified (uses element's bounding box).",
                                   "minimum": 1
                                 },
                                 "fill": {
@@ -6621,6 +6544,9 @@
                             "circle": {
                               "type": "object",
                               "description": "Configuration for circle annotations.",
+                              "required": [
+                                "radius"
+                              ],
                               "properties": {
                                 "radius": {
                                   "type": "number",
@@ -6796,8 +6722,18 @@
                             },
                             "highlight": {
                               "type": "object",
-                              "description": "Configuration for highlight annotations (semi-transparent overlay).",
+                              "description": "Configuration for highlight annotations (semi-transparent overlay). Requires either a 'find' element (uses element's bounding box) or explicit 'width' and 'height' properties with a 'position'.",
                               "properties": {
+                                "width": {
+                                  "type": "number",
+                                  "description": "Width of the highlight area in pixels. Optional if 'find' is specified.",
+                                  "minimum": 1
+                                },
+                                "height": {
+                                  "type": "number",
+                                  "description": "Height of the highlight area in pixels. Optional if 'find' is specified.",
+                                  "minimum": 1
+                                },
                                 "color": {
                                   "type": "string",
                                   "description": "Highlight color (hex, rgb, or named color).",
@@ -6814,7 +6750,7 @@
                             },
                             "blur": {
                               "type": "object",
-                              "description": "Configuration for blur annotations (for redacting sensitive information).",
+                              "description": "Configuration for blur annotations (for redacting sensitive information). Note: Current implementation uses a semi-transparent overlay rather than true pixel blur. Requires 'width' and 'height' unless a 'find' element is specified (which provides dimensions automatically).",
                               "properties": {
                                 "intensity": {
                                   "type": "number",
@@ -6976,16 +6912,16 @@
                               },
                               "rectangle_properties": {
                                 "type": "object",
-                                "description": "Configuration for rectangle annotations.",
+                                "description": "Configuration for rectangle annotations. When used with 'find', width and height are derived from the element's bounding box. When positioning freely (using 'position'), width and height must be specified.",
                                 "properties": {
                                   "width": {
                                     "type": "number",
-                                    "description": "Width of the rectangle in pixels.",
+                                    "description": "Width of the rectangle in pixels. Optional if 'find' is specified (uses element's bounding box).",
                                     "minimum": 1
                                   },
                                   "height": {
                                     "type": "number",
-                                    "description": "Height of the rectangle in pixels.",
+                                    "description": "Height of the rectangle in pixels. Optional if 'find' is specified (uses element's bounding box).",
                                     "minimum": 1
                                   },
                                   "fill": {
@@ -7028,6 +6964,9 @@
                               "circle_properties": {
                                 "type": "object",
                                 "description": "Configuration for circle annotations.",
+                                "required": [
+                                  "radius"
+                                ],
                                 "properties": {
                                   "radius": {
                                     "type": "number",
@@ -7203,8 +7142,18 @@
                               },
                               "highlight_properties": {
                                 "type": "object",
-                                "description": "Configuration for highlight annotations (semi-transparent overlay).",
+                                "description": "Configuration for highlight annotations (semi-transparent overlay). Requires either a 'find' element (uses element's bounding box) or explicit 'width' and 'height' properties with a 'position'.",
                                 "properties": {
+                                  "width": {
+                                    "type": "number",
+                                    "description": "Width of the highlight area in pixels. Optional if 'find' is specified.",
+                                    "minimum": 1
+                                  },
+                                  "height": {
+                                    "type": "number",
+                                    "description": "Height of the highlight area in pixels. Optional if 'find' is specified.",
+                                    "minimum": 1
+                                  },
                                   "color": {
                                     "type": "string",
                                     "description": "Highlight color (hex, rgb, or named color).",
@@ -7221,7 +7170,7 @@
                               },
                               "blur_properties": {
                                 "type": "object",
-                                "description": "Configuration for blur annotations (for redacting sensitive information).",
+                                "description": "Configuration for blur annotations (for redacting sensitive information). Note: Current implementation uses a semi-transparent overlay rather than true pixel blur. Requires 'width' and 'height' unless a 'find' element is specified (which provides dimensions automatically).",
                                 "properties": {
                                   "intensity": {
                                     "type": "number",

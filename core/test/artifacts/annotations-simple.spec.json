@@ -1,0 +1,36 @@
+{
+  "specId": "annotation-simple-test",
+  "tests": [
+    {
+      "testId": "test-simple-annotation",
+      "description": "Test simple text annotation without element finding",
+      "steps": [
+        {
+          "goTo": "http://localhost:8092/index.html"
+        },
+        {
+          "stepId": "annotation-text-only",
+          "screenshot": {
+            "path": "annotation-text-simple.png",
+            "directory": "test/artifacts/annotations",
+            "overwrite": "true",
+            "annotations": [
+              {
+                "position": {
+                  "x": 50,
+                  "y": 50
+                },
+                "text": {
+                  "content": "Simple Test",
+                  "fontSize": 20,
+                  "color": "#FF0000",
+                  "backgroundColor": "#FFFFFF"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

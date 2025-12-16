@@ -88,7 +88,7 @@ async function saveScreenshot({ config, step, driver }) {
       result.description = `File already exists: ${filePath}`;
       return result;
     } else {
-      // Set temp file path
+        await sharp(filePath)
       existFilePath = filePath;
       filePath = path.join(dir, `${step.stepId}_${Date.now()}.png`);
     }
@@ -281,6 +281,27 @@ async function saveScreenshot({ config, step, driver }) {
       result.description = `Couldn't crop image. ${error}`;
       return result;
     }
+  }
+
+  // Apply annotations if specified
+  if (step.screenshot.annotations && Array.isArray(step.screenshot.annotations)) {
+    const { annotateScreenshot } = require("./annotateScreenshot");
+    
+    // Always annotate the newly captured screenshot (filePath)
+    const annotationResult = await annotateScreenshot({
+      config,
+      filePath: filePath,
+      annotations: step.screenshot.annotations,
+      driver,
+    });
+
+    if (!annotationResult.success) {
+      result.status = "FAIL";
+      result.description = `Annotation failed: ${annotationResult.error}`;
+      return result;
+    }
+
+    result.description += ` Added ${step.screenshot.annotations.length} annotation(s).`;
   }
 
   // If file already exists
