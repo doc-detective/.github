@@ -6,11 +6,11 @@ const {
 } = require("../utils");
 const fs = require("fs");
 const path = require("path");
+const { spawn } = require("child_process");
 
 exports.runShell = runShell;
 
-// Run a shell command.
-async function runShell({ config, step }) {
+async function runShell({ config, step, scopeRegistry = null }) {
   // Promisify and execute command
   const result = {
     status: "PASS",
@@ -48,7 +48,101 @@ async function runShell({ config, step }) {
     timeout: step.runShell.timeout || 60000,
   };
 
-  // Execute command
+  const scopeName = step.runShell.scope;
+  if (scopeName && scopeRegistry) {
+    if (scopeRegistry.has(scopeName)) {
+      const existingScope = scopeRegistry.get(scopeName);
+      result.outputs.stdio.stdout = existingScope.stdout;
+      result.outputs.stdio.stderr = existingScope.stderr;
+      if (existingScope.exitCode !== null) {
+        result.outputs.exitCode = existingScope.exitCode;
+      }
+      result.description = `Interacted with existing scope '${scopeName}'.`;
+      
+      if (step.runShell.stdio) {
+        const combined = existingScope.stdout + existingScope.stderr;
+        if (step.runShell.stdio.startsWith("/") && step.runShell.stdio.endsWith("/")) {
+          const regex = new RegExp(step.runShell.stdio.slice(1, -1));
+          if (!regex.test(combined)) {
+            result.status = "FAIL";
+            result.description = `Couldn't find expected output (${step.runShell.stdio}) in scope '${scopeName}' output.`;
+          }
+        } else if (!combined.includes(step.runShell.stdio)) {
+          result.status = "FAIL";
+          result.description = `Couldn't find expected output (${step.runShell.stdio}) in scope '${scopeName}' output.`;
+        }
+      }
+      return result;
+    }
+    
+    let shell = "bash";
+    let shellArgs = ["-c"];
+    if (process.platform === "win32") {
+      shell = "cmd";
+      shellArgs = ["/c"];
+    }
+    const fullCommand = [step.runShell.command, ...step.runShell.args].join(" ");
+    shellArgs.push(fullCommand);
+    
+    const spawnOptions = {
+      stdio: ["pipe", "pipe", "pipe"],
+    };
+    if (process.platform === "win32") {
+      spawnOptions.shell = true;
+      spawnOptions.windowsHide = true;
+    }
+    if (step.runShell.workingDirectory) {
+      spawnOptions.cwd = step.runShell.workingDirectory;
+    }
+    
+    const childProcess = spawn(shell, shellArgs, spawnOptions);
+    scopeRegistry.create(scopeName, childProcess);
+    
+    const timeout = step.runShell.timeout;
+    const scopeObj = scopeRegistry.get(scopeName);
+    
+    await new Promise((resolve) => {
+      const checkComplete = setInterval(() => {
+        if (scopeObj.closed) {
+          clearInterval(checkComplete);
+          resolve();
+        }
+      }, 50);
+      
+      setTimeout(() => {
+        clearInterval(checkComplete);
+        resolve();
+      }, timeout);
+    });
+    
+    result.outputs.stdio.stdout = scopeObj.stdout.replace(/\r$/, "");
+    result.outputs.stdio.stderr = scopeObj.stderr.replace(/\r$/, "");
+    result.outputs.exitCode = scopeObj.exitCode !== null ? scopeObj.exitCode : 0;
+    result.description = `Created scope '${scopeName}' and executed command.`;
+    
+    if (scopeObj.exitCode !== null && !step.runShell.exitCodes.includes(scopeObj.exitCode)) {
+      result.status = "FAIL";
+      result.description = `Scope '${scopeName}' returned exit code ${scopeObj.exitCode}. Expected one of ${JSON.stringify(step.runShell.exitCodes)}`;
+      return result;
+    }
+    
+    if (step.runShell.stdio) {
+      const combined = scopeObj.stdout + scopeObj.stderr;
+      if (step.runShell.stdio.startsWith("/") && step.runShell.stdio.endsWith("/")) {
+        const regex = new RegExp(step.runShell.stdio.slice(1, -1));
+        if (!regex.test(combined)) {
+          result.status = "FAIL";
+          result.description = `Couldn't find expected output (${step.runShell.stdio}) in scope '${scopeName}' output.`;
+        }
+      } else if (!combined.includes(step.runShell.stdio)) {
+        result.status = "FAIL";
+        result.description = `Couldn't find expected output (${step.runShell.stdio}) in scope '${scopeName}' output.`;
+      }
+    }
+    
+    return result;
+  }
+
   const timeout = step.runShell.timeout;
   const options = {};
   if (step.runShell.workingDirectory)

@@ -7,7 +7,6 @@ const os = require("os");
 
 exports.runCode = runCode;
 
-// Create a temporary script file
 function createTempScript(code, language) {
   let extension;
   switch (language) {
@@ -36,8 +35,7 @@ function createTempScript(code, language) {
   return tmpFile;
 }
 
-// Run gather, compile, and run code.
-async function runCode({ config, step }) {
+async function runCode({ config, step, scopeRegistry = null }) {
   const result = {
     status: "PASS",
     description: "Executed code.",
@@ -101,7 +99,6 @@ async function runCode({ config, step }) {
       return result;
     }
 
-    // Prepare shell command based on language
     const shellStep = {
       runShell: {
         command:
@@ -113,10 +110,13 @@ async function runCode({ config, step }) {
         args: [scriptPath, ...step.runCode.args],
       },
     };
+    
+    if (step.runCode.scope) {
+      shellStep.runShell.scope = step.runCode.scope;
+    }
     delete shellStep.runCode;
 
-    // Execute script using runShell
-    const shellResult = await runShell({ config: config, step: shellStep });
+    const shellResult = await runShell({ config: config, step: shellStep, scopeRegistry: scopeRegistry });
 
     // Copy results
     result.status = shellResult.status;

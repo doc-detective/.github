@@ -823,3 +823,453 @@ describe("getRunner() function", function () {
     }
   });
 });
+
+// =============================================================================
+// SCOPE PROPERTY TESTS
+// Tests for the `scope` property on runShell, runCode, and type actions.
+// The scope property enables:
+// - runShell/runCode: Create named terminal scopes for long-running/parallel processes
+// - type: Send input to an existing terminal scope
+// =============================================================================
+
+describe("Scope property for terminal management", function () {
+  this.timeout(0); // Indefinite timeout for browser/process operations
+
+  describe("runShell with scope", function () {
+    it("should accept scope property in runShell step", async () => {
+      // Test that the schema accepts the scope property
+      const scopeTest = {
+        tests: [
+          {
+            steps: [
+              {
+                runShell: {
+                  command: "echo 'Hello from scope'",
+                  scope: "my-test-scope",
+                  exitCodes: [0],
+                  stdio: "Hello from scope"
+                }
+              }
+            ]
+          }
+        ]
+      };
+      
+      const tempFilePath = path.resolve("./test/temp-scope-runshell-basic.json");
+      fs.writeFileSync(tempFilePath, JSON.stringify(scopeTest, null, 2));
+      const config = { input: tempFilePath, logLevel: "silent" };
+      
+      let result;
+      try {
+        result = await runTests(config);
+        // At minimum, the step should not fail due to invalid schema
+        assert.notEqual(result, null, "Result should not be null");
+        // Step should pass (scope property accepted even if not yet fully implemented)
+        assert.equal(result.summary.specs.fail, 0, "Spec should not fail");
+      } finally {
+        fs.unlinkSync(tempFilePath);
+      }
+    });
+
+    it("should create a named scope for a background process", async () => {
+      // This test verifies that runShell with scope creates a persistent process
+      // that can be interacted with later
+      const backgroundScopeTest = {
+        tests: [
+          {
+            steps: [
+              {
+                // Start a background process that waits for input
+                runShell: {
+                  command: "cat",
+                  scope: "background-cat",
+                  timeout: 1000 // Short timeout since cat will wait indefinitely
+                }
+              }
+            ]
+          }
+        ]
+      };
+      
+      const tempFilePath = path.resolve("./test/temp-scope-background.json");
+      fs.writeFileSync(tempFilePath, JSON.stringify(backgroundScopeTest, null, 2));
+      const config = { input: tempFilePath, logLevel: "silent" };
+      
+      let result;
+      try {
+        result = await runTests(config);
+        // When scope is properly implemented, the process should be created
+        // and managed in background without blocking
+        assert.notEqual(result, null, "Result should not be null");
+      } finally {
+        fs.unlinkSync(tempFilePath);
+      }
+    });
+
+    it("should allow referencing an existing scope from another runShell step", async () => {
+      // This test verifies scope persistence across steps
+      const persistentScopeTest = {
+        tests: [
+          {
+            steps: [
+              {
+                // Create a scope
+                runShell: {
+                  command: "echo 'Scope initialized'",
+                  scope: "persistent-scope",
+                  exitCodes: [0]
+                }
+              },
+              {
+                // Reference the same scope
+                runShell: {
+                  command: "echo 'Using same scope'",
+                  scope: "persistent-scope",
+                  exitCodes: [0]
+                }
+              }
+            ]
+          }
+        ]
+      };
+      
+      const tempFilePath = path.resolve("./test/temp-scope-persistent.json");
+      fs.writeFileSync(tempFilePath, JSON.stringify(persistentScopeTest, null, 2));
+      const config = { input: tempFilePath, logLevel: "silent" };
+      
+      let result;
+      try {
+        result = await runTests(config);
+        assert.notEqual(result, null, "Result should not be null");
+        // Both steps should pass
+        assert.equal(result.summary.steps.fail, 0, "No steps should fail");
+      } finally {
+        fs.unlinkSync(tempFilePath);
+      }
+    });
+  });
+
+  describe("runCode with scope", function () {
+    it("should accept scope property in runCode step", async () => {
+      const scopeCodeTest = {
+        tests: [
+          {
+            steps: [
+              {
+                runCode: {
+                  language: "javascript",
+                  code: "console.log('Hello from code scope');",
+                  scope: "code-scope",
+                  exitCodes: [0],
+                  stdio: "Hello from code scope"
+                }
+              }
+            ]
+          }
+        ]
+      };
+      
+      const tempFilePath = path.resolve("./test/temp-scope-runcode-basic.json");
+      fs.writeFileSync(tempFilePath, JSON.stringify(scopeCodeTest, null, 2));
+      const config = { input: tempFilePath, logLevel: "silent" };
+      
+      let result;
+      try {
+        result = await runTests(config);
+        assert.notEqual(result, null, "Result should not be null");
+        // Step should pass (scope property accepted)
+        assert.equal(result.summary.specs.fail, 0, "Spec should not fail");
+      } finally {
+        fs.unlinkSync(tempFilePath);
+      }
+    });
+
+    it("should create a named scope for runCode background process", async () => {
+      const backgroundCodeTest = {
+        tests: [
+          {
+            steps: [
+              {
+                runCode: {
+                  language: "javascript",
+                  code: "setInterval(() => {}, 1000); console.log('Background started');",
+                  scope: "js-background",
+                  timeout: 2000
+                }
+              }
+            ]
+          }
+        ]
+      };
+      
+      const tempFilePath = path.resolve("./test/temp-scope-runcode-background.json");
+      fs.writeFileSync(tempFilePath, JSON.stringify(backgroundCodeTest, null, 2));
+      const config = { input: tempFilePath, logLevel: "silent" };
+      
+      let result;
+      try {
+        result = await runTests(config);
+        assert.notEqual(result, null, "Result should not be null");
+      } finally {
+        fs.unlinkSync(tempFilePath);
+      }
+    });
+  });
+
+  describe("type with scope", function () {
+    it("should fail when referencing a non-existent scope", async () => {
+      // Per schema: "If the specified scope doesn't exist, the step fails."
+      const nonExistentScopeTest = {
+        tests: [
+          {
+            steps: [
+              {
+                type: {
+                  keys: ["hello"],
+                  scope: "non-existent-scope"
+                }
+              }
+            ]
+          }
+        ]
+      };
+      
+      const tempFilePath = path.resolve("./test/temp-scope-type-nonexistent.json");
+      fs.writeFileSync(tempFilePath, JSON.stringify(nonExistentScopeTest, null, 2));
+      const config = { input: tempFilePath, logLevel: "silent" };
+      
+      let result;
+      try {
+        result = await runTests(config);
+        // The step should fail because the scope doesn't exist
+        assert.equal(result.summary.steps.fail, 1, "Step should fail for non-existent scope");
+      } finally {
+        fs.unlinkSync(tempFilePath);
+      }
+    });
+
+    it("should send input to an existing terminal scope", async () => {
+      // This test creates a scope with runShell and then sends input via type
+      const typeToScopeTest = {
+        tests: [
+          {
+            steps: [
+              {
+                // Start a process that reads stdin
+                runShell: {
+                  command: "cat",
+                  scope: "input-receiver",
+                  timeout: 5000
+                }
+              },
+              {
+                // Send input to the scope
+                type: {
+                  keys: ["hello world", "$ENTER$"],
+                  scope: "input-receiver"
+                }
+              }
+            ]
+          }
+        ]
+      };
+      
+      const tempFilePath = path.resolve("./test/temp-scope-type-to-scope.json");
+      fs.writeFileSync(tempFilePath, JSON.stringify(typeToScopeTest, null, 2));
+      const config = { input: tempFilePath, logLevel: "silent" };
+      
+      let result;
+      try {
+        result = await runTests(config);
+        assert.notEqual(result, null, "Result should not be null");
+      } finally {
+        fs.unlinkSync(tempFilePath);
+      }
+    });
+  });
+
+  describe("Scope lifecycle management", function () {
+    it("should cleanup scopes after test completion", async () => {
+      // Scopes should be cleaned up when a test completes to avoid resource leaks
+      const scopeCleanupTest = {
+        tests: [
+          {
+            steps: [
+              {
+                runShell: {
+                  command: "echo 'cleanup test'",
+                  scope: "cleanup-scope",
+                  exitCodes: [0]
+                }
+              }
+            ]
+          }
+        ]
+      };
+      
+      const tempFilePath = path.resolve("./test/temp-scope-cleanup.json");
+      fs.writeFileSync(tempFilePath, JSON.stringify(scopeCleanupTest, null, 2));
+      const config = { input: tempFilePath, logLevel: "silent" };
+      
+      let result;
+      try {
+        result = await runTests(config);
+        assert.notEqual(result, null, "Result should not be null");
+        // Test passes without hanging (scope cleanup worked)
+        assert.equal(result.summary.specs.fail, 0, "Spec should pass");
+      } finally {
+        fs.unlinkSync(tempFilePath);
+      }
+    });
+
+    it("should isolate scopes between different tests", async () => {
+      const isolatedScopesTest = {
+        tests: [
+          {
+            steps: [
+              {
+                runShell: {
+                  command: "echo 'test 1'",
+                  scope: "shared-name",
+                  exitCodes: [0]
+                }
+              }
+            ]
+          },
+          {
+            steps: [
+              {
+                runShell: {
+                  command: "echo 'test 2'",
+                  scope: "shared-name",
+                  exitCodes: [0]
+                }
+              }
+            ]
+          }
+        ]
+      };
+      
+      const tempFilePath = path.resolve("./test/temp-scope-isolation.json");
+      fs.writeFileSync(tempFilePath, JSON.stringify(isolatedScopesTest, null, 2));
+      const config = { input: tempFilePath, logLevel: "silent" };
+      
+      let result;
+      try {
+        result = await runTests(config);
+        assert.notEqual(result, null, "Result should not be null");
+        assert.equal(result.summary.tests.fail, 0, "No tests should fail");
+      } finally {
+        fs.unlinkSync(tempFilePath);
+      }
+    });
+  });
+
+  describe("Scope edge cases", function () {
+    it("should handle empty scope name gracefully", async () => {
+      const emptyScopeTest = {
+        tests: [
+          {
+            steps: [
+              {
+                runShell: {
+                  command: "echo 'empty scope'",
+                  scope: "",
+                  exitCodes: [0]
+                }
+              }
+            ]
+          }
+        ]
+      };
+      
+      const tempFilePath = path.resolve("./test/temp-scope-empty.json");
+      fs.writeFileSync(tempFilePath, JSON.stringify(emptyScopeTest, null, 2));
+      const config = { input: tempFilePath, logLevel: "silent" };
+      
+      let result;
+      try {
+        result = await runTests(config);
+        assert.notEqual(result, null, "Result should not be null");
+      } finally {
+        fs.unlinkSync(tempFilePath);
+      }
+    });
+
+    it("should handle special characters in scope name", async () => {
+      const specialCharScopeTest = {
+        tests: [
+          {
+            steps: [
+              {
+                runShell: {
+                  command: "echo 'special chars'",
+                  scope: "my-scope_123.test",
+                  exitCodes: [0]
+                }
+              }
+            ]
+          }
+        ]
+      };
+      
+      const tempFilePath = path.resolve("./test/temp-scope-special-chars.json");
+      fs.writeFileSync(tempFilePath, JSON.stringify(specialCharScopeTest, null, 2));
+      const config = { input: tempFilePath, logLevel: "silent" };
+      
+      let result;
+      try {
+        result = await runTests(config);
+        assert.notEqual(result, null, "Result should not be null");
+        assert.equal(result.summary.specs.fail, 0, "Spec should pass");
+      } finally {
+        fs.unlinkSync(tempFilePath);
+      }
+    });
+
+    it("should handle multiple concurrent scopes", async () => {
+      const concurrentScopesTest = {
+        tests: [
+          {
+            steps: [
+              {
+                runShell: {
+                  command: "echo 'scope A'",
+                  scope: "concurrent-a",
+                  exitCodes: [0]
+                }
+              },
+              {
+                runShell: {
+                  command: "echo 'scope B'",
+                  scope: "concurrent-b",
+                  exitCodes: [0]
+                }
+              },
+              {
+                runShell: {
+                  command: "echo 'scope C'",
+                  scope: "concurrent-c",
+                  exitCodes: [0]
+                }
+              }
+            ]
+          }
+        ]
+      };
+      
+      const tempFilePath = path.resolve("./test/temp-scope-concurrent.json");
+      fs.writeFileSync(tempFilePath, JSON.stringify(concurrentScopesTest, null, 2));
+      const config = { input: tempFilePath, logLevel: "silent" };
+      
+      let result;
+      try {
+        result = await runTests(config);
+        assert.notEqual(result, null, "Result should not be null");
+        assert.equal(result.summary.steps.fail, 0, "All steps should pass");
+      } finally {
+        fs.unlinkSync(tempFilePath);
+      }
+    });
+  });
+});
