@@ -73,32 +73,40 @@ function matchesCondition(output, condition) {
  * Waits for stdout/stderr conditions to be met by listening to streams.
  * 
  * @param {object} options - Wait options
-    const stdoutListener = (chunk) => {
-      // append incoming chunk to buffer and test against the accumulated buffer
-      const full = scope.stdoutBuffer.join('\n');
-      if (matchesCondition(full, conditions.stdout)) {
-        stdoutMet = true;
-        log(config, "info", `Stdout condition met: ${conditions.stdout}`);
-        
-        if (stderrMet) {
-          cleanup();
-          resolve({ met: true });
-        }
+ * @param {object} options.scope - The scope object with streams
+ * @param {object} options.conditions - Conditions to wait for
+ * @param {string} options.conditions.stdout - Stdout condition (optional)
+ * @param {string} options.conditions.stderr - Stderr condition (optional)
+ * @param {number} options.timeout - Timeout in milliseconds (default 30000)
+ * @param {object} options.config - Config for logging
+ * @returns {Promise<object>} Resolves with {met: true} or rejects with timeout error
+ */
+async function waitForConditions({ scope, conditions, timeout = 30000, config }) {
+  // If no conditions specified, resolve immediately
+  if (!conditions || (!conditions.stdout && !conditions.stderr)) {
+    return { met: true };
+  }
+  
+  return new Promise((resolve, reject) => {
     let stdoutMet = !conditions.stdout || conditions.stdout === '';
     let stderrMet = !conditions.stderr || conditions.stderr === '';
     let timeoutId;
     
-    const stderrListener = (chunk) => {
-      // append incoming chunk to buffer and test against the accumulated buffer
-      const full = scope.stderrBuffer.join('\n');
-      if (matchesCondition(full, conditions.stderr)) {
+    // Check if already met from buffer
+    if (!stdoutMet && scope.stdoutBuffer) {
+      const stdoutContent = scope.stdoutBuffer.join('\n');
+      if (matchesCondition(stdoutContent, conditions.stdout)) {
+        stdoutMet = true;
+        log(config, "debug", `Stdout condition already met in buffer: ${conditions.stdout}`);
+      }
+    }
+    
+    if (!stderrMet && scope.stderrBuffer) {
+      const stderrContent = scope.stderrBuffer.join('\n');
+      if (matchesCondition(stderrContent, conditions.stderr)) {
         stderrMet = true;
-        log(config, "info", `Stderr condition met: ${conditions.stderr}`);
-        
-        if (stdoutMet) {
-          cleanup();
-          resolve({ met: true });
-        }
+        log(config, "debug", `Stderr condition already met in buffer: ${conditions.stderr}`);
+      }
     }
     
     // Check if all conditions already met
@@ -116,13 +124,15 @@ function matchesCondition(output, condition) {
       reject(new Error(`Timeout waiting for conditions: ${unmetConditions.join(', ')}`));
     }, timeout);
     
-    // Listen to stdout
+    // Listen to stdout - match against accumulated buffer to catch patterns spanning chunks
     const stdoutListener = (data) => {
       const chunk = data.toString();
       log(config, "debug", `Stdout chunk: ${chunk.substring(0, 100)}...`);
       
       if (!stdoutMet && conditions.stdout) {
-        if (matchesCondition(chunk, conditions.stdout)) {
+        // Match against accumulated buffer to catch patterns spanning multiple chunks
+        const fullOutput = scope.stdoutBuffer.join('\n');
+        if (matchesCondition(fullOutput, conditions.stdout)) {
           stdoutMet = true;
           log(config, "info", `Stdout condition met: ${conditions.stdout}`);
           
@@ -134,13 +144,15 @@ function matchesCondition(output, condition) {
       }
     };
     
-    // Listen to stderr
+    // Listen to stderr - match against accumulated buffer to catch patterns spanning chunks
     const stderrListener = (data) => {
       const chunk = data.toString();
       log(config, "debug", `Stderr chunk: ${chunk.substring(0, 100)}...`);
       
       if (!stderrMet && conditions.stderr) {
-        if (matchesCondition(chunk, conditions.stderr)) {
+        // Match against accumulated buffer to catch patterns spanning multiple chunks
+        const fullOutput = scope.stderrBuffer.join('\n');
+        if (matchesCondition(fullOutput, conditions.stderr)) {
           stderrMet = true;
           log(config, "info", `Stderr condition met: ${conditions.stderr}`);
           

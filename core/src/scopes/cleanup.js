@@ -103,20 +103,16 @@ function setupCleanupHandlers(config = { logLevel: 'info' }) {
   
   // Helper to run cleanup and then exit reliably
   const exitWithCleanup = (code, reason) => {
-    // Start cleanup and ensure we exit afterwards. Use finally-style behavior
-    // and a fallback timeout to avoid hanging indefinitely.
-    (async () => {
-      try {
-        await handleExit(reason);
-      } catch (err) {
+    handleExit(reason)
+      .catch((err) => {
         log(config, 'error', `Error during cleanup: ${err.stack || err}`);
-      } finally {
-        // allow stdio to flush then exit
+      })
+      .finally(() => {
+        // Allow stdio to flush then exit
         setImmediate(() => process.exit(code));
-        // force exit after 5s if something prevents exit
+        // Force exit after 5s if something prevents exit
         setTimeout(() => process.exit(code), 5000).unref();
-      }
-    })();
+      });
   };
 
   // SIGINT (Ctrl+C)

@@ -70,16 +70,43 @@ const specialKeyMap = {
 
 // Mapping of special keys to terminal control sequences for terminal scopes
 const specialKeyTerminalMap = {
+  // Basic control characters
   $ENTER$: '\r',
   $RETURN$: '\r',
   $TAB$: '\t',
   $BACKSPACE$: '\x7f',
   $ESCAPE$: '\x1b',
   $SPACE$: ' ',
+  // Arrow keys
   $ARROW_UP$: '\x1b[A',
   $ARROW_DOWN$: '\x1b[B',
   $ARROW_RIGHT$: '\x1b[C',
   $ARROW_LEFT$: '\x1b[D',
+  // Modifier keys (standalone escape sequences)
+  $CTRL$: '\x1b[17~',
+  $CONTROL$: '\x1b[17~',
+  $ALT$: '\x1b',
+  $SHIFT$: '\x1b[16~',
+  // Navigation keys
+  $HOME$: '\x1b[H',
+  $END$: '\x1b[F',
+  $PAGE_UP$: '\x1b[5~',
+  $PAGE_DOWN$: '\x1b[6~',
+  $INSERT$: '\x1b[2~',
+  $DELETE$: '\x1b[3~',
+  // Function keys (F1-F12)
+  $F1$: '\x1bOP',
+  $F2$: '\x1bOQ',
+  $F3$: '\x1bOR',
+  $F4$: '\x1bOS',
+  $F5$: '\x1b[15~',
+  $F6$: '\x1b[17~',
+  $F7$: '\x1b[18~',
+  $F8$: '\x1b[19~',
+  $F9$: '\x1b[20~',
+  $F10$: '\x1b[21~',
+  $F11$: '\x1b[23~',
+  $F12$: '\x1b[24~',
 };
 
 // Type a sequence of keys in the active element.

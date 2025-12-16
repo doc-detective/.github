@@ -4552,7 +4552,7 @@
                                                           },
                                                           "waitUntil": {
                                                             "type": "object",
-                                                            "description": "Conditions to wait for in the command's output before considering the step complete. When specified, the process continues running after conditions are met.",
+                                                            "description": "Conditions to wait for in the command's output before considering the step complete. When specified, the process continues running after conditions are met. Times out after 30 seconds.",
                                                             "properties": {
                                                               "stdio": {
                                                                 "type": "object",
@@ -4667,7 +4667,7 @@
                                                             },
                                                             "waitUntil": {
                                                               "type": "object",
-                                                              "description": "Conditions to wait for in the command's output before considering the step complete. When specified, the process continues running after conditions are met.",
+                                                              "description": "Conditions to wait for in the command's output before considering the step complete. When specified, the process continues running after conditions are met. Times out after 30 seconds.",
                                                               "properties": {
                                                                 "stdio": {
                                                                   "type": "object",
@@ -4928,7 +4928,7 @@
                                                           },
                                                           "waitUntil": {
                                                             "type": "object",
-                                                            "description": "Conditions to wait for in the code's output before considering the step complete. When specified, the process continues running after conditions are met.",
+                                                            "description": "Conditions to wait for in the code's output before considering the step complete. When specified, the process continues running after conditions are met. Times out after 30 seconds.",
                                                             "properties": {
                                                               "stdio": {
                                                                 "type": "object",
@@ -5044,7 +5044,7 @@
                                                             },
                                                             "waitUntil": {
                                                               "type": "object",
-                                                              "description": "Conditions to wait for in the code's output before considering the step complete. When specified, the process continues running after conditions are met.",
+                                                              "description": "Conditions to wait for in the code's output before considering the step complete. When specified, the process continues running after conditions are met. Times out after 30 seconds.",
                                                               "properties": {
                                                                 "stdio": {
                                                                   "type": "object",
@@ -8336,7 +8336,7 @@
                                   },
                                   "waitUntil": {
                                     "type": "object",
-                                    "description": "Conditions to wait for in the command's output before considering the step complete. When specified, the process continues running after conditions are met.",
+                                    "description": "Conditions to wait for in the command's output before considering the step complete. When specified, the process continues running after conditions are met. Times out after 30 seconds.",
                                     "properties": {
                                       "stdio": {
                                         "type": "object",
@@ -8451,7 +8451,7 @@
                                     },
                                     "waitUntil": {
                                       "type": "object",
-                                      "description": "Conditions to wait for in the command's output before considering the step complete. When specified, the process continues running after conditions are met.",
+                                      "description": "Conditions to wait for in the command's output before considering the step complete. When specified, the process continues running after conditions are met. Times out after 30 seconds.",
                                       "properties": {
                                         "stdio": {
                                           "type": "object",
@@ -12777,7 +12777,7 @@
                                             },
                                             "waitUntil": {
                                               "type": "object",
-                                              "description": "Conditions to wait for in the command's output before considering the step complete. When specified, the process continues running after conditions are met.",
+                                              "description": "Conditions to wait for in the command's output before considering the step complete. When specified, the process continues running after conditions are met. Times out after 30 seconds.",
                                               "properties": {
                                                 "stdio": {
                                                   "type": "object",
@@ -12892,7 +12892,7 @@
                                               },
                                               "waitUntil": {
                                                 "type": "object",
-                                                "description": "Conditions to wait for in the command's output before considering the step complete. When specified, the process continues running after conditions are met.",
+                                                "description": "Conditions to wait for in the command's output before considering the step complete. When specified, the process continues running after conditions are met. Times out after 30 seconds.",
                                                 "properties": {
                                                   "stdio": {
                                                     "type": "object",
@@ -13153,7 +13153,7 @@
                                             },
                                             "waitUntil": {
                                               "type": "object",
-                                              "description": "Conditions to wait for in the code's output before considering the step complete. When specified, the process continues running after conditions are met.",
+                                              "description": "Conditions to wait for in the code's output before considering the step complete. When specified, the process continues running after conditions are met. Times out after 30 seconds.",
                                               "properties": {
                                                 "stdio": {
                                                   "type": "object",
@@ -13269,7 +13269,7 @@
                                               },
                                               "waitUntil": {
                                                 "type": "object",
-                                                "description": "Conditions to wait for in the code's output before considering the step complete. When specified, the process continues running after conditions are met.",
+                                                "description": "Conditions to wait for in the code's output before considering the step complete. When specified, the process continues running after conditions are met. Times out after 30 seconds.",
                                                 "properties": {
                                                   "stdio": {
                                                     "type": "object",
@@ -21703,7 +21703,7 @@
                                               },
                                               "waitUntil": {
                                                 "type": "object",
-                                                "description": "Conditions to wait for in the command's output before considering the step complete. When specified, the process continues running after conditions are met.",
+                                                "description": "Conditions to wait for in the command's output before considering the step complete. When specified, the process continues running after conditions are met. Times out after 30 seconds.",
                                                 "properties": {
                                                   "stdio": {
                                                     "type": "object",
@@ -21818,7 +21818,7 @@
                                                 },
                                                 "waitUntil": {
                                                   "type": "object",
-                                                  "description": "Conditions to wait for in the command's output before considering the step complete. When specified, the process continues running after conditions are met.",
+                                                  "description": "Conditions to wait for in the command's output before considering the step complete. When specified, the process continues running after conditions are met. Times out after 30 seconds.",
                                                   "properties": {
                                                     "stdio": {
                                                       "type": "object",
@@ -22079,7 +22079,7 @@
                                               },
                                               "waitUntil": {
                                                 "type": "object",
-                                                "description": "Conditions to wait for in the code's output before considering the step complete. When specified, the process continues running after conditions are met.",
+                                                "description": "Conditions to wait for in the code's output before considering the step complete. When specified, the process continues running after conditions are met. Times out after 30 seconds.",
                                                 "properties": {
                                                   "stdio": {
                                                     "type": "object",
@@ -22195,7 +22195,7 @@
                                                 },
                                                 "waitUntil": {
                                                   "type": "object",
-                                                  "description": "Conditions to wait for in the code's output before considering the step complete. When specified, the process continues running after conditions are met.",
+                                                  "description": "Conditions to wait for in the code's output before considering the step complete. When specified, the process continues running after conditions are met. Times out after 30 seconds.",
                                                   "properties": {
                                                     "stdio": {
                                                       "type": "object",
@@ -29429,7 +29429,7 @@
                                                     },
                                                     "waitUntil": {
                                                       "type": "object",
-                                                      "description": "Conditions to wait for in the command's output before considering the step complete. When specified, the process continues running after conditions are met.",
+                                                      "description": "Conditions to wait for in the command's output before considering the step complete. When specified, the process continues running after conditions are met. Times out after 30 seconds.",
                                                       "properties": {
                                                         "stdio": {
                                                           "type": "object",
@@ -29544,7 +29544,7 @@
                                                       },
                                                       "waitUntil": {
                                                         "type": "object",
-                                                        "description": "Conditions to wait for in the command's output before considering the step complete. When specified, the process continues running after conditions are met.",
+                                                        "description": "Conditions to wait for in the command's output before considering the step complete. When specified, the process continues running after conditions are met. Times out after 30 seconds.",
                                                         "properties": {
                                                           "stdio": {
                                                             "type": "object",
@@ -29805,7 +29805,7 @@
                                                     },
                                                     "waitUntil": {
                                                       "type": "object",
-                                                      "description": "Conditions to wait for in the code's output before considering the step complete. When specified, the process continues running after conditions are met.",
+                                                      "description": "Conditions to wait for in the code's output before considering the step complete. When specified, the process continues running after conditions are met. Times out after 30 seconds.",
                                                       "properties": {
                                                         "stdio": {
                                                           "type": "object",
@@ -29921,7 +29921,7 @@
                                                       },
                                                       "waitUntil": {
                                                         "type": "object",
-                                                        "description": "Conditions to wait for in the code's output before considering the step complete. When specified, the process continues running after conditions are met.",
+                                                        "description": "Conditions to wait for in the code's output before considering the step complete. When specified, the process continues running after conditions are met. Times out after 30 seconds.",
                                                         "properties": {
                                                           "stdio": {
                                                             "type": "object",
