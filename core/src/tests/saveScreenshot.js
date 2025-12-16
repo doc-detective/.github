@@ -88,7 +88,7 @@ async function saveScreenshot({ config, step, driver }) {
       result.description = `File already exists: ${filePath}`;
       return result;
     } else {
-      // Set temp file path
+        await sharp(filePath)
       existFilePath = filePath;
       filePath = path.join(dir, `${step.stepId}_${Date.now()}.png`);
     }

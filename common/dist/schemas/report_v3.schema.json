@@ -6428,20 +6428,16 @@
                                                     },
                                                     "rectangle": {
                                                       "type": "object",
-                                                      "description": "Configuration for rectangle annotations.",
-                                                      "required": [
-                                                        "width",
-                                                        "height"
-                                                      ],
+                                                      "description": "Configuration for rectangle annotations. When used with 'find', width and height are derived from the element's bounding box. When positioning freely (using 'position'), width and height must be specified.",
                                                       "properties": {
                                                         "width": {
                                                           "type": "number",
-                                                          "description": "Width of the rectangle in pixels.",
+                                                          "description": "Width of the rectangle in pixels. Optional if 'find' is specified (uses element's bounding box).",
                                                           "minimum": 1
                                                         },
                                                         "height": {
                                                           "type": "number",
-                                                          "description": "Height of the rectangle in pixels.",
+                                                          "description": "Height of the rectangle in pixels. Optional if 'find' is specified (uses element's bounding box).",
                                                           "minimum": 1
                                                         },
                                                         "fill": {
@@ -6852,20 +6848,16 @@
                                                       },
                                                       "rectangle_properties": {
                                                         "type": "object",
-                                                        "description": "Configuration for rectangle annotations.",
-                                                        "required": [
-                                                          "width",
-                                                          "height"
-                                                        ],
+                                                        "description": "Configuration for rectangle annotations. When used with 'find', width and height are derived from the element's bounding box. When positioning freely (using 'position'), width and height must be specified.",
                                                         "properties": {
                                                           "width": {
                                                             "type": "number",
-                                                            "description": "Width of the rectangle in pixels.",
+                                                            "description": "Width of the rectangle in pixels. Optional if 'find' is specified (uses element's bounding box).",
                                                             "minimum": 1
                                                           },
                                                           "height": {
                                                             "type": "number",
-                                                            "description": "Height of the rectangle in pixels.",
+                                                            "description": "Height of the rectangle in pixels. Optional if 'find' is specified (uses element's bounding box).",
                                                             "minimum": 1
                                                           },
                                                           "fill": {
@@ -7829,20 +7821,16 @@
                                                       },
                                                       "rectangle": {
                                                         "type": "object",
-                                                        "description": "Configuration for rectangle annotations.",
-                                                        "required": [
-                                                          "width",
-                                                          "height"
-                                                        ],
+                                                        "description": "Configuration for rectangle annotations. When used with 'find', width and height are derived from the element's bounding box. When positioning freely (using 'position'), width and height must be specified.",
                                                         "properties": {
                                                           "width": {
                                                             "type": "number",
-                                                            "description": "Width of the rectangle in pixels.",
+                                                            "description": "Width of the rectangle in pixels. Optional if 'find' is specified (uses element's bounding box).",
                                                             "minimum": 1
                                                           },
                                                           "height": {
                                                             "type": "number",
-                                                            "description": "Height of the rectangle in pixels.",
+                                                            "description": "Height of the rectangle in pixels. Optional if 'find' is specified (uses element's bounding box).",
                                                             "minimum": 1
                                                           },
                                                           "fill": {
@@ -8253,20 +8241,16 @@
                                                         },
                                                         "rectangle_properties": {
                                                           "type": "object",
-                                                          "description": "Configuration for rectangle annotations.",
-                                                          "required": [
-                                                            "width",
-                                                            "height"
-                                                          ],
+                                                          "description": "Configuration for rectangle annotations. When used with 'find', width and height are derived from the element's bounding box. When positioning freely (using 'position'), width and height must be specified.",
                                                           "properties": {
                                                             "width": {
                                                               "type": "number",
-                                                              "description": "Width of the rectangle in pixels.",
+                                                              "description": "Width of the rectangle in pixels. Optional if 'find' is specified (uses element's bounding box).",
                                                               "minimum": 1
                                                             },
                                                             "height": {
                                                               "type": "number",
-                                                              "description": "Height of the rectangle in pixels.",
+                                                              "description": "Height of the rectangle in pixels. Optional if 'find' is specified (uses element's bounding box).",
                                                               "minimum": 1
                                                             },
                                                             "fill": {
@@ -16365,20 +16349,16 @@
                                                           },
                                                           "rectangle": {
                                                             "type": "object",
-                                                            "description": "Configuration for rectangle annotations.",
-                                                            "required": [
-                                                              "width",
-                                                              "height"
-                                                            ],
+                                                            "description": "Configuration for rectangle annotations. When used with 'find', width and height are derived from the element's bounding box. When positioning freely (using 'position'), width and height must be specified.",
                                                             "properties": {
                                                               "width": {
                                                                 "type": "number",
-                                                                "description": "Width of the rectangle in pixels.",
+                                                                "description": "Width of the rectangle in pixels. Optional if 'find' is specified (uses element's bounding box).",
                                                                 "minimum": 1
                                                               },
                                                               "height": {
                                                                 "type": "number",
-                                                                "description": "Height of the rectangle in pixels.",
+                                                                "description": "Height of the rectangle in pixels. Optional if 'find' is specified (uses element's bounding box).",
                                                                 "minimum": 1
                                                               },
                                                               "fill": {
@@ -16789,20 +16769,16 @@
                                                             },
                                                             "rectangle_properties": {
                                                               "type": "object",
-                                                              "description": "Configuration for rectangle annotations.",
-                                                              "required": [
-                                                                "width",
-                                                                "height"
-                                                              ],
+                                                              "description": "Configuration for rectangle annotations. When used with 'find', width and height are derived from the element's bounding box. When positioning freely (using 'position'), width and height must be specified.",
                                                               "properties": {
                                                                 "width": {
                                                                   "type": "number",
-                                                                  "description": "Width of the rectangle in pixels.",
+                                                                  "description": "Width of the rectangle in pixels. Optional if 'find' is specified (uses element's bounding box).",
                                                                   "minimum": 1
                                                                 },
                                                                 "height": {
                                                                   "type": "number",
-                                                                  "description": "Height of the rectangle in pixels.",
+                                                                  "description": "Height of the rectangle in pixels. Optional if 'find' is specified (uses element's bounding box).",
                                                                   "minimum": 1
                                                                 },
                                                                 "fill": {
@@ -17766,20 +17742,16 @@
                                                             },
                                                             "rectangle": {
                                                               "type": "object",
-                                                              "description": "Configuration for rectangle annotations.",
-                                                              "required": [
-                                                                "width",
-                                                                "height"
-                                                              ],
+                                                              "description": "Configuration for rectangle annotations. When used with 'find', width and height are derived from the element's bounding box. When positioning freely (using 'position'), width and height must be specified.",
                                                               "properties": {
                                                                 "width": {
                                                                   "type": "number",
-                                                                  "description": "Width of the rectangle in pixels.",
+                                                                  "description": "Width of the rectangle in pixels. Optional if 'find' is specified (uses element's bounding box).",
                                                                   "minimum": 1
                                                                 },
                                                                 "height": {
                                                                   "type": "number",
-                                                                  "description": "Height of the rectangle in pixels.",
+                                                                  "description": "Height of the rectangle in pixels. Optional if 'find' is specified (uses element's bounding box).",
                                                                   "minimum": 1
                                                                 },
                                                                 "fill": {
@@ -18190,20 +18162,16 @@
                                                               },
                                                               "rectangle_properties": {
                                                                 "type": "object",
-                                                                "description": "Configuration for rectangle annotations.",
-                                                                "required": [
-                                                                  "width",
-                                                                  "height"
-                                                                ],
+                                                                "description": "Configuration for rectangle annotations. When used with 'find', width and height are derived from the element's bounding box. When positioning freely (using 'position'), width and height must be specified.",
                                                                 "properties": {
                                                                   "width": {
                                                                     "type": "number",
-                                                                    "description": "Width of the rectangle in pixels.",
+                                                                    "description": "Width of the rectangle in pixels. Optional if 'find' is specified (uses element's bounding box).",
                                                                     "minimum": 1
                                                                   },
                                                                   "height": {
                                                                     "type": "number",
-                                                                    "description": "Height of the rectangle in pixels.",
+                                                                    "description": "Height of the rectangle in pixels. Optional if 'find' is specified (uses element's bounding box).",
                                                                     "minimum": 1
                                                                   },
                                                                   "fill": {
