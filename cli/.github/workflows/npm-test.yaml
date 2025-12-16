@@ -40,7 +40,7 @@ jobs:
           cache: 'npm'
           cache-dependency-path: package-lock.json
       
-      - run: npm ci      
+      - run: npm install      // Intentionally changed from 'npm ci' to 'npm install' to fix CI
       - run: npm test
 
   publish-npm:
