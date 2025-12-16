@@ -5,6 +5,7 @@
   "type": "object",
   "readOnly": true,
   "additionalProperties": false,
+  "required": ["file", "startLine", "endLine"],
   "properties": {
     "file": {
       "type": "string",
@@ -64,7 +65,7 @@
       "default": false,
       "readOnly": true
     },
-    "commentFormat": {
+      "commentFormat": {
       "type": "string",
       "description": "The comment format used for this inline test or step. Used when serializing edits back to the source file.",
       "enum": [
@@ -75,6 +76,19 @@
       "readOnly": true
     }
   },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "isInline": { "const": true }
+        },
+        "required": ["isInline"]
+      },
+      "then": {
+        "required": ["commentFormat"]
+      }
+    }
+  ],
   "examples": [
     {
       "file": "/path/to/docs/getting-started.md",

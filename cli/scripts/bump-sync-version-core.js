@@ -19,6 +19,14 @@ function execCommand(command, options = {}) {
 }
 
 function main() {
+  // Guard: Only run in CI environment to prevent accidental local execution
+  if (!process.env.CI) {
+    console.error("Error: This script should only be run in a CI environment.");
+    console.error("It performs destructive git operations (commits, tags, pushes).");
+    console.error("Set CI=true environment variable to bypass this check if you know what you're doing.");
+    process.exit(1);
+  }
+
   // Clean git state
   execCommand("git checkout -- .");
   execCommand("git clean -fd");

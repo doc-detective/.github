@@ -358,11 +358,11 @@ async function main(argv) {
   const config = await setConfig({ configPath: configPath, args: argv });
 
   log(
-    `CLI:VERSION INFO:\n${JSON.stringify(getVersionData(), null, 2)}`,
+    config,
     "debug",
-    config
+    `CLI:VERSION INFO:\n${JSON.stringify(getVersionData(), null, 2)}`
   );
-  log(`CLI:CONFIG:\n${JSON.stringify(config, null, 2)}`, "debug", config);
+  log(config, "debug", `CLI:CONFIG:\n${JSON.stringify(config, null, 2)}`);
 
   // Check for DOC_DETECTIVE_API environment variable
   let api = await getResolvedTestsFromEnv(config);

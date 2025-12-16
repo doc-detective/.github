@@ -69,10 +69,10 @@ async function runWithUI(config, options = {}) {
     }));
 
     // Wait for React to flush the completed state to the screen
-    // Uses requestAnimationFrame to ensure the paint cycle completes
+    // Uses setImmediate to ensure the event loop processes pending I/O
     await new Promise((resolve) => {
-      requestAnimationFrame(() => {
-        requestAnimationFrame(resolve);
+      setImmediate(() => {
+        setImmediate(resolve);
       });
     });
 

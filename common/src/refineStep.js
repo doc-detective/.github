@@ -234,7 +234,7 @@ const refineStep = async ({
   }
 
   // Extract AI configuration (support both legacy config.ai and new config.integrations)
-  const aiConfig = {};
+  const aiConfig = config?.ai || {};
   const resolvedModel = model || aiConfig.model;
   const baseURL = aiConfig.baseURL;
 

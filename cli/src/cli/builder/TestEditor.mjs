@@ -9,7 +9,6 @@ import SelectInput from 'ink-select-input';
 import {
   getTestFields,
   validateTest,
-  createDefaultStep,
   getCommonStepProperties,
   getStepTypes,
 } from './schemaUtils.mjs';
@@ -31,18 +30,20 @@ const TestEditor = ({
   const [view, setView] = useState('menu'); // 'menu', 'editMeta', 'editStep', 'addStep', 'preview', 'confirmCancel'
   const [editingField, setEditingField] = useState(null);
   const [editingStepIndex, setEditingStepIndex] = useState(null);
-  const [localTest, setLocalTest] = useState(test);
+  // Ensure we have a safe test object even if `test` is undefined/null
+  const safeTest = test || { description: '', steps: [] };
+  const [localTest, setLocalTest] = useState(safeTest);
 
   // Track original test for detecting changes
-  const [originalTest] = useState(() => JSON.parse(JSON.stringify(test)));
+  const [originalTest] = useState(() => JSON.parse(JSON.stringify(safeTest)));
 
   // Track if there are unsaved changes
   const hasUnsavedChanges = useMemo(() => {
     return JSON.stringify(localTest) !== JSON.stringify(originalTest);
   }, [localTest, originalTest]);
 
-  // Get test fields
-  const { fields: testFields } = useMemo(() => getTestFields(), []);
+  // Get test fields (default to empty array if util returns nothing)
+  const { fields: testFields = [] } = useMemo(() => getTestFields() || {}, []);
 
   // Validation
   const validation = useMemo(() => validateTest(localTest), [localTest]);
@@ -156,8 +157,8 @@ const TestEditor = ({
 
   // Add step view
   if (view === 'addStep') {
-    // Create new step with step editor (it will prompt for type)
-    const newStep = createDefaultStep();
+    // Create new step - pass empty object so StepEditor will prompt for type selection
+    const newStep = {};
 
     return React.createElement(StepEditor, {
       step: newStep,
@@ -227,10 +228,14 @@ const TestEditor = ({
       return localTest[f.name] !== undefined;
     });
 
-    const items = deletableFields.map((f) => ({
-      label: `🗑️  ${f.name}: ${String(localTest[f.name]).substring(0, 30)}`,
-      value: f.name,
-    }));
+    const items = deletableFields.map((f) => {
+      const val = localTest[f.name];
+      const preview = typeof val === 'object' ? JSON.stringify(val) : String(val);
+      return {
+        label: `🗑️  ${f.name}: ${preview.substring(0, 30)}`,
+        value: f.name,
+      };
+    });
 
     return React.createElement(
       Box,
@@ -278,7 +283,14 @@ const TestEditor = ({
         React.createElement(
           Box,
           { marginTop: 1 },
-          React.createElement(Text, { color: 'red' }, 'Validation errors: ' + validation.errors)
+          React.createElement(
+            Text,
+            { color: 'red' },
+            'Validation errors: ' +
+              (Array.isArray(validation.errors)
+                ? JSON.stringify(validation.errors, null, 2)
+                : String(validation.errors))
+          )
         ),
       React.createElement(
         Box,
@@ -332,8 +344,8 @@ const TestEditor = ({
   });
 
   // Get common step properties and valid step types once for reuse
-  const commonStepProps = Object.keys(getCommonStepProperties());
-  const validStepTypes = getStepTypes();
+  const commonStepProps = Object.keys(getCommonStepProperties() || {});
+  const validStepTypes = getStepTypes() || [];
 
   steps.forEach((step, index) => {
     // Determine step type by finding a key that is a valid step type (not a common property)
