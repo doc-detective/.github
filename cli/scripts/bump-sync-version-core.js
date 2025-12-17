@@ -19,9 +19,17 @@ function execCommand(command, options = {}) {
 }
 
 function main() {
+  // Guard: Only run in CI environment to prevent accidental local execution
+  if (!process.env.CI) {
+    console.error("Error: This script should only be run in a CI environment.");
+    console.error("It performs destructive git operations (commits, tags, pushes).");
+    console.error("Set CI=true environment variable to bypass this check if you know what you're doing.");
+    process.exit(1);
+  }
+
   // Clean git state
-    execCommand("git checkout -- .");
-    execCommand("git clean -fd");
+  execCommand("git checkout -- .");
+  execCommand("git clean -fd");
 
   // Get current project version
   const packageJsonPath = path.join(process.cwd(), "package.json");
@@ -54,42 +62,40 @@ function main() {
   // Extract major and minor versions using semver
   const projMajor = semver.major(projVersion);
   const projMinor = semver.minor(projVersion);
+  const projPatch = semver.patch(projVersion);
   const coreMajor = semver.major(coreVersion);
   const coreMinor = semver.minor(coreVersion);
+  const corePatch = semver.patch(coreVersion);
 
-  console.log(`Project version: ${projMajor}.${projMinor}.x`);
-  console.log(`core version: ${coreMajor}.${coreMinor}.x`);
+  console.log(`Project version: ${projMajor}.${projMinor}.${projPatch}`);
+  console.log(`core version: ${coreMajor}.${coreMinor}.${corePatch}`);
 
   let newVersion;
 
   if (projMajor !== coreMajor || projMinor !== coreMinor) {
     // Major or minor mismatch: set version to match doc-detective-core major.minor.0
     newVersion = `${coreMajor}.${coreMinor}.0`;
-
-    // Validate the new version before setting it
-    if (!semver.valid(newVersion)) {
-      console.error(`Error: Generated invalid version: ${newVersion}`);
-      process.exit(1);
-    }
-
     console.log(`Version mismatch detected. Setting version to: ${newVersion}`);
-    execCommand(`npm version --no-git-tag-version ${newVersion}`);
   } else {
     // Project version is already equal or greater than core version, just bump patch
-    console.log("Project version is current or ahead. Bumping patch version.");
-    execCommand("npm version patch --no-git-tag-version");
-    // Get the new version after bumping
-    const updatedPackageJson = JSON.parse(
-      fs.readFileSync(packageJsonPath, "utf8")
+    newVersion = `${projMajor}.${projMinor}.${projPatch + 1}`;
+    console.log(
+      "Project version is current or ahead. Bumping patch version to:",
+      newVersion
     );
-    newVersion = updatedPackageJson.version;
   }
+  
+  // Validate the new version before setting it
+  if (!semver.valid(newVersion)) {
+    console.error(`Error: Generated invalid version: ${newVersion}`);
+    process.exit(1);
+  }
+
+  execCommand(`npm version --no-git-tag-version ${newVersion}`);
 
   // Commit changes
   execCommand("git add package.json package-lock.json");
-  execCommand(
-    'git commit -m "update doc-detective-core [skip ci]"'
-  );
+  execCommand('git commit -m "update doc-detective-core [skip ci]"');
 
   // Create tag
   execCommand(`git tag "v${newVersion}"`);

@@ -367,9 +367,15 @@ async function runSpecs({ resolvedTests }) {
   const config = resolvedTests.config;
   const specs = resolvedTests.specs;
 
+  // Ensure config.environment is set for getAvailableApps
+  // This is needed when resolvedTests comes from an external source (e.g., API)
+  if (!config.environment) {
+    config.environment = getEnvironment();
+  }
+
   // Get runner details
   const runnerDetails = {
-    environment: getEnvironment(),
+    environment: config.environment,
     availableApps: await getAvailableApps({ config }),
     allowUnsafeSteps: await allowUnsafeSteps({ config }),
   };

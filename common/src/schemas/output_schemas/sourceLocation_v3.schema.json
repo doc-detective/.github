@@ -1,0 +1,120 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "sourceLocation",
+  "description": "Tracks the original source location of a test or step for inline editing support. This is a read-only property populated during test detection.",
+  "type": "object",
+  "readOnly": true,
+  "additionalProperties": false,
+  "required": ["file", "startLine", "endLine"],
+  "properties": {
+    "file": {
+      "type": "string",
+      "description": "Absolute path to the source file containing this test or step.",
+      "readOnly": true
+    },
+    "startLine": {
+      "type": "integer",
+      "description": "1-based line number where this test or step starts.",
+      "minimum": 1,
+      "readOnly": true
+    },
+    "endLine": {
+      "type": "integer",
+      "description": "1-based line number where this test or step ends.",
+      "minimum": 1,
+      "readOnly": true
+    },
+    "startColumn": {
+      "type": "integer",
+      "description": "1-based column number where this test or step starts on startLine.",
+      "minimum": 1,
+      "readOnly": true
+    },
+    "endColumn": {
+      "type": "integer",
+      "description": "1-based column number where this test or step ends on endLine.",
+      "minimum": 1,
+      "readOnly": true
+    },
+    "startOffset": {
+      "type": "integer",
+      "description": "0-based character offset from the beginning of the file where this test or step starts.",
+      "minimum": 0,
+      "readOnly": true
+    },
+    "endOffset": {
+      "type": "integer",
+      "description": "0-based character offset from the beginning of the file where this test or step ends.",
+      "minimum": 0,
+      "readOnly": true
+    },
+    "originalText": {
+      "type": "string",
+      "description": "The original text content of this test or step as found in the source file.",
+      "readOnly": true
+    },
+    "isInline": {
+      "type": "boolean",
+      "description": "Whether this test or step was detected from inline comments within a content file (true) or from a standalone spec file (false).",
+      "default": false,
+      "readOnly": true
+    },
+    "isAutoDetected": {
+      "type": "boolean",
+      "description": "Whether this step was auto-detected from markup patterns (true) or explicitly defined in an inline comment (false). Only applicable to steps.",
+      "default": false,
+      "readOnly": true
+    },
+      "commentFormat": {
+      "type": "string",
+      "description": "The comment format used for this inline test or step. Used when serializing edits back to the source file.",
+      "enum": [
+        "htmlComment",
+        "jsxComment",
+        "linkReference"
+      ],
+      "readOnly": true
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "isInline": { "const": true }
+        },
+        "required": ["isInline"]
+      },
+      "then": {
+        "required": ["commentFormat"]
+      }
+    }
+  ],
+  "examples": [
+    {
+      "file": "/path/to/docs/getting-started.md",
+      "startLine": 42,
+      "endLine": 45,
+      "startColumn": 1,
+      "endColumn": 3,
+      "startOffset": 1250,
+      "endOffset": 1350,
+      "originalText": "<!-- test testId=\"navigation-test\" -->",
+      "isInline": true,
+      "isAutoDetected": false,
+      "commentFormat": "htmlComment"
+    },
+    {
+      "file": "/path/to/docs/tutorial.md",
+      "startLine": 78,
+      "endLine": 78,
+      "startColumn": 1,
+      "endColumn": 45,
+      "startOffset": 2100,
+      "endOffset": 2145,
+      "originalText": "[example link](https://example.com)",
+      "isInline": true,
+      "isAutoDetected": true,
+      "commentFormat": "linkReference"
+    }
+  ]
+}

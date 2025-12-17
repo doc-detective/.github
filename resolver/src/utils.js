@@ -25,6 +25,8 @@ exports.cleanTemp = cleanTemp;
 exports.calculatePercentageDifference = calculatePercentageDifference;
 exports.fetchFile = fetchFile;
 exports.isRelativeUrl = isRelativeUrl;
+exports.calculateSourceLocation = calculateSourceLocation;
+exports.detectCommentFormat = detectCommentFormat;
 
 function isRelativeUrl(url) {
   try {
@@ -35,6 +37,148 @@ function isRelativeUrl(url) {
     // If URL constructor throws an error, it's a relative URL
     return true;
   }
+}
+
+/**
+ * Calculate line and column numbers from a character offset in content.
+ * Lines are 1-based, columns are 1-based.
+ * 
+ * @param {string} content - The full content string
+ * @param {number} startOffset - 0-based character offset for start position
+ * @param {number} endOffset - 0-based character offset for end position
+ * @returns {Object} Object with startLine, endLine, startColumn, endColumn
+ */
+function calculateLineColumn(content, startOffset, endOffset) {
+  // Validate and normalize offsets
+  let start = Math.max(0, startOffset);
+  let end = Math.max(0, endOffset);
+  
+  // Swap if start > end
+  if (start > end) {
+    [start, end] = [end, start];
+  }
+  
+  // Clamp to content length
+  start = Math.min(start, content.length);
+  end = Math.min(end, content.length);
+
+  let startLine = 1;
+  let startColumn = 1;
+  let endLine = 1;
+  let endColumn = 1;
+  let currentOffset = 0;
+  let startFound = false;
+  let endFound = false;
+
+  const lines = content.split('\n');
+  
+  for (let i = 0; i < lines.length; i++) {
+    const isLastLine = i === lines.length - 1;
+    // Only add 1 for newline if this line actually has a trailing newline (not the last line)
+    const hasNewline = !isLastLine;
+    const lineLength = lines[i].length + (hasNewline ? 1 : 0);
+    const lineEnd = currentOffset + lineLength;
+    // For the last line, lineEnd should equal content.length
+    const effectiveLineEnd = isLastLine ? content.length : lineEnd;
+    
+    // Check if start falls within this line: [currentOffset, effectiveLineEnd)
+    // For last line, use <= to include EOF position
+    if (!startFound) {
+      const startInLine = isLastLine
+        ? (start >= currentOffset && start <= effectiveLineEnd)
+        : (start >= currentOffset && start < effectiveLineEnd);
+      if (startInLine) {
+        startLine = i + 1;
+        startColumn = start - currentOffset + 1;
+        startFound = true;
+      }
+    }
+    
+    // Check if end falls within this line: [currentOffset, effectiveLineEnd)
+    // For last line, use <= to include EOF position
+    if (!endFound) {
+      const endInLine = isLastLine
+        ? (end >= currentOffset && end <= effectiveLineEnd)
+        : (end >= currentOffset && end < effectiveLineEnd);
+      if (endInLine) {
+        endLine = i + 1;
+        endColumn = end - currentOffset + 1;
+        endFound = true;
+      }
+    }
+    
+    // Break when both offsets have been located
+    if (startFound && endFound) {
+      break;
+    }
+    
+    currentOffset = lineEnd;
+  }
+  
+  return { startLine, endLine, startColumn, endColumn };
+}
+
+/**
+ * Detect the comment format used for an inline test or step.
+ * 
+ * @param {string} originalText - The original text of the match
+ * @returns {string} One of: 'htmlComment', 'jsxComment', 'linkReference'
+ */
+function detectCommentFormat(originalText) {
+  if (!originalText || typeof originalText !== 'string') {
+    return 'htmlComment';
+  }
+  
+  const trimmed = originalText.trim();
+  
+  // HTML-style comments: <!-- ... -->
+  if (trimmed.startsWith('<!--')) {
+    return 'htmlComment';
+  }
+  
+  // JSX-style comments: {/* ... */}
+  if (trimmed.startsWith('{/*') || trimmed.startsWith('{ /*')) {
+    return 'jsxComment';
+  }
+  
+  // Link references: [text](url) or [text][ref]
+  if (/^\[.+\]\(.+\)$/.test(trimmed) || /^\[.+\]\[.+\]$/.test(trimmed)) {
+    return 'linkReference';
+  }
+  
+  // Default to HTML comment
+  return 'htmlComment';
+}
+
+/**
+ * Create a sourceLocation object for a detected test or step.
+ * 
+ * @param {Object} options - Options for creating the source location
+ * @param {string} options.filePath - Absolute path to the source file
+ * @param {string} options.content - Full file content
+ * @param {number} options.startOffset - 0-based character offset where the match starts
+ * @param {number} options.endOffset - 0-based character offset where the match ends
+ * @param {string} options.originalText - The original matched text
+ * @param {boolean} options.isAutoDetected - Whether this was auto-detected from markup patterns
+ * @returns {Object} A sourceLocation object
+ */
+function calculateSourceLocation({ filePath, content, startOffset, endOffset, originalText, isAutoDetected = false }) {
+  const { startLine, endLine, startColumn, endColumn } = calculateLineColumn(content, startOffset, endOffset);
+  const commentFormat = detectCommentFormat(originalText);
+  
+  return {
+    file: filePath,
+    startLine,
+    endLine,
+    startColumn,
+    endColumn,
+    startOffset,
+    endOffset,
+    originalText,
+    isInline: true,
+    isAutoDetected,
+    commentFormat,
+  };
 }
 
 // Parse XML-style attributes to an object
@@ -590,6 +734,12 @@ async function parseContent({ config, content, filePath, fileType }) {
     let statementContent = "";
     let stepsCleanup = false;
     currentIndex = statement.sortIndex;
+    
+    // Calculate statement match boundaries for sourceLocation
+    const matchText = statement[0] || '';
+    const matchStartOffset = statement.index || 0;
+    const matchEndOffset = matchStartOffset + matchText.length;
+    
     switch (statement.type) {
       case "testStart":
         // Test start statement
@@ -632,6 +782,17 @@ async function parseContent({ config, content, filePath, fileType }) {
         if (!test.steps) {
           test.steps = [];
         }
+        
+        // Add sourceLocation for inline test
+        test.sourceLocation = calculateSourceLocation({
+          filePath: path.resolve(filePath),
+          content,
+          startOffset: matchStartOffset,
+          endOffset: matchEndOffset,
+          originalText: matchText,
+          isAutoDetected: false,
+        });
+        
         tests.push(test);
         break;
       case "testEnd":
@@ -707,6 +868,16 @@ async function parseContent({ config, content, filePath, fileType }) {
               }
             }
 
+            // Add sourceLocation for auto-detected step
+            step.sourceLocation = calculateSourceLocation({
+              filePath: path.resolve(filePath),
+              content,
+              startOffset: matchStartOffset,
+              endOffset: matchEndOffset,
+              originalText: matchText,
+              isAutoDetected: true,
+            });
+
             // Make sure is valid v3 step schema
             const valid = validate({
               schemaKey: "step_v3",
@@ -727,10 +898,21 @@ async function parseContent({ config, content, filePath, fileType }) {
         }
         break;
       case "step":
-        // Step statement
+        // Step statement (explicit inline step comment)
         test = findTest({ tests, testId });
         statementContent = statement[1] || statement[0];
         let step = parseObject({ stringifiedObject: statementContent });
+        
+        // Add sourceLocation for explicit inline step
+        step.sourceLocation = calculateSourceLocation({
+          filePath: path.resolve(filePath),
+          content,
+          startOffset: matchStartOffset,
+          endOffset: matchEndOffset,
+          originalText: matchText,
+          isAutoDetected: false,
+        });
+        
         // Make sure is valid v3 step schema
         const validation = validate({
           schemaKey: "step_v3",
@@ -847,6 +1029,8 @@ async function parseTests({ config, files }) {
         object: content,
         filePath: file,
       });
+      // Set sourcePath to track origin file for JSON/YAML specs
+      content.sourcePath = path.resolve(file);
       specs.push(content);
     } else {
       // Process non-object
@@ -923,6 +1107,8 @@ async function parseTests({ config, files }) {
           object: spec,
           filePath: file,
         });
+        // Set sourcePath to track origin file for non-JSON/YAML specs
+        spec.sourcePath = path.resolve(file);
         specs.push(spec);
       }
     }

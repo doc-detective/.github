@@ -30,7 +30,55 @@ function createServer(options = {}) {
     app.use(express.static(staticDir));
   }
 
+  // Endpoint for testing DOC_DETECTIVE_API - returns resolved tests
+  // NOTE: This specific route MUST be defined before the wildcard /api/:path route
+  app.get("/api/resolved-tests", (req, res) => {
+    try {
+      // Check for x-runner-token header
+      const token = req.headers['x-runner-token'];
+      
+      if (!token || token !== 'test-token-123') {
+        return res.status(401).json({ error: "Unauthorized" });
+      }
+
+      // Return a valid resolvedTests object
+      const resolvedTests = {
+        "resolvedTestsId": "api-resolved-tests-id",
+        "config": {
+          "logLevel": "info"
+        },
+        "specs": [
+          {
+            "specId": "api-spec",
+            "tests": [
+              {
+                "testId": "api-test",
+                "contexts": [
+                  {
+                    "contextId": "api-context",
+                    "steps": [
+                      {
+                        "stepId": "step-1",
+                        "checkLink": `http://localhost:${port}`
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      };
+
+      res.json(resolvedTests);
+    } catch (error) {
+      console.error("Error processing resolved tests request:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
   // Echo API endpoint that returns the request body
+  // NOTE: This wildcard route must be defined AFTER specific /api/* routes
   app.all("/api/:path", (req, res) => {
     try {
       const requestBody = req.method === "GET" ? req.query : req.body;
@@ -85,7 +133,7 @@ function createServer(options = {}) {
      * @returns {Promise} Promise that resolves when server is stopped
      */
     stop: () => {
-      return new Promise((resolve) => {
+      return new Promise((resolve, reject) => {
         if (server) {
           server.close((error) => {
             if (error) {

@@ -1,0 +1,110 @@
+const { runTests } = require('doc-detective-core');
+
+/**
+ * Run tests with Ink-based CLI UI
+ * @param {Object} config - Configuration object
+ * @param {Object} options - Additional options like resolvedTests
+ * @returns {Promise<Object>} Test results
+ */
+async function runWithUI(config, options = {}) {
+  // Dynamic import of ESM modules
+  const [{ render }, React, { default: App }] = await Promise.all([
+    import('ink'),
+    import('react'),
+    import('./App.mjs'),
+  ]);
+
+  let appInstance;
+  let updateState;
+
+  // Create a promise that resolves when the app is mounted
+  const mountPromise = new Promise((resolve) => {
+    const AppWrapper = () => {
+      const [state, setState] = React.useState({
+        phase: 'initializing',
+        results: null,
+        error: null,
+        currentSpec: null,
+        currentTest: null,
+        // Note: Progress tracking fields are initialized for future use when
+        // doc-detective-core adds progress callback support. Currently, runTests()
+        // does not provide progress callbacks, so these values remain at initial state
+        // during execution. The UI shows phase transitions (initializing → running → completed)
+        // rather than granular progress.
+        progress: {
+          specs: { current: 0, total: 0 },
+          tests: { current: 0, total: 0 },
+          steps: { current: 0, total: 0 },
+        },
+      });
+
+      // Store the state updater for external use
+      React.useEffect(() => {
+        updateState = setState;
+        resolve();
+      }, []);
+
+      return React.createElement(App, {
+        config,
+        resolvedTests: options.resolvedTests,
+        state,
+      });
+    };
+
+    appInstance = render(React.createElement(AppWrapper));
+  });
+
+  // Wait for the app to mount
+  await mountPromise;
+
+  try {
+    // Update to running phase
+    updateState((prev) => ({ ...prev, phase: 'running' }));
+
+    // Run tests
+    const results = options.resolvedTests
+      ? await runTests(config, { resolvedTests: options.resolvedTests })
+      : await runTests(config);
+
+    // Update to completed phase with results
+    updateState((prev) => ({
+      ...prev,
+      phase: 'completed',
+      results,
+    }));
+
+    // Wait for React to flush the completed state to the screen
+    // Uses setImmediate to ensure the event loop processes pending I/O
+    await new Promise((resolve) => {
+      setImmediate(() => {
+        setImmediate(resolve);
+      });
+    });
+
+    // Unmount the app
+    if (appInstance) {
+      appInstance.unmount();
+    }
+
+    return results;
+  } catch (error) {
+    // Update to error phase
+    updateState((prev) => ({
+      ...prev,
+      phase: 'error',
+      error: error.message ? error : new Error(String(error)),
+    }));
+
+    // Wait a bit to show the error before unmounting
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+
+    // Unmount the app
+    if (appInstance) {
+      appInstance.unmount();
+    }
+
+    throw error;
+  }
+}
+
+module.exports = { runWithUI };

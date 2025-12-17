@@ -17,6 +17,9 @@
           "stepId": {
             "$ref": "#/components/schemas/stepId"
           },
+          "sourceLocation": {
+            "$ref": "#/components/schemas/sourceLocation"
+          },
           "description": {
             "$ref": "#/components/schemas/description"
           },
@@ -45,6 +48,10 @@
       "stepId": {
         "type": "string",
         "description": "ID of the step."
+      },
+      "sourceLocation": {
+        "$ref": "sourceLocation_v3.schema.json#",
+        "description": "Source location information for inline steps. Read-only, populated during detection."
       },
       "description": {
         "type": "string",
