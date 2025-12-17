@@ -673,7 +673,7 @@ const generate = async ({
   const providerFactory = createProvider({
     provider: detected.provider,
     apiKey: detected.apiKey,
-    baseURL,
+    baseURL: baseURL || detected.baseURL,
   });
 
   // Get model instance
@@ -856,7 +856,7 @@ const generateWithSchemaValidation = async ({
 
       // Schema validation failed, store error for retry
       lastError = validation.errors;
-      lastObject = result.object;
+      lastObject = validationObject;
 
       if (attempt === MAX_SCHEMA_VALIDATION_RETRIES) {
         throw new Error(

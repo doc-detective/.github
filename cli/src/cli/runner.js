@@ -26,6 +26,11 @@ async function runWithUI(config, options = {}) {
         error: null,
         currentSpec: null,
         currentTest: null,
+        // Note: Progress tracking fields are initialized for future use when
+        // doc-detective-core adds progress callback support. Currently, runTests()
+        // does not provide progress callbacks, so these values remain at initial state
+        // during execution. The UI shows phase transitions (initializing → running → completed)
+        // rather than granular progress.
         progress: {
           specs: { current: 0, total: 0 },
           tests: { current: 0, total: 0 },

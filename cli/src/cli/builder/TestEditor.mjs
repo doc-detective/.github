@@ -203,9 +203,13 @@ const TestEditor = ({
         React.createElement(Text, { bold: true, color: 'cyan' }, 'Select property to add:')
       ),
       React.createElement(
-        Text,
-        { color: 'gray', dimColor: true, marginBottom: 1 },
-        '(Esc to go back)'
+        Box,
+        { marginBottom: 1 },
+        React.createElement(
+          Text,
+          { color: 'gray', dimColor: true },
+          '(Esc to go back)'
+        )
       ),
       React.createElement(ScrollableSelect, {
         items,
@@ -249,9 +253,13 @@ const TestEditor = ({
         React.createElement(Text, { bold: true, color: 'red' }, 'Select property to delete:')
       ),
       React.createElement(
-        Text,
-        { color: 'gray', dimColor: true, marginBottom: 1 },
-        '(Esc to go back)'
+        Box,
+        { marginBottom: 1 },
+        React.createElement(
+          Text,
+          { color: 'gray', dimColor: true },
+          '(Esc to go back)'
+        )
       ),
       React.createElement(SelectInput, {
         items,

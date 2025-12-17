@@ -114,7 +114,7 @@
       "originalText": "[example link](https://example.com)",
       "isInline": true,
       "isAutoDetected": true,
-      "commentFormat": "htmlComment"
+      "commentFormat": "linkReference"
     }
   ]
 }

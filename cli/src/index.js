@@ -32,6 +32,24 @@ function computeFileHash(filePath) {
 }
 
 /**
+ * Recursively sort all object keys for consistent comparison.
+ * @param {*} obj - The value to sort keys for
+ * @returns {*} The value with all object keys sorted
+ */
+function sortKeys(obj) {
+  if (obj === null || typeof obj !== 'object') {
+    return obj;
+  }
+  if (Array.isArray(obj)) {
+    return obj.map(sortKeys);
+  }
+  return Object.keys(obj).sort().reduce((result, key) => {
+    result[key] = sortKeys(obj[key]);
+    return result;
+  }, {});
+}
+
+/**
  * Canonicalize a spec object for content comparison.
  * Removes volatile fields like sourcePath, contentPath, specId that don't affect spec content.
  * @param {Object} spec - The spec object to canonicalize
@@ -43,8 +61,8 @@ function canonicalizeSpec(spec) {
   delete clone.sourcePath;
   delete clone.contentPath;
   delete clone.specId;
-  // Sort keys for consistent comparison
-  return JSON.stringify(clone, Object.keys(clone).sort());
+  // Recursively sort all object keys for consistent comparison
+  return JSON.stringify(sortKeys(clone));
 }
 
 /**
