@@ -30,6 +30,7 @@
     "axios": "^1.13.2",
     "doc-detective-common": "3.6.0-dev.1",
     "dotenv": "^17.2.3",
+    "fast-xml-parser": "^5.3.3",
     "json-schema-faker": "^0.5.9",
     "posthog-node": "^5.17.2"
   },

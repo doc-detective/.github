@@ -4,6 +4,7 @@ const path = require("path");
 const os = require("os");
 const crypto = require("crypto");
 const AdmZip = require("adm-zip");
+const { XMLParser } = require("fast-xml-parser");
 
 // Internal constants - not exposed to users
 const POLLING_INTERVAL_MS = 5000;
@@ -11,6 +12,8 @@ const POLLING_TIMEOUT_MS = 300000; // 5 minutes
 const API_REQUEST_TIMEOUT_MS = 30000; // 30 seconds for individual API requests
 const DOWNLOAD_TIMEOUT_MS = 300000; // 5 minutes for downloads
 const DEFAULT_SCENARIO_NAME = "Doc Detective";
+// Base URL for REST API (different from publishing API)
+const REST_API_PATH = "/rest/all-files";
 
 /**
  * Creates a Base64-encoded Basic Auth header from username and API token.
@@ -48,6 +51,25 @@ function createApiClient(herettoConfig) {
     headers: {
       Authorization: `Basic ${authHeader}`,
       "Content-Type": "application/json",
+    },
+  });
+}
+
+/**
+ * Creates an axios instance configured for Heretto REST API requests (different base URL).
+ * @param {Object} herettoConfig - Heretto integration configuration
+ * @returns {Object} Configured axios instance for REST API
+ */
+function createRestApiClient(herettoConfig) {
+  const authHeader = createAuthHeader(
+    herettoConfig.username,
+    herettoConfig.apiToken
+  );
+  return axios.create({
+    baseURL: `https://${herettoConfig.organizationId}.heretto.com`,
+    timeout: API_REQUEST_TIMEOUT_MS,
+    headers: {
+      Authorization: `Basic ${authHeader}`,
     },
   });
 }
@@ -404,6 +426,17 @@ async function loadHerettoContent(herettoConfig, log, config) {
       config
     );
 
+    // Build file mapping from extracted content
+    if (outputPath && herettoConfig.uploadOnChange) {
+      const fileMapping = await buildFileMapping(
+        outputPath,
+        herettoConfig,
+        log,
+        config
+      );
+      herettoConfig.fileMapping = fileMapping;
+    }
+
     return outputPath;
   } catch (error) {
     log(
@@ -415,14 +448,354 @@ async function loadHerettoContent(herettoConfig, log, config) {
   }
 }
 
+/**
+ * Builds a mapping of local file paths to Heretto file metadata.
+ * Parses DITA files to extract file references and attempts to resolve UUIDs.
+ * @param {string} outputPath - Path to extracted Heretto content
+ * @param {Object} herettoConfig - Heretto integration configuration
+ * @param {Function} log - Logging function
+ * @param {Object} config - Doc Detective config for logging
+ * @returns {Promise<Object>} Mapping of local paths to {fileId, filePath}
+ */
+async function buildFileMapping(outputPath, herettoConfig, log, config) {
+  const fileMapping = {};
+  const xmlParser = new XMLParser({
+    ignoreAttributes: false,
+    attributeNamePrefix: "@_",
+  });
+
+  try {
+    // Recursively find all DITA/XML files
+    const ditaFiles = findFilesWithExtensions(outputPath, [
+      ".dita",
+      ".ditamap",
+      ".xml",
+    ]);
+
+    for (const ditaFile of ditaFiles) {
+      try {
+        const content = fs.readFileSync(ditaFile, "utf-8");
+        const parsed = xmlParser.parse(content);
+
+        // Extract image references from DITA content
+        const imageRefs = extractImageReferences(parsed);
+
+        for (const imageRef of imageRefs) {
+          // Resolve relative path to absolute local path
+          const absoluteLocalPath = path.resolve(
+            path.dirname(ditaFile),
+            imageRef
+          );
+
+          if (!fileMapping[absoluteLocalPath]) {
+            fileMapping[absoluteLocalPath] = {
+              filePath: imageRef,
+              sourceFile: ditaFile,
+            };
+          }
+        }
+      } catch (parseError) {
+        log(
+          config,
+          "debug",
+          `Failed to parse ${ditaFile} for file mapping: ${parseError.message}`
+        );
+      }
+    }
+
+    log(
+      config,
+      "debug",
+      `Built file mapping with ${Object.keys(fileMapping).length} entries`
+    );
+  } catch (error) {
+    log(config, "warning", `Failed to build file mapping: ${error.message}`);
+  }
+
+  return fileMapping;
+}
+
+/**
+ * Recursively finds files with specified extensions.
+ * @param {string} dir - Directory to search
+ * @param {Array<string>} extensions - File extensions to match (e.g., ['.dita', '.xml'])
+ * @returns {Array<string>} Array of matching file paths
+ */
+function findFilesWithExtensions(dir, extensions) {
+  const results = [];
+
+  try {
+    const items = fs.readdirSync(dir);
+
+    for (const item of items) {
+      const fullPath = path.join(dir, item);
+      const stat = fs.statSync(fullPath);
+
+      if (stat.isDirectory()) {
+        results.push(...findFilesWithExtensions(fullPath, extensions));
+      } else if (
+        extensions.some((ext) => fullPath.toLowerCase().endsWith(ext))
+      ) {
+        results.push(fullPath);
+      }
+    }
+  } catch (error) {
+    // Ignore read errors for inaccessible directories
+  }
+
+  return results;
+}
+
+/**
+ * Extracts image references from parsed DITA XML content.
+ * Looks for <image> elements with href attributes.
+ * @param {Object} parsedXml - Parsed XML object
+ * @returns {Array<string>} Array of image href values
+ */
+function extractImageReferences(parsedXml) {
+  const refs = [];
+
+  function traverse(obj) {
+    if (!obj || typeof obj !== "object") return;
+
+    // Check for image elements
+    if (obj.image) {
+      const images = Array.isArray(obj.image) ? obj.image : [obj.image];
+      for (const img of images) {
+        if (img["@_href"]) {
+          refs.push(img["@_href"]);
+        }
+      }
+    }
+
+    // Recursively traverse all properties
+    for (const key of Object.keys(obj)) {
+      if (typeof obj[key] === "object") {
+        traverse(obj[key]);
+      }
+    }
+  }
+
+  traverse(parsedXml);
+  return refs;
+}
+
+/**
+ * Searches for a file in Heretto by filename.
+ * @param {Object} herettoConfig - Heretto integration configuration
+ * @param {string} filename - Name of the file to search for
+ * @param {string} folderPath - Optional folder path to search within
+ * @param {Function} log - Logging function
+ * @param {Object} config - Doc Detective config for logging
+ * @returns {Promise<Object|null>} File info with ID and URI, or null if not found
+ */
+async function searchFileByName(
+  herettoConfig,
+  filename,
+  folderPath,
+  log,
+  config
+) {
+  const client = createApiClient(herettoConfig);
+
+  try {
+    const searchBody = {
+      queryString: filename,
+      foldersToSearch: {},
+      startOffset: 0,
+      endOffset: 10,
+      searchResultType: "FILES_ONLY",
+      addPrefixAndFuzzy: false,
+    };
+
+    // If folderPath provided, search within that folder; otherwise search root
+    if (folderPath) {
+      searchBody.foldersToSearch[folderPath] = true;
+    } else {
+      // Search in organization root
+      searchBody.foldersToSearch[
+        `/db/organizations/${herettoConfig.organizationId}/`
+      ] = true;
+    }
+
+    const response = await client.post(
+      "/ezdnxtgen/api/search".replace("/ezdnxtgen/api/v2", ""),
+      searchBody,
+      {
+        baseURL: `https://${herettoConfig.organizationId}.heretto.com`,
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+
+    if (response.data?.hits?.length > 0) {
+      // Find exact filename match
+      const exactMatch = response.data.hits.find(
+        (hit) => hit.fileEntity?.name === filename
+      );
+
+      if (exactMatch) {
+        return {
+          fileId: exactMatch.fileEntity.ID,
+          filePath: exactMatch.fileEntity.URI,
+          name: exactMatch.fileEntity.name,
+        };
+      }
+    }
+
+    return null;
+  } catch (error) {
+    log(
+      config,
+      "debug",
+      `Failed to search for file "${filename}": ${error.message}`
+    );
+    return null;
+  }
+}
+
+/**
+ * Uploads a file to Heretto CMS.
+ * @param {Object} herettoConfig - Heretto integration configuration
+ * @param {string} fileId - UUID of the file to update
+ * @param {string} localFilePath - Local path to the file to upload
+ * @param {Function} log - Logging function
+ * @param {Object} config - Doc Detective config for logging
+ * @returns {Promise<Object>} Result object with status and description
+ */
+async function uploadFile(herettoConfig, fileId, localFilePath, log, config) {
+  const client = createRestApiClient(herettoConfig);
+
+  try {
+    // Read file as binary
+    const fileBuffer = fs.readFileSync(localFilePath);
+
+    // Determine content type from file extension
+    const ext = path.extname(localFilePath).toLowerCase();
+    let contentType = "application/octet-stream";
+    if (ext === ".png") contentType = "image/png";
+    else if (ext === ".jpg" || ext === ".jpeg") contentType = "image/jpeg";
+    else if (ext === ".gif") contentType = "image/gif";
+    else if (ext === ".svg") contentType = "image/svg+xml";
+    else if (ext === ".webp") contentType = "image/webp";
+
+    log(config, "debug", `Uploading ${localFilePath} to Heretto file ${fileId}`);
+
+    const response = await client.put(
+      `${REST_API_PATH}/${fileId}/content`,
+      fileBuffer,
+      {
+        headers: {
+          "Content-Type": contentType,
+          "Content-Length": fileBuffer.length,
+        },
+        maxBodyLength: Infinity,
+        maxContentLength: Infinity,
+      }
+    );
+
+    if (response.status === 200 || response.status === 201) {
+      log(
+        config,
+        "info",
+        `Successfully uploaded ${path.basename(localFilePath)} to Heretto`
+      );
+      return {
+        status: "PASS",
+        description: `File uploaded successfully to Heretto`,
+      };
+    }
+
+    return {
+      status: "FAIL",
+      description: `Unexpected response status: ${response.status}`,
+    };
+  } catch (error) {
+    const errorMessage = error.response?.data || error.message;
+    log(
+      config,
+      "warning",
+      `Failed to upload file to Heretto: ${errorMessage}`
+    );
+    return {
+      status: "FAIL",
+      description: `Failed to upload: ${errorMessage}`,
+    };
+  }
+}
+
+/**
+ * Resolves a local file path to a Heretto file ID.
+ * First checks file mapping, then searches by filename if needed.
+ * @param {Object} herettoConfig - Heretto integration configuration
+ * @param {string} localFilePath - Local path to the file
+ * @param {Object} sourceIntegration - Source integration metadata from step
+ * @param {Function} log - Logging function
+ * @param {Object} config - Doc Detective config for logging
+ * @returns {Promise<string|null>} Heretto file ID or null if not found
+ */
+async function resolveFileId(
+  herettoConfig,
+  localFilePath,
+  sourceIntegration,
+  log,
+  config
+) {
+  // If fileId is already known, use it
+  if (sourceIntegration?.fileId) {
+    return sourceIntegration.fileId;
+  }
+
+  // Check file mapping
+  if (herettoConfig.fileMapping && herettoConfig.fileMapping[localFilePath]) {
+    const mapping = herettoConfig.fileMapping[localFilePath];
+    if (mapping.fileId) {
+      return mapping.fileId;
+    }
+  }
+
+  // Search by filename
+  const filename = path.basename(localFilePath);
+  const searchResult = await searchFileByName(
+    herettoConfig,
+    filename,
+    null,
+    log,
+    config
+  );
+
+  if (searchResult?.fileId) {
+    // Cache the result in file mapping
+    if (!herettoConfig.fileMapping) {
+      herettoConfig.fileMapping = {};
+    }
+    herettoConfig.fileMapping[localFilePath] = {
+      fileId: searchResult.fileId,
+      filePath: searchResult.filePath,
+    };
+    return searchResult.fileId;
+  }
+
+  log(
+    config,
+    "warning",
+    `Could not resolve Heretto file ID for ${localFilePath}`
+  );
+  return null;
+}
+
 module.exports = {
   createAuthHeader,
   createApiClient,
+  createRestApiClient,
   findScenario,
   triggerPublishingJob,
   pollJobStatus,
   downloadAndExtractOutput,
   loadHerettoContent,
+  buildFileMapping,
+  searchFileByName,
+  uploadFile,
+  resolveFileId,
   // Export constants for testing
   POLLING_INTERVAL_MS,
   POLLING_TIMEOUT_MS,
