@@ -11,6 +11,7 @@ const {
   transformToSchemaKey,
   readFile,
 } = require("doc-detective-common");
+const { loadHerettoContent } = require("./heretto");
 
 exports.qualifyFiles = qualifyFiles;
 exports.parseTests = parseTests;
@@ -223,8 +224,67 @@ async function qualifyFiles({ config }) {
   const cleanup = config.afterAll;
   if (cleanup) sequence = sequence.concat(cleanup);
 
+  if (sequence.length === 0) {
+    log(config, "warning", "No input sources specified.");
+    return [];
+  }
+
+  const ignoredDitaMaps = [];
+
   for (let source of sequence) {
     log(config, "debug", `source: ${source}`);
+    
+    // Check if source is a heretto:<name> reference
+    if (source.startsWith("heretto:")) {
+      const herettoName = source.substring(8); // Remove "heretto:" prefix
+      const herettoConfig = config?.integrations?.heretto?.find(
+        (h) => h.name === herettoName
+      );
+      
+      if (!herettoConfig) {
+        log(
+          config,
+          "warning",
+          `Heretto integration "${herettoName}" not found in config. Skipping.`
+        );
+        continue;
+      }
+      
+      // Load Heretto content if not already loaded
+      if (!herettoConfig.outputPath) {
+        try {
+          const outputPath = await loadHerettoContent(herettoConfig, log, config);
+          if (outputPath) {
+            herettoConfig.outputPath = outputPath;
+            log(config, "debug", `Adding Heretto output path: ${outputPath}`);
+            // Insert the output path into the sequence for processing
+            const currentIndex = sequence.indexOf(source);
+            sequence.splice(currentIndex + 1, 0, outputPath);
+            ignoredDitaMaps.push(outputPath); // DITA maps are already processed in Heretto
+          } else {
+            log(
+              config,
+              "warning",
+              `Failed to load Heretto content for "${herettoName}". Skipping.`
+            );
+          }
+        } catch (error) {
+          log(
+            config,
+            "warning",
+            `Failed to load Heretto content from "${herettoName}": ${error.message}`
+          );
+        }
+      } else {
+        // Already loaded, add to sequence if not already there
+        if (!sequence.includes(herettoConfig.outputPath)) {
+          const currentIndex = sequence.indexOf(source);
+          sequence.splice(currentIndex + 1, 0, herettoConfig.outputPath);
+        }
+      }
+      continue;
+    }
+    
     // Check if source is a URL
     let isURL = source.startsWith("http://") || source.startsWith("https://");
     // If URL, fetch file and place in temp directory
@@ -244,13 +304,15 @@ async function qualifyFiles({ config }) {
     if (
       isFile &&
       path.extname(source) === ".ditamap" &&
-      config.processDitaMap
+      !ignoredDitaMaps.some((ignored) => source.includes(ignored)) &&
+      config.processDitaMaps
     ) {
       const ditaOutput = await processDitaMap({ config, source });
       if (ditaOutput) {
         // Add output directory to to sequence right after the ditamap file
         const currentIndex = sequence.indexOf(source);
         sequence.splice(currentIndex + 1, 0, ditaOutput);
+        ignoredDitaMaps.push(ditaOutput); // DITA maps are already processed locally
       }
       continue;
     }
