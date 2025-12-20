@@ -978,7 +978,7 @@ async function parseTests({ config, files }) {
       specs.push(content);
     } else {
       // Process non-object
-      let id = `${crypto.randomUUID()}`;
+      let id = path.basename(file);
       let spec = { specId: id, contentPath: file, tests: [] };
       const fileType = config.fileTypes.find((fileType) =>
         fileType.extensions.includes(extension)
