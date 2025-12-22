@@ -4,7 +4,9 @@
   "description": "Detect and resolve docs into Doc Detective tests.",
   "main": "src/index.js",
   "scripts": {
-    "test": "mocha src/*.test.js",
+    "test": "mocha src/*.test.js --ignore src/*.integration.test.js",
+    "test:integration": "mocha src/*.integration.test.js --timeout 600000",
+    "test:all": "mocha src/*.test.js --timeout 600000",
     "dev": "node dev"
   },
   "repository": {
@@ -28,7 +30,7 @@
     "adm-zip": "^0.5.16",
     "ajv": "^8.17.1",
     "axios": "^1.13.2",
-    "doc-detective-common": "3.6.0-dev.1",
+    "doc-detective-common": "file:../common",
     "dotenv": "^17.2.3",
     "fast-xml-parser": "^5.3.3",
     "json-schema-faker": "^0.5.9",

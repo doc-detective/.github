@@ -173,7 +173,10 @@ async function findScenario(client, log, config, scenarioName) {
       "debug",
       `Found existing "${scenarioName}" scenario: ${foundScenario.id}`
     );
-    return { scenarioId: foundScenario.id, fileId: fileUuidPickerParam.value };
+    return {
+      scenarioId: foundScenario.id,
+      fileId: fileUuidPickerParam.value,
+    };
   } catch (error) {
     log(
       config,
@@ -214,7 +217,63 @@ async function getJobStatus(client, fileId, jobId) {
 }
 
 /**
+ * Gets all asset file paths from a completed publishing job.
+ * Handles pagination to retrieve all assets.
+ * @param {Object} client - Configured axios instance
+ * @param {string} fileId - UUID of the DITA map
+ * @param {string} jobId - ID of the publishing job
+ * @returns {Promise<Array<string>>} Array of asset file paths
+ */
+async function getJobAssetDetails(client, fileId, jobId) {
+  const allAssets = [];
+  let page = 0;
+  const pageSize = 100;
+  let hasMorePages = true;
+
+  while (hasMorePages) {
+    const response = await client.get(
+      `/files/${fileId}/publishes/${jobId}/assets`,
+      {
+        params: {
+          page,
+          size: pageSize,
+        },
+      }
+    );
+
+    const data = response.data;
+    const content = data.content || [];
+
+    for (const asset of content) {
+      if (asset.filePath) {
+        allAssets.push(asset.filePath);
+      }
+    }
+
+    // Check if there are more pages
+    const totalPages = data.totalPages || 1;
+    page++;
+    hasMorePages = page < totalPages;
+  }
+
+  return allAssets;
+}
+
+/**
+ * Validates that a .ditamap file exists in the job assets.
+ * Checks for any .ditamap file in the ot-output/dita/ directory.
+ * @param {Array<string>} assets - Array of asset file paths
+ * @returns {boolean} True if a .ditamap is found in ot-output/dita/
+ */
+function validateDitamapInAssets(assets) {
+  return assets.some((assetPath) => 
+    assetPath.startsWith("ot-output/dita/") && assetPath.endsWith(".ditamap")
+  );
+}
+
+/**
  * Polls a publishing job until completion or timeout.
+ * After job completes, validates that a .ditamap file exists in the output.
  * @param {Object} client - Configured axios instance
  * @param {string} fileId - UUID of the DITA map
  * @param {string} jobId - ID of the publishing job
@@ -230,17 +289,46 @@ async function pollJobStatus(client, fileId, jobId, log, config) {
       const job = await getJobStatus(client, fileId, jobId);
       log(config, "debug", `Job ${jobId} status: ${job?.status?.status}`);
 
-      if (job?.status?.result === "SUCCESS") {
-        return job;
-      }
-
-      if (job?.status?.result === "FAIL") {
+      // Check if job has reached a terminal state (result is set)
+      if (job?.status?.result) {
         log(
           config,
-          "warning",
-          `Publishing job ${jobId} failed.`
+          "debug",
+          `Job ${jobId} completed with result: ${job.status.result}`
         );
-        return null;
+
+        // Validate that a .ditamap file exists in the output
+        try {
+          const assets = await getJobAssetDetails(client, fileId, jobId);
+          log(
+            config,
+            "debug",
+            `Job ${jobId} has ${assets.length} assets`
+          );
+
+          if (validateDitamapInAssets(assets)) {
+            log(
+              config,
+              "debug",
+              `Found .ditamap file in ot-output/dita/`
+            );
+            return job;
+          }
+
+          log(
+            config,
+            "warning",
+            `Publishing job ${jobId} completed but no .ditamap file found in ot-output/dita/`
+          );
+          return null;
+        } catch (assetError) {
+          log(
+            config,
+            "warning",
+            `Failed to validate job assets: ${assetError.message}`
+          );
+          return null;
+        }
       }
 
       // Wait before next poll
@@ -375,7 +463,12 @@ async function loadHerettoContent(herettoConfig, log, config) {
 
     // Find the Doc Detective publishing scenario
     const scenarioName = herettoConfig.scenarioName || DEFAULT_SCENARIO_NAME;
-    const scenario = await findScenario(client, log, config, scenarioName);
+    const scenario = await findScenario(
+      client,
+      log,
+      config,
+      scenarioName
+    );
     if (!scenario) {
       log(
         config,
@@ -789,6 +882,9 @@ module.exports = {
   createRestApiClient,
   findScenario,
   triggerPublishingJob,
+  getJobStatus,
+  getJobAssetDetails,
+  validateDitamapInAssets,
   pollJobStatus,
   downloadAndExtractOutput,
   loadHerettoContent,
