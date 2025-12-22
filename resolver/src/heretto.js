@@ -70,6 +70,7 @@ function createRestApiClient(herettoConfig) {
     timeout: API_REQUEST_TIMEOUT_MS,
     headers: {
       Authorization: `Basic ${authHeader}`,
+      Accept: "application/xml, text/xml, */*",
     },
   });
 }
@@ -444,6 +445,140 @@ async function downloadAndExtractOutput(
 }
 
 /**
+ * Retrieves resource dependencies (all files) for a ditamap from Heretto REST API.
+ * This provides the complete file structure with UUIDs and paths.
+ * @param {Object} restClient - Configured axios instance for REST API
+ * @param {string} ditamapId - UUID of the ditamap file
+ * @param {Function} log - Logging function
+ * @param {Object} config - Doc Detective config for logging
+ * @returns {Promise<Object>} Object mapping relative paths to UUIDs and parent folder info
+ */
+async function getResourceDependencies(restClient, ditamapId, log, config) {
+  const pathToUuidMap = {};
+  
+  const xmlParser = new XMLParser({
+    ignoreAttributes: false,
+    attributeNamePrefix: "@_",
+  });
+  
+  // First, try to get the ditamap's own info (this is more reliable than the dependencies endpoint)
+  try {
+    log(config, "debug", `Fetching ditamap info for: ${ditamapId}`);
+    const ditamapInfo = await restClient.get(`${REST_API_PATH}/${ditamapId}`);
+    const ditamapParsed = xmlParser.parse(ditamapInfo.data);
+    
+    const ditamapUri = ditamapParsed.resource?.["xmldb-uri"] || ditamapParsed["@_uri"];
+    const ditamapName = ditamapParsed.resource?.name || ditamapParsed["@_name"];
+    const ditamapParentFolder = ditamapParsed.resource?.["folder-uuid"] || 
+                                ditamapParsed.resource?.["@_folder-uuid"] || 
+                                ditamapParsed["@_folder-uuid"];
+    
+    log(config, "debug", `Ditamap info: uri=${ditamapUri}, name=${ditamapName}, parentFolder=${ditamapParentFolder}`);
+    
+    if (ditamapUri) {
+      let relativePath = ditamapUri;
+      const orgPathMatch = relativePath?.match(/\/db\/organizations\/[^/]+\/(.+)/);
+      if (orgPathMatch) {
+        relativePath = orgPathMatch[1];
+      }
+      
+      pathToUuidMap[relativePath] = {
+        uuid: ditamapId,
+        fullPath: ditamapUri,
+        name: ditamapName,
+        parentFolderId: ditamapParentFolder,
+        isDitamap: true,
+      };
+      
+      // Store the ditamap info as reference points for creating new files
+      pathToUuidMap._ditamapPath = relativePath;
+      pathToUuidMap._ditamapId = ditamapId;
+      pathToUuidMap._ditamapParentFolderId = ditamapParentFolder;
+      
+      log(config, "debug", `Ditamap path: ${relativePath}, parent folder: ${ditamapParentFolder}`);
+    }
+  } catch (ditamapError) {
+    log(config, "warning", `Could not get ditamap info: ${ditamapError.message}`);
+  }
+  
+  // Then try to get the full dependencies list (this endpoint may not be available)
+  try {
+    log(config, "debug", `Fetching resource dependencies for ditamap: ${ditamapId}`);
+    
+    const response = await restClient.get(`${REST_API_PATH}/${ditamapId}/dependencies`);
+    const xmlData = response.data;
+    
+    const parsed = xmlParser.parse(xmlData);
+    
+    // Extract dependencies from the response
+    // Response format: <dependencies><dependency id="uuid" uri="path">...</dependency>...</dependencies>
+    const extractDependencies = (obj, parentPath = "") => {
+      if (!obj) return;
+      
+      // Handle single dependency or array of dependencies
+      let dependencies = obj.dependencies?.dependency || obj.dependency;
+      if (!dependencies) {
+        // Try to extract from root-level response
+        if (obj["@_id"] && obj["@_uri"]) {
+          dependencies = [obj];
+        } else if (Array.isArray(obj)) {
+          dependencies = obj;
+        }
+      }
+      
+      if (!dependencies) return;
+      if (!Array.isArray(dependencies)) {
+        dependencies = [dependencies];
+      }
+      
+      for (const dep of dependencies) {
+        const uuid = dep["@_id"] || dep["@_uuid"] || dep.id || dep.uuid;
+        const uri = dep["@_uri"] || dep["@_path"] || dep.uri || dep.path || dep["xmldb-uri"];
+        const name = dep["@_name"] || dep.name;
+        const parentFolderId = dep["@_folder-uuid"] || dep["@_parent"] || dep["folder-uuid"];
+        
+        if (uuid && (uri || name)) {
+          // Extract the relative path from the full URI
+          // URI format: /db/organizations/{org}/{path}
+          let relativePath = uri || name;
+          const orgPathMatch = relativePath?.match(/\/db\/organizations\/[^/]+\/(.+)/);
+          if (orgPathMatch) {
+            relativePath = orgPathMatch[1];
+          }
+          
+          pathToUuidMap[relativePath] = {
+            uuid,
+            fullPath: uri,
+            name: name || path.basename(relativePath || ""),
+            parentFolderId,
+          };
+          
+          log(config, "debug", `Mapped: ${relativePath} -> ${uuid}`);
+        }
+        
+        // Recursively process nested dependencies
+        if (dep.dependencies || dep.dependency) {
+          extractDependencies(dep);
+        }
+      }
+    };
+    
+    extractDependencies(parsed);
+    
+    log(config, "info", `Retrieved ${Object.keys(pathToUuidMap).length} resource dependencies from Heretto`);
+    
+  } catch (error) {
+    // Log more details about the error for debugging
+    const statusCode = error.response?.status;
+    const responseData = error.response?.data;
+    log(config, "debug", `Dependencies endpoint not available (${statusCode}), will use ditamap info as fallback`);
+    // Continue with ditamap info only - the fallback will create files in the ditamap's parent folder
+  }
+  
+  return pathToUuidMap;
+}
+
+/**
  * Main function to load content from a Heretto CMS instance.
  * Triggers a publishing job, waits for completion, and downloads the output.
  * @param {Object} herettoConfig - Heretto integration configuration
@@ -460,6 +595,7 @@ async function loadHerettoContent(herettoConfig, log, config) {
 
   try {
     const client = createApiClient(herettoConfig);
+    const restClient = createRestApiClient(herettoConfig);
 
     // Find the Doc Detective publishing scenario
     const scenarioName = herettoConfig.scenarioName || DEFAULT_SCENARIO_NAME;
@@ -476,6 +612,19 @@ async function loadHerettoContent(herettoConfig, log, config) {
         `Skipping Heretto "${herettoConfig.name}" - could not find or create publishing scenario`
       );
       return null;
+    }
+
+    // Fetch resource dependencies to build path-to-UUID mapping
+    // This gives us the complete file structure with UUIDs before we even run the job
+    if (herettoConfig.uploadOnChange) {
+      log(config, "debug", `Fetching resource dependencies for ditamap ${scenario.fileId}...`);
+      const resourceDependencies = await getResourceDependencies(
+        restClient,
+        scenario.fileId,
+        log,
+        config
+      );
+      herettoConfig.resourceDependencies = resourceDependencies;
     }
 
     // Trigger publishing job
@@ -519,7 +668,7 @@ async function loadHerettoContent(herettoConfig, log, config) {
       config
     );
 
-    // Build file mapping from extracted content
+    // Build file mapping from extracted content (legacy approach, still useful as fallback)
     if (outputPath && herettoConfig.uploadOnChange) {
       const fileMapping = await buildFileMapping(
         outputPath,
@@ -892,6 +1041,7 @@ module.exports = {
   searchFileByName,
   uploadFile,
   resolveFileId,
+  getResourceDependencies,
   // Export constants for testing
   POLLING_INTERVAL_MS,
   POLLING_TIMEOUT_MS,
