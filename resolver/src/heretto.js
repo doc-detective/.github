@@ -861,7 +861,7 @@ async function searchFileByName(
     }
 
     const response = await client.post(
-      "/ezdnxtgen/api/search".replace("/ezdnxtgen/api/v2", ""),
+      "/ezdnxtgen/api/search",
       searchBody,
       {
         baseURL: `https://${herettoConfig.organizationId}.heretto.com`,
