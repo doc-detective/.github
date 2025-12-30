@@ -60,6 +60,33 @@ function isRelativeUrl(url) {
   }
 }
 
+/**
+ * Generates a unique specId from a file path that is safe for storage/URLs.
+ * Uses relative path from cwd when possible to provide uniqueness while
+ * avoiding collisions from files with the same basename in different directories.
+ * @param {string} filePath - Absolute or relative file path
+ * @returns {string} A safe specId derived from the file path
+ */
+function generateSpecId(filePath) {
+  const absolutePath = path.resolve(filePath);
+  const cwd = process.cwd();
+  
+  let relativePath;
+  if (absolutePath.startsWith(cwd)) {
+    relativePath = path.relative(cwd, absolutePath);
+  } else {
+    relativePath = absolutePath;
+  }
+  
+  const normalizedPath = relativePath
+    .split(path.sep)
+    .join("/")
+    .replace(/^\.\//, "")
+    .replace(/[^a-zA-Z0-9._\-\/]/g, "_");
+  
+  return normalizedPath;
+}
+
 // Parse XML-style attributes to an object
 // Example: 'wait=500' becomes { wait: 500 }
 // Example: 'testId="myTestId" detectSteps=false' becomes { testId: "myTestId", detectSteps: false }
@@ -978,7 +1005,9 @@ async function parseTests({ config, files }) {
       specs.push(content);
     } else {
       // Process non-object
-      let id = path.basename(file);
+      // Generate a specId that includes more of the file path to avoid collisions
+      // when different files share the same basename
+      let id = generateSpecId(file);
       let spec = { specId: id, contentPath: file, tests: [] };
       const fileType = config.fileTypes.find((fileType) =>
         fileType.extensions.includes(extension)
