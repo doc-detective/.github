@@ -7,7 +7,7 @@
         },
         {
           "screenshot": {
-            "path": "/Users/docdetective/Workspaces/.github/core/test/temp-regression-screenshot.png",
+            "path": "core/test/artifacts/temp-regression-screenshot.png",
             "maxVariation": 0.05,
             "overwrite": "false"
           }

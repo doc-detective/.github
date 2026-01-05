@@ -8,7 +8,7 @@
             "args": [
               "completely different content"
             ],
-            "path": "/Users/docdetective/Workspaces/.github/core/test/temp-regression-output.txt",
+            "path": "core/test/temp-regression-output.txt",
             "maxVariation": 0.1,
             "overwrite": "aboveVariation"
           }

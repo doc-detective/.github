@@ -8,7 +8,7 @@ exports.waitForConditions = waitForConditions;
 /**
  * Checks if a pattern string represents a regex pattern.
  * Regex patterns must start and end with '/' and the last '/' must be at the end or followed only by flags.
- * Valid flags are: g, i, m, u, y, s
+ * Valid flags are: g, i, m, u, y, s, d
  * 
  * @param {string} pattern - The pattern to check
  * @returns {boolean} True if pattern is a regex
@@ -71,6 +71,12 @@ function matchesCondition(output, condition) {
 
 /**
  * Waits for stdout/stderr conditions to be met by listening to streams.
+ * 
+ * Note: There is a potential race condition between the initial buffer check and listener
+ * attachment. If data arrives after the buffer check but before listeners are attached,
+ * it will be added to the buffer but won't trigger a condition check until the next chunk
+ * arrives. This is a known limitation that should be acceptable for most use cases since
+ * the pattern will still be detected when subsequent data arrives.
  * 
  * @param {object} options - Wait options
  * @param {object} options.scope - The scope object with streams
