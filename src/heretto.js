@@ -4,6 +4,7 @@ const path = require("path");
 const os = require("os");
 const crypto = require("crypto");
 const AdmZip = require("adm-zip");
+const { XMLParser } = require("fast-xml-parser");
 
 // Internal constants - not exposed to users
 const POLLING_INTERVAL_MS = 5000;
@@ -11,6 +12,8 @@ const POLLING_TIMEOUT_MS = 300000; // 5 minutes
 const API_REQUEST_TIMEOUT_MS = 30000; // 30 seconds for individual API requests
 const DOWNLOAD_TIMEOUT_MS = 300000; // 5 minutes for downloads
 const DEFAULT_SCENARIO_NAME = "Doc Detective";
+// Base URL for REST API (different from publishing API)
+const REST_API_PATH = "/rest/all-files";
 
 /**
  * Creates a Base64-encoded Basic Auth header from username and API token.
@@ -48,6 +51,26 @@ function createApiClient(herettoConfig) {
     headers: {
       Authorization: `Basic ${authHeader}`,
       "Content-Type": "application/json",
+    },
+  });
+}
+
+/**
+ * Creates an axios instance configured for Heretto REST API requests (different base URL).
+ * @param {Object} herettoConfig - Heretto integration configuration
+ * @returns {Object} Configured axios instance for REST API
+ */
+function createRestApiClient(herettoConfig) {
+  const authHeader = createAuthHeader(
+    herettoConfig.username,
+    herettoConfig.apiToken
+  );
+  return axios.create({
+    baseURL: `https://${herettoConfig.organizationId}.heretto.com`,
+    timeout: API_REQUEST_TIMEOUT_MS,
+    headers: {
+      Authorization: `Basic ${authHeader}`,
+      Accept: "application/xml, text/xml, */*",
     },
   });
 }
@@ -151,7 +174,10 @@ async function findScenario(client, log, config, scenarioName) {
       "debug",
       `Found existing "${scenarioName}" scenario: ${foundScenario.id}`
     );
-    return { scenarioId: foundScenario.id, fileId: fileUuidPickerParam.value };
+    return {
+      scenarioId: foundScenario.id,
+      fileId: fileUuidPickerParam.value,
+    };
   } catch (error) {
     log(
       config,
@@ -192,7 +218,63 @@ async function getJobStatus(client, fileId, jobId) {
 }
 
 /**
+ * Gets all asset file paths from a completed publishing job.
+ * Handles pagination to retrieve all assets.
+ * @param {Object} client - Configured axios instance
+ * @param {string} fileId - UUID of the DITA map
+ * @param {string} jobId - ID of the publishing job
+ * @returns {Promise<Array<string>>} Array of asset file paths
+ */
+async function getJobAssetDetails(client, fileId, jobId) {
+  const allAssets = [];
+  let page = 0;
+  const pageSize = 100;
+  let hasMorePages = true;
+
+  while (hasMorePages) {
+    const response = await client.get(
+      `/files/${fileId}/publishes/${jobId}/assets`,
+      {
+        params: {
+          page,
+          size: pageSize,
+        },
+      }
+    );
+
+    const data = response.data;
+    const content = data.content || [];
+
+    for (const asset of content) {
+      if (asset.filePath) {
+        allAssets.push(asset.filePath);
+      }
+    }
+
+    // Check if there are more pages
+    const totalPages = data.totalPages || 1;
+    page++;
+    hasMorePages = page < totalPages;
+  }
+
+  return allAssets;
+}
+
+/**
+ * Validates that a .ditamap file exists in the job assets.
+ * Checks for any .ditamap file in the ot-output/dita/ directory.
+ * @param {Array<string>} assets - Array of asset file paths
+ * @returns {boolean} True if a .ditamap is found in ot-output/dita/
+ */
+function validateDitamapInAssets(assets) {
+  return assets.some((assetPath) => 
+    assetPath.startsWith("ot-output/dita/") && assetPath.endsWith(".ditamap")
+  );
+}
+
+/**
  * Polls a publishing job until completion or timeout.
+ * After job completes, validates that a .ditamap file exists in the output.
  * @param {Object} client - Configured axios instance
  * @param {string} fileId - UUID of the DITA map
  * @param {string} jobId - ID of the publishing job
@@ -208,17 +290,46 @@ async function pollJobStatus(client, fileId, jobId, log, config) {
       const job = await getJobStatus(client, fileId, jobId);
       log(config, "debug", `Job ${jobId} status: ${job?.status?.status}`);
 
-      if (job?.status?.result === "SUCCESS") {
-        return job;
-      }
-
-      if (job?.status?.result === "FAIL") {
+      // Check if job has reached a terminal state (result is set)
+      if (job?.status?.result) {
         log(
           config,
-          "warning",
-          `Publishing job ${jobId} failed.`
+          "debug",
+          `Job ${jobId} completed with result: ${job.status.result}`
         );
-        return null;
+
+        // Validate that a .ditamap file exists in the output
+        try {
+          const assets = await getJobAssetDetails(client, fileId, jobId);
+          log(
+            config,
+            "debug",
+            `Job ${jobId} has ${assets.length} assets`
+          );
+
+          if (validateDitamapInAssets(assets)) {
+            log(
+              config,
+              "debug",
+              `Found .ditamap file in ot-output/dita/`
+            );
+            return job;
+          }
+
+          log(
+            config,
+            "warning",
+            `Publishing job ${jobId} completed but no .ditamap file found in ot-output/dita/`
+          );
+          return null;
+        } catch (assetError) {
+          log(
+            config,
+            "warning",
+            `Failed to validate job assets: ${assetError.message}`
+          );
+          return null;
+        }
       }
 
       // Wait before next poll
@@ -334,6 +445,139 @@ async function downloadAndExtractOutput(
 }
 
 /**
+ * Retrieves resource dependencies (all files) for a ditamap from Heretto REST API.
+ * This provides the complete file structure with UUIDs and paths.
+ * @param {Object} restClient - Configured axios instance for REST API
+ * @param {string} ditamapId - UUID of the ditamap file
+ * @param {Function} log - Logging function
+ * @param {Object} config - Doc Detective config for logging
+ * @returns {Promise<Object>} Object mapping relative paths to UUIDs and parent folder info
+ */
+async function getResourceDependencies(restClient, ditamapId, log, config) {
+  const pathToUuidMap = {};
+  
+  const xmlParser = new XMLParser({
+    ignoreAttributes: false,
+    attributeNamePrefix: "@_",
+  });
+  
+  // First, try to get the ditamap's own info (this is more reliable than the dependencies endpoint)
+  try {
+    log(config, "debug", `Fetching ditamap info for: ${ditamapId}`);
+    const ditamapInfo = await restClient.get(`${REST_API_PATH}/${ditamapId}`);
+    const ditamapParsed = xmlParser.parse(ditamapInfo.data);
+    
+    const ditamapUri = ditamapParsed.resource?.["xmldb-uri"] || ditamapParsed["@_uri"];
+    const ditamapName = ditamapParsed.resource?.name || ditamapParsed["@_name"];
+    const ditamapParentFolder = ditamapParsed.resource?.["folder-uuid"] || 
+                                ditamapParsed.resource?.["@_folder-uuid"] || 
+                                ditamapParsed["@_folder-uuid"];
+    
+    log(config, "debug", `Ditamap info: uri=${ditamapUri}, name=${ditamapName}, parentFolder=${ditamapParentFolder}`);
+    
+    if (ditamapUri) {
+      let relativePath = ditamapUri;
+      const orgPathMatch = relativePath?.match(/\/db\/organizations\/[^/]+\/(.+)/);
+      if (orgPathMatch) {
+        relativePath = orgPathMatch[1];
+      }
+      
+      pathToUuidMap[relativePath] = {
+        uuid: ditamapId,
+        fullPath: ditamapUri,
+        name: ditamapName,
+        parentFolderId: ditamapParentFolder,
+        isDitamap: true,
+      };
+      
+      // Store the ditamap info as reference points for creating new files
+      pathToUuidMap._ditamapPath = relativePath;
+      pathToUuidMap._ditamapId = ditamapId;
+      pathToUuidMap._ditamapParentFolderId = ditamapParentFolder;
+      
+      log(config, "debug", `Ditamap path: ${relativePath}, parent folder: ${ditamapParentFolder}`);
+    }
+  } catch (ditamapError) {
+    log(config, "warning", `Could not get ditamap info: ${ditamapError.message}`);
+  }
+  
+  // Then try to get the full dependencies list (this endpoint may not be available)
+  try {
+    log(config, "debug", `Fetching resource dependencies for ditamap: ${ditamapId}`);
+    
+    const response = await restClient.get(`${REST_API_PATH}/${ditamapId}/dependencies`);
+    const xmlData = response.data;
+    
+    const parsed = xmlParser.parse(xmlData);
+    
+    // Extract dependencies from the response
+    // Response format: <dependencies><dependency id="uuid" uri="path">...</dependency>...</dependencies>
+    const extractDependencies = (obj, parentPath = "") => {
+      if (!obj) return;
+      
+      // Handle single dependency or array of dependencies
+      let dependencies = obj.dependencies?.dependency || obj.dependency;
+      if (!dependencies) {
+        // Try to extract from root-level response
+        if (obj["@_id"] && obj["@_uri"]) {
+          dependencies = [obj];
+        } else if (Array.isArray(obj)) {
+          dependencies = obj;
+        }
+      }
+      
+      if (!dependencies) return;
+      if (!Array.isArray(dependencies)) {
+        dependencies = [dependencies];
+      }
+      
+      for (const dep of dependencies) {
+        const uuid = dep["@_id"] || dep["@_uuid"] || dep.id || dep.uuid;
+        const uri = dep["@_uri"] || dep["@_path"] || dep.uri || dep.path || dep["xmldb-uri"];
+        const name = dep["@_name"] || dep.name;
+        const parentFolderId = dep["@_folder-uuid"] || dep["@_parent"] || dep["folder-uuid"];
+        
+        if (uuid && (uri || name)) {
+          // Extract the relative path from the full URI
+          // URI format: /db/organizations/{org}/{path}
+          let relativePath = uri || name;
+          const orgPathMatch = relativePath?.match(/\/db\/organizations\/[^/]+\/(.+)/);
+          if (orgPathMatch) {
+            relativePath = orgPathMatch[1];
+          }
+          
+          pathToUuidMap[relativePath] = {
+            uuid,
+            fullPath: uri,
+            name: name || path.basename(relativePath || ""),
+            parentFolderId,
+          };
+          
+          log(config, "debug", `Mapped: ${relativePath} -> ${uuid}`);
+        }
+        
+        // Recursively process nested dependencies
+        if (dep.dependencies || dep.dependency) {
+          extractDependencies(dep);
+        }
+      }
+    };
+    
+    extractDependencies(parsed);
+    
+    log(config, "info", `Retrieved ${Object.keys(pathToUuidMap).length} resource dependencies from Heretto`);
+    
+  } catch (error) {
+    // Log more details about the error for debugging
+    const statusCode = error.response?.status;
+    log(config, "debug", `Dependencies endpoint not available (${statusCode}), will use ditamap info as fallback`);
+    // Continue with ditamap info only - the fallback will create files in the ditamap's parent folder
+  }
+  
+  return pathToUuidMap;
+}
+
+/**
  * Main function to load content from a Heretto CMS instance.
  * Triggers a publishing job, waits for completion, and downloads the output.
  * @param {Object} herettoConfig - Heretto integration configuration
@@ -350,10 +594,16 @@ async function loadHerettoContent(herettoConfig, log, config) {
 
   try {
     const client = createApiClient(herettoConfig);
+    const restClient = createRestApiClient(herettoConfig);
 
     // Find the Doc Detective publishing scenario
     const scenarioName = herettoConfig.scenarioName || DEFAULT_SCENARIO_NAME;
-    const scenario = await findScenario(client, log, config, scenarioName);
+    const scenario = await findScenario(
+      client,
+      log,
+      config,
+      scenarioName
+    );
     if (!scenario) {
       log(
         config,
@@ -361,6 +611,19 @@ async function loadHerettoContent(herettoConfig, log, config) {
         `Skipping Heretto "${herettoConfig.name}" - could not find or create publishing scenario`
       );
       return null;
+    }
+
+    // Fetch resource dependencies to build path-to-UUID mapping
+    // This gives us the complete file structure with UUIDs before we even run the job
+    if (herettoConfig.uploadOnChange) {
+      log(config, "debug", `Fetching resource dependencies for ditamap ${scenario.fileId}...`);
+      const resourceDependencies = await getResourceDependencies(
+        restClient,
+        scenario.fileId,
+        log,
+        config
+      );
+      herettoConfig.resourceDependencies = resourceDependencies;
     }
 
     // Trigger publishing job
@@ -404,6 +667,17 @@ async function loadHerettoContent(herettoConfig, log, config) {
       config
     );
 
+    // Build file mapping from extracted content (legacy approach, still useful as fallback)
+    if (outputPath && herettoConfig.uploadOnChange) {
+      const fileMapping = await buildFileMapping(
+        outputPath,
+        herettoConfig,
+        log,
+        config
+      );
+      herettoConfig.fileMapping = fileMapping;
+    }
+
     return outputPath;
   } catch (error) {
     log(
@@ -415,14 +689,371 @@ async function loadHerettoContent(herettoConfig, log, config) {
   }
 }
 
+/**
+ * Builds a mapping of local file paths to Heretto file metadata.
+ * Parses DITA files to extract file references and attempts to resolve UUIDs.
+ * @param {string} outputPath - Path to extracted Heretto content
+ * @param {Object} herettoConfig - Heretto integration configuration
+ * @param {Function} log - Logging function
+ * @param {Object} config - Doc Detective config for logging
+ * @returns {Promise<Object>} Mapping of local paths to {fileId, filePath}
+ */
+async function buildFileMapping(outputPath, herettoConfig, log, config) {
+  const fileMapping = {};
+  const xmlParser = new XMLParser({
+    ignoreAttributes: false,
+    attributeNamePrefix: "@_",
+  });
+
+  try {
+    // Recursively find all DITA/XML files
+    const ditaFiles = findFilesWithExtensions(outputPath, [
+      ".dita",
+      ".ditamap",
+      ".xml",
+    ]);
+
+    for (const ditaFile of ditaFiles) {
+      try {
+        const content = fs.readFileSync(ditaFile, "utf-8");
+        const parsed = xmlParser.parse(content);
+
+        // Extract image references from DITA content
+        const imageRefs = extractImageReferences(parsed);
+
+        for (const imageRef of imageRefs) {
+          // Resolve relative path to absolute local path
+          const absoluteLocalPath = path.resolve(
+            path.dirname(ditaFile),
+            imageRef
+          );
+
+          if (!fileMapping[absoluteLocalPath]) {
+            fileMapping[absoluteLocalPath] = {
+              filePath: imageRef,
+              sourceFile: ditaFile,
+            };
+          }
+        }
+      } catch (parseError) {
+        log(
+          config,
+          "debug",
+          `Failed to parse ${ditaFile} for file mapping: ${parseError.message}`
+        );
+      }
+    }
+
+    log(
+      config,
+      "debug",
+      `Built file mapping with ${Object.keys(fileMapping).length} entries`
+    );
+  } catch (error) {
+    log(config, "warning", `Failed to build file mapping: ${error.message}`);
+  }
+
+  return fileMapping;
+}
+
+/**
+ * Recursively finds files with specified extensions.
+ * @param {string} dir - Directory to search
+ * @param {Array<string>} extensions - File extensions to match (e.g., ['.dita', '.xml'])
+ * @returns {Array<string>} Array of matching file paths
+ */
+function findFilesWithExtensions(dir, extensions) {
+  const results = [];
+
+  try {
+    const items = fs.readdirSync(dir);
+
+    for (const item of items) {
+      const fullPath = path.join(dir, item);
+      const stat = fs.statSync(fullPath);
+
+      if (stat.isDirectory()) {
+        results.push(...findFilesWithExtensions(fullPath, extensions));
+      } else if (
+        extensions.some((ext) => fullPath.toLowerCase().endsWith(ext))
+      ) {
+        results.push(fullPath);
+      }
+    }
+  } catch (error) {
+    // Ignore read errors for inaccessible directories
+  }
+
+  return results;
+}
+
+/**
+ * Extracts image references from parsed DITA XML content.
+ * Looks for <image> elements with href attributes.
+ * @param {Object} parsedXml - Parsed XML object
+ * @returns {Array<string>} Array of image href values
+ */
+function extractImageReferences(parsedXml) {
+  const refs = [];
+
+  function traverse(obj) {
+    if (!obj || typeof obj !== "object") return;
+
+    // Check for image elements
+    if (obj.image) {
+      const images = Array.isArray(obj.image) ? obj.image : [obj.image];
+      for (const img of images) {
+        if (img["@_href"]) {
+          refs.push(img["@_href"]);
+        }
+      }
+    }
+
+    // Recursively traverse all properties
+    for (const key of Object.keys(obj)) {
+      if (typeof obj[key] === "object") {
+        traverse(obj[key]);
+      }
+    }
+  }
+
+  traverse(parsedXml);
+  return refs;
+}
+
+/**
+ * Searches for a file in Heretto by filename.
+ * @param {Object} herettoConfig - Heretto integration configuration
+ * @param {string} filename - Name of the file to search for
+ * @param {string} folderPath - Optional folder path to search within
+ * @param {Function} log - Logging function
+ * @param {Object} config - Doc Detective config for logging
+ * @returns {Promise<Object|null>} File info with ID and URI, or null if not found
+ */
+async function searchFileByName(
+  herettoConfig,
+  filename,
+  folderPath,
+  log,
+  config
+) {
+  const client = createApiClient(herettoConfig);
+
+  try {
+    const searchBody = {
+      queryString: filename,
+      foldersToSearch: {},
+      startOffset: 0,
+      endOffset: 10,
+      searchResultType: "FILES_ONLY",
+      addPrefixAndFuzzy: false,
+    };
+
+    // If folderPath provided, search within that folder; otherwise search root
+    if (folderPath) {
+      searchBody.foldersToSearch[folderPath] = true;
+    } else {
+      // Search in organization root
+      searchBody.foldersToSearch[
+        `/db/organizations/${herettoConfig.organizationId}/`
+      ] = true;
+    }
+
+    const response = await client.post(
+      "/ezdnxtgen/api/search",
+      searchBody,
+      {
+        baseURL: `https://${herettoConfig.organizationId}.heretto.com`,
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+
+    if (response.data?.hits?.length > 0) {
+      // Find exact filename match
+      const exactMatch = response.data.hits.find(
+        (hit) => hit.fileEntity?.name === filename
+      );
+
+      if (exactMatch) {
+        return {
+          fileId: exactMatch.fileEntity.ID,
+          filePath: exactMatch.fileEntity.URI,
+          name: exactMatch.fileEntity.name,
+        };
+      }
+    }
+
+    return null;
+  } catch (error) {
+    log(
+      config,
+      "debug",
+      `Failed to search for file "${filename}": ${error.message}`
+    );
+    return null;
+  }
+}
+
+/**
+ * Uploads a file to Heretto CMS.
+ * @param {Object} herettoConfig - Heretto integration configuration
+ * @param {string} fileId - UUID of the file to update
+ * @param {string} localFilePath - Local path to the file to upload
+ * @param {Function} log - Logging function
+ * @param {Object} config - Doc Detective config for logging
+ * @returns {Promise<Object>} Result object with status and description
+ */
+async function uploadFile(herettoConfig, fileId, localFilePath, log, config) {
+  const client = createRestApiClient(herettoConfig);
+
+  try {
+    // Ensure the local file exists before attempting to read it
+    if (!fs.existsSync(localFilePath)) {
+      log(
+        config,
+        "warning",
+        `Local file does not exist, cannot upload to Heretto: ${localFilePath}`
+      );
+      return {
+        status: "FAIL",
+        description: `Local file not found: ${localFilePath}`,
+      };
+    }
+
+    // Read file as binary
+    const fileBuffer = fs.readFileSync(localFilePath);
+
+    // Determine content type from file extension
+    const ext = path.extname(localFilePath).toLowerCase();
+    let contentType = "application/octet-stream";
+    if (ext === ".png") contentType = "image/png";
+    else if (ext === ".jpg" || ext === ".jpeg") contentType = "image/jpeg";
+    else if (ext === ".gif") contentType = "image/gif";
+    else if (ext === ".svg") contentType = "image/svg+xml";
+    else if (ext === ".webp") contentType = "image/webp";
+
+    log(config, "debug", `Uploading ${localFilePath} to Heretto file ${fileId}`);
+
+    const response = await client.put(
+      `${REST_API_PATH}/${fileId}/content`,
+      fileBuffer,
+      {
+        headers: {
+          "Content-Type": contentType,
+          "Content-Length": fileBuffer.length,
+        },
+        maxBodyLength: Infinity,
+        maxContentLength: Infinity,
+      }
+    );
+
+    if (response.status === 200 || response.status === 201) {
+      log(
+        config,
+        "info",
+        `Successfully uploaded ${path.basename(localFilePath)} to Heretto`
+      );
+      return {
+        status: "PASS",
+        description: `File uploaded successfully to Heretto`,
+      };
+    }
+
+    return {
+      status: "FAIL",
+      description: `Unexpected response status: ${response.status}`,
+    };
+  } catch (error) {
+    const errorMessage = error.response?.data || error.message;
+    log(
+      config,
+      "warning",
+      `Failed to upload file to Heretto: ${errorMessage}`
+    );
+    return {
+      status: "FAIL",
+      description: `Failed to upload: ${errorMessage}`,
+    };
+  }
+}
+
+/**
+ * Resolves a local file path to a Heretto file ID.
+ * First checks file mapping, then searches by filename if needed.
+ * @param {Object} herettoConfig - Heretto integration configuration
+ * @param {string} localFilePath - Local path to the file
+ * @param {Object} sourceIntegration - Source integration metadata from step
+ * @param {Function} log - Logging function
+ * @param {Object} config - Doc Detective config for logging
+ * @returns {Promise<string|null>} Heretto file ID or null if not found
+ */
+async function resolveFileId(
+  herettoConfig,
+  localFilePath,
+  sourceIntegration,
+  log,
+  config
+) {
+  // If fileId is already known, use it
+  if (sourceIntegration?.fileId) {
+    return sourceIntegration.fileId;
+  }
+
+  // Check file mapping
+  if (herettoConfig.fileMapping && herettoConfig.fileMapping[localFilePath]) {
+    const mapping = herettoConfig.fileMapping[localFilePath];
+    if (mapping.fileId) {
+      return mapping.fileId;
+    }
+  }
+
+  // Search by filename
+  const filename = path.basename(localFilePath);
+  const searchResult = await searchFileByName(
+    herettoConfig,
+    filename,
+    null,
+    log,
+    config
+  );
+
+  if (searchResult?.fileId) {
+    // Cache the result in file mapping
+    if (!herettoConfig.fileMapping) {
+      herettoConfig.fileMapping = {};
+    }
+    herettoConfig.fileMapping[localFilePath] = {
+      fileId: searchResult.fileId,
+      filePath: searchResult.filePath,
+    };
+    return searchResult.fileId;
+  }
+
+  log(
+    config,
+    "warning",
+    `Could not resolve Heretto file ID for ${localFilePath}`
+  );
+  return null;
+}
+
 module.exports = {
   createAuthHeader,
   createApiClient,
+  createRestApiClient,
   findScenario,
   triggerPublishingJob,
+  getJobStatus,
+  getJobAssetDetails,
+  validateDitamapInAssets,
   pollJobStatus,
   downloadAndExtractOutput,
   loadHerettoContent,
+  buildFileMapping,
+  searchFileByName,
+  uploadFile,
+  resolveFileId,
+  getResourceDependencies,
   // Export constants for testing
   POLLING_INTERVAL_MS,
   POLLING_TIMEOUT_MS,

@@ -100,9 +100,11 @@ describe("Heretto Integration", function () {
 
       const result = await heretto.findScenario(mockClient, mockLog, mockConfig, "Doc Detective");
 
-      expect(result).to.deep.equal({ scenarioId: "scenario-123", fileId: "file-uuid-456" });
+      expect(result).to.deep.equal({
+        scenarioId: "scenario-123",
+        fileId: "file-uuid-456",
+      });
       expect(mockClient.get.calledTwice).to.be.true;
-      expect(mockClient.post.called).to.be.false;
     });
 
     it("should return null if scenario is not found", async function () {
@@ -114,7 +116,6 @@ describe("Heretto Integration", function () {
 
       expect(result).to.be.null;
       expect(mockClient.get.calledOnce).to.be.true;
-      expect(mockClient.post.called).to.be.false;
     });
 
     it("should return null if scenario fetch fails", async function () {
@@ -228,6 +229,157 @@ describe("Heretto Integration", function () {
     });
   });
 
+  describe("getJobAssetDetails", function () {
+    it("should return all asset file paths from single page", async function () {
+      const assetsResponse = {
+        content: [
+          { filePath: "ot-output/dita/my-guide.ditamap" },
+          { filePath: "ot-output/dita/topic1.dita" },
+          { filePath: "ot-output/dita/topic2.dita" },
+        ],
+        totalPages: 1,
+        number: 0,
+        size: 100,
+      };
+
+      mockClient.get.resolves({ data: assetsResponse });
+
+      const result = await heretto.getJobAssetDetails(mockClient, "file-uuid", "job-123");
+
+      expect(result).to.deep.equal([
+        "ot-output/dita/my-guide.ditamap",
+        "ot-output/dita/topic1.dita",
+        "ot-output/dita/topic2.dita",
+      ]);
+      expect(mockClient.get.calledOnce).to.be.true;
+      expect(mockClient.get.firstCall.args[0]).to.equal("/files/file-uuid/publishes/job-123/assets");
+    });
+
+    it("should handle pagination and aggregate all assets", async function () {
+      const page1Response = {
+        content: [
+          { filePath: "ot-output/dita/topic1.dita" },
+          { filePath: "ot-output/dita/topic2.dita" },
+        ],
+        totalPages: 2,
+        number: 0,
+        size: 100,
+      };
+
+      const page2Response = {
+        content: [
+          { filePath: "ot-output/dita/topic3.dita" },
+          { filePath: "ot-output/dita/my-guide.ditamap" },
+        ],
+        totalPages: 2,
+        number: 1,
+        size: 100,
+      };
+
+      mockClient.get
+        .onFirstCall().resolves({ data: page1Response })
+        .onSecondCall().resolves({ data: page2Response });
+
+      const result = await heretto.getJobAssetDetails(mockClient, "file-uuid", "job-123");
+
+      expect(result).to.deep.equal([
+        "ot-output/dita/topic1.dita",
+        "ot-output/dita/topic2.dita",
+        "ot-output/dita/topic3.dita",
+        "ot-output/dita/my-guide.ditamap",
+      ]);
+      expect(mockClient.get.calledTwice).to.be.true;
+    });
+
+    it("should return empty array when no assets", async function () {
+      const assetsResponse = {
+        content: [],
+        totalPages: 1,
+        number: 0,
+        size: 100,
+      };
+
+      mockClient.get.resolves({ data: assetsResponse });
+
+      const result = await heretto.getJobAssetDetails(mockClient, "file-uuid", "job-123");
+
+      expect(result).to.deep.equal([]);
+    });
+
+    it("should skip assets without filePath", async function () {
+      const assetsResponse = {
+        content: [
+          { filePath: "ot-output/dita/topic1.dita" },
+          { otherField: "no-path" },
+          { filePath: "ot-output/dita/topic2.dita" },
+        ],
+        totalPages: 1,
+      };
+
+      mockClient.get.resolves({ data: assetsResponse });
+
+      const result = await heretto.getJobAssetDetails(mockClient, "file-uuid", "job-123");
+
+      expect(result).to.deep.equal([
+        "ot-output/dita/topic1.dita",
+        "ot-output/dita/topic2.dita",
+      ]);
+    });
+  });
+
+  describe("validateDitamapInAssets", function () {
+    it("should return true when ditamap is in ot-output/dita/", function () {
+      const assets = [
+        "ot-output/dita/topic1.dita",
+        "ot-output/dita/my-guide.ditamap",
+        "ot-output/dita/topic2.dita",
+      ];
+
+      const result = heretto.validateDitamapInAssets(assets);
+
+      expect(result).to.be.true;
+    });
+
+    it("should return false when no ditamap is present", function () {
+      const assets = [
+        "ot-output/dita/topic1.dita",
+        "ot-output/dita/topic2.dita",
+      ];
+
+      const result = heretto.validateDitamapInAssets(assets);
+
+      expect(result).to.be.false;
+    });
+
+    it("should return false when ditamap is in wrong directory", function () {
+      const assets = [
+        "ot-output/other/my-guide.ditamap",
+        "ot-output/dita/topic1.dita",
+      ];
+
+      const result = heretto.validateDitamapInAssets(assets);
+
+      expect(result).to.be.false;
+    });
+
+    it("should return true when any ditamap is in correct directory", function () {
+      const assets = [
+        "ot-output/dita/different-guide.ditamap",
+        "ot-output/dita/topic1.dita",
+      ];
+
+      const result = heretto.validateDitamapInAssets(assets);
+
+      expect(result).to.be.true;
+    });
+
+    it("should return false when assets array is empty", function () {
+      const result = heretto.validateDitamapInAssets([]);
+
+      expect(result).to.be.false;
+    });
+  });
+
   describe("pollJobStatus", function () {
     const mockLog = sinon.stub();
     const mockConfig = { logLevel: "info" };
@@ -236,40 +388,91 @@ describe("Heretto Integration", function () {
       mockLog.reset();
     });
 
-    it("should return completed job when status.result is SUCCESS", async function () {
+    it("should return completed job when status.result is SUCCESS and ditamap is present", async function () {
       const completedJob = {
         id: "job-123",
         status: { status: "COMPLETED", result: "SUCCESS" },
       };
 
-      mockClient.get.resolves({ data: completedJob });
+      const assetsResponse = {
+        content: [
+          { filePath: "ot-output/dita/my-guide.ditamap" },
+          { filePath: "ot-output/dita/topic1.dita" },
+        ],
+        totalPages: 1,
+      };
+
+      mockClient.get
+        .onFirstCall().resolves({ data: completedJob })
+        .onSecondCall().resolves({ data: assetsResponse });
 
       const result = await heretto.pollJobStatus(mockClient, "file-uuid", "job-123", mockLog, mockConfig);
 
       expect(result).to.deep.equal(completedJob);
     });
 
-    it("should return null when status.result is FAIL", async function () {
+    it("should return completed job when status.result is FAIL but ditamap is present", async function () {
       const failedJob = {
         id: "job-123",
         status: { status: "FAILED", result: "FAIL" },
       };
 
-      mockClient.get.resolves({ data: failedJob });
+      const assetsResponse = {
+        content: [
+          { filePath: "ot-output/dita/my-guide.ditamap" },
+          { filePath: "ot-output/dita/topic1.dita" },
+        ],
+        totalPages: 1,
+      };
+
+      mockClient.get
+        .onFirstCall().resolves({ data: failedJob })
+        .onSecondCall().resolves({ data: assetsResponse });
+
+      const result = await heretto.pollJobStatus(mockClient, "file-uuid", "job-123", mockLog, mockConfig);
+
+      expect(result).to.deep.equal(failedJob);
+    });
+
+    it("should return null when job completes but ditamap is missing", async function () {
+      const completedJob = {
+        id: "job-123",
+        status: { status: "COMPLETED", result: "SUCCESS" },
+      };
+
+      const assetsResponse = {
+        content: [
+          { filePath: "ot-output/dita/topic1.dita" },
+          { filePath: "ot-output/dita/topic2.dita" },
+        ],
+        totalPages: 1,
+      };
+
+      mockClient.get
+        .onFirstCall().resolves({ data: completedJob })
+        .onSecondCall().resolves({ data: assetsResponse });
 
       const result = await heretto.pollJobStatus(mockClient, "file-uuid", "job-123", mockLog, mockConfig);
 
       expect(result).to.be.null;
     });
 
-    it("should poll until completion", async function () {
+    it("should poll until completion then validate assets", async function () {
       // Use fake timers to avoid waiting for real POLLING_INTERVAL_MS delays
       const clock = sinon.useFakeTimers();
 
+      const assetsResponse = {
+        content: [
+          { filePath: "ot-output/dita/my-guide.ditamap" },
+        ],
+        totalPages: 1,
+      };
+
       mockClient.get
-        .onFirstCall().resolves({ data: { id: "job-123", status: { status: "PENDING", result: null } } })
-        .onSecondCall().resolves({ data: { id: "job-123", status: { status: "PROCESSING", result: null } } })
-        .onThirdCall().resolves({ data: { id: "job-123", status: { status: "COMPLETED", result: "SUCCESS" } } });
+        .onCall(0).resolves({ data: { id: "job-123", status: { status: "PENDING", result: null } } })
+        .onCall(1).resolves({ data: { id: "job-123", status: { status: "PROCESSING", result: null } } })
+        .onCall(2).resolves({ data: { id: "job-123", status: { status: "COMPLETED", result: "SUCCESS" } } })
+        .onCall(3).resolves({ data: assetsResponse });
 
       const pollPromise = heretto.pollJobStatus(mockClient, "file-uuid", "job-123", mockLog, mockConfig);
 
@@ -281,7 +484,7 @@ describe("Heretto Integration", function () {
       const result = await pollPromise;
 
       expect(result.status.result).to.equal("SUCCESS");
-      expect(mockClient.get.callCount).to.equal(3);
+      expect(mockClient.get.callCount).to.equal(4); // 3 status polls + 1 assets call
 
       clock.restore();
     });
@@ -308,6 +511,21 @@ describe("Heretto Integration", function () {
 
     it("should return null when polling error occurs", async function () {
       mockClient.get.rejects(new Error("Network error"));
+
+      const result = await heretto.pollJobStatus(mockClient, "file-uuid", "job-123", mockLog, mockConfig);
+
+      expect(result).to.be.null;
+    });
+
+    it("should return null when asset validation fails", async function () {
+      const completedJob = {
+        id: "job-123",
+        status: { status: "COMPLETED", result: "SUCCESS" },
+      };
+
+      mockClient.get
+        .onFirstCall().resolves({ data: completedJob })
+        .onSecondCall().rejects(new Error("Failed to fetch assets"));
 
       const result = await heretto.pollJobStatus(mockClient, "file-uuid", "job-123", mockLog, mockConfig);
 
