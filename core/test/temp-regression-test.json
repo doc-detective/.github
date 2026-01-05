@@ -1,0 +1,19 @@
+{
+  "tests": [
+    {
+      "steps": [
+        {
+          "runShell": {
+            "command": "echo",
+            "args": [
+              "completely different content"
+            ],
+            "path": "core/test/temp-regression-output.txt",
+            "maxVariation": 0.1,
+            "overwrite": "aboveVariation"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "terminateScope",
+  "description": "Terminate a named scope. Sends SIGTERM to the process, waits up to 5 seconds, then sends SIGKILL if needed.",
+  "type": "string",
+  "pattern": "^[a-zA-Z0-9_-]{1,64}$",
+  "examples": [
+    "dev-server",
+    "npm-init",
+    "test-scope"
+  ]
+}

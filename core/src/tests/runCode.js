@@ -35,7 +35,8 @@ function createTempScript(code, language) {
   return tmpFile;
 }
 
-async function runCode({ config, step, scopeRegistry = null }) {
+// Run gather, compile, and run code.
+async function runCode({ config, step }) {
   const result = {
     status: "PASS",
     description: "Executed code.",
@@ -108,6 +109,10 @@ async function runCode({ config, step, scopeRegistry = null }) {
             ? "node"
             : "bash",
         args: [scriptPath, ...step.runCode.args],
+        scope: step.runCode.scope, // Pass through scope
+        waitUntil: step.runCode.waitUntil, // Pass through waitUntil
+        workingDirectory: step.runCode.workingDirectory,
+        timeout: step.runCode.timeout,
       },
     };
     
@@ -116,7 +121,8 @@ async function runCode({ config, step, scopeRegistry = null }) {
     }
     delete shellStep.runCode;
 
-    const shellResult = await runShell({ config: config, step: shellStep, scopeRegistry: scopeRegistry });
+    // Execute script using runShell
+    const shellResult = await runShell({ config: config, step: shellStep });
 
     // Copy results
     result.status = shellResult.status;
@@ -149,7 +155,7 @@ if (require.main === module) {
       language: "python",
     },
   };
-  runCode(config, step)
+  runCode({ config, step })
     .then((result) => {
       console.log(result);
     })

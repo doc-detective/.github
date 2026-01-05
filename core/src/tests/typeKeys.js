@@ -3,6 +3,8 @@ const { Key } = require("webdriverio");
 const {
   findElementByCriteria,
 } = require("./findStrategies");
+const { hasScope, getScope } = require("../scopes/registry");
+const { writeToTerminal } = require("../scopes/terminal");
 
 exports.typeKeys = typeKeys;
 

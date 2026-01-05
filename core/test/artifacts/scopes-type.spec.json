@@ -1,0 +1,33 @@
+{
+  "$schema": "https://raw.githubusercontent.com/doc-detective/common/refs/heads/main/dist/schemas/spec_v3.schema.json",
+  "description": "Test type action with scopes for interactive terminal input",
+  "tests": [
+    {
+      "testId": "type-to-scope",
+      "description": "Type input to a scope running read command",
+      "contexts": [],
+      "steps": [
+        {
+          "runShell": {
+            "command": "read -p 'Enter name: ' name && echo \"Hello $name\" && sleep 5",
+            "scope": "shell-interactive",
+            "waitUntil": {
+              "stdio": {
+                "stdout": "Enter name:"
+              }
+            }
+          }
+        },
+        {
+          "type": {
+            "keys": "TestUser\n",
+            "scope": "shell-interactive"
+          }
+        },
+        {
+          "terminateScope": "shell-interactive"
+        }
+      ]
+    }
+  ]
+}

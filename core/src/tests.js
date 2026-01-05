@@ -20,12 +20,15 @@ const { httpRequest } = require("./tests/httpRequest");
 const { clickElement } = require("./tests/click");
 const { runCode } = require("./tests/runCode");
 const { dragAndDropElement } = require("./tests/dragAndDrop");
+const { terminateScope } = require("./tests/terminateScope");
+const { setupCleanupHandlers, cleanupTestScopes } = require("./scopes/cleanup");
 const path = require("path");
 const { spawn } = require("child_process");
 const { randomUUID } = require("crypto");
 const { setAppiumHome } = require("./appium");
 const { resolveExpression } = require("./expressions");
 const { getEnvironment, getAvailableApps } = require("./config");
+const { uploadChangedFiles } = require("./integrations");
 
 class ScopeRegistry {
   constructor() {
@@ -439,6 +442,9 @@ async function runViaApi({ resolvedTests, apiKey, config = {} }) {
 async function runSpecs({ resolvedTests }) {
   const config = resolvedTests.config;
   const specs = resolvedTests.specs;
+  
+  // Setup process-level cleanup handlers for scopes
+  setupCleanupHandlers(config);
 
   // Get runner details
   const runnerDetails = {
@@ -723,6 +729,7 @@ async function runSpecs({ resolvedTests }) {
             scopeRegistry: scopeRegistry,
             options: {
               openApiDefinitions: context.openApi || [],
+              test: test,
             },
           });
           log(
@@ -843,6 +850,14 @@ async function runSpecs({ resolvedTests }) {
       else testResult = "PASS";
 
       testReport = { result: testResult, ...testReport };
+      
+      // Cleanup scopes for this test
+      try {
+        await cleanupTestScopes(test.testId, config);
+      } catch (error) {
+        log(config, "warn", `Error cleaning up scopes for test ${test.testId}: ${error.message}`);
+      }
+      
       specReport.tests.push(testReport);
       report.summary.tests[testResult.toLowerCase()]++;
     }
@@ -873,6 +888,31 @@ async function runSpecs({ resolvedTests }) {
   if (appium) {
     log(config, "debug", "Closing Appium server");
     kill(appium.pid);
+  }
+
+  // Upload changed files back to source integrations (best-effort)
+  // This automatically syncs any changed screenshots back to their source CMS
+  // Only upload if uploadOnChange is enabled (defaults to true for backward compatibility)
+  // Check both global config.uploadOnChange and per-integration uploadOnChange settings
+  const herettoConfigs = config?.integrations?.heretto || [];
+  const hasUploadEnabledIntegration = herettoConfigs.some(
+    (h) => h.uploadOnChange !== false // Default to true if not explicitly set to false
+  );
+  const globalUploadOnChange = config?.uploadOnChange ?? true;
+  if (globalUploadOnChange && hasUploadEnabledIntegration && herettoConfigs.length > 0) {
+    try {
+      const uploadResults = await uploadChangedFiles({ config, report, log });
+      report.uploadResults = uploadResults;
+    } catch (error) {
+      log(config, "warning", `Failed to upload changed files: ${error.message}`);
+      report.uploadResults = {
+        total: 0,
+        successful: 0,
+        failed: 0,
+        skipped: 0,
+        error: error.message,
+      };
+    }
   }
 
   return report;
@@ -939,9 +979,9 @@ async function runStep({
     });
     config.recording = actionResult.recording;
   } else if (typeof step.runCode !== "undefined") {
-    actionResult = await runCode({ config: config, step: step, scopeRegistry: scopeRegistry });
+    actionResult = await runCode({ config: config, step: step, test: options?.test, scopeRegistry: scopeRegistry });
   } else if (typeof step.runShell !== "undefined") {
-    actionResult = await runShell({ config: config, step: step, scopeRegistry: scopeRegistry });
+    actionResult = await runShell({ config: config, step: step, test: options?.test, scopeRegistry: scopeRegistry });
   } else if (typeof step.screenshot !== "undefined") {
     actionResult = await saveScreenshot({
       config: config,
@@ -954,6 +994,11 @@ async function runStep({
       step: step,
       driver: driver,
       scopeRegistry: scopeRegistry,
+    });
+  } else if (typeof step.terminateScope !== "undefined") {
+    actionResult = await terminateScope({
+      config: config,
+      step: step,
     });
   } else if (typeof step.wait !== "undefined") {
     actionResult = await wait({ step: step, driver: driver });

@@ -44,10 +44,12 @@ async function dereferenceSchemas() {
     "runShell_v3.schema.json",
     "saveCookie_v3.schema.json",
     "screenshot_v3.schema.json",
+    "sourceIntegration_v3.schema.json",
     "spec_v3.schema.json",
     "step_v3.schema.json",
     "stopRecord_v3.schema.json",
     "test_v3.schema.json",
+    "terminateScope_v3.schema.json",
     "type_v3.schema.json",
     "wait_v3.schema.json",
     // v2 schemas
@@ -174,10 +176,10 @@ function updateRefPaths(schema) {
     }
     if (key === "$ref" && !value.startsWith("#")) {
       // File name of the referenced schema
-      valueFile = value.split("#")[0];
+      const valueFile = value.split("#")[0];
       // Attribute path in the referenced schema
-      valueAttribute = value.split("#")[1];
-      valuePath = path.resolve(`${__dirname}/build/${valueFile}`);
+      const valueAttribute = value.split("#")[1];
+      const valuePath = path.resolve(`${__dirname}/build/${valueFile}`);
       schema[key] = `${valuePath}#${valueAttribute}`;
       // console.log({value, valueFile, valueAttribute, final: schema[key]})
     }

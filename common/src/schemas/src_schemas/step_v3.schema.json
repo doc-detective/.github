@@ -358,6 +358,23 @@
           }
         }
       ]
+    },
+    {
+      "allOf": [
+        {
+          "$ref": "#/components/schemas/common"
+        },
+        {
+          "title": "terminateScope",
+          "type": "object",
+          "required": ["terminateScope"],
+          "properties": {
+            "terminateScope": {
+              "$ref": "terminateScope_v3.schema.json#"
+            }
+          }
+        }
+      ]
     }
   ],
   "examples": [
@@ -627,6 +644,12 @@
           "selector": "#targetElement"
         }
       }
+    },
+    {
+      "terminateScope": "dev-server"
+    },
+    {
+      "terminateScope": "npm-init"
     }
   ]
 }

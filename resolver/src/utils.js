@@ -11,6 +11,7 @@ const {
   transformToSchemaKey,
   readFile,
 } = require("doc-detective-common");
+const { loadHerettoContent } = require("./heretto");
 
 exports.qualifyFiles = qualifyFiles;
 exports.parseTests = parseTests;
@@ -25,6 +26,28 @@ exports.cleanTemp = cleanTemp;
 exports.calculatePercentageDifference = calculatePercentageDifference;
 exports.fetchFile = fetchFile;
 exports.isRelativeUrl = isRelativeUrl;
+exports.findHerettoIntegration = findHerettoIntegration;
+
+/**
+ * Finds which Heretto integration a file belongs to based on its path.
+ * @param {Object} config - Doc Detective config with _herettoPathMapping
+ * @param {string} filePath - Path to check
+ * @returns {string|null} Heretto integration name or null if not from Heretto
+ */
+function findHerettoIntegration(config, filePath) {
+  if (!config._herettoPathMapping) return null;
+  
+  const normalizedFilePath = path.resolve(filePath);
+  
+  for (const [outputPath, integrationName] of Object.entries(config._herettoPathMapping)) {
+    const normalizedOutputPath = path.resolve(outputPath);
+    if (normalizedFilePath.startsWith(normalizedOutputPath)) {
+      return integrationName;
+    }
+  }
+  
+  return null;
+}
 
 function isRelativeUrl(url) {
   try {
@@ -35,6 +58,33 @@ function isRelativeUrl(url) {
     // If URL constructor throws an error, it's a relative URL
     return true;
   }
+}
+
+/**
+ * Generates a unique specId from a file path that is safe for storage/URLs.
+ * Uses relative path from cwd when possible to provide uniqueness while
+ * avoiding collisions from files with the same basename in different directories.
+ * @param {string} filePath - Absolute or relative file path
+ * @returns {string} A safe specId derived from the file path
+ */
+function generateSpecId(filePath) {
+  const absolutePath = path.resolve(filePath);
+  const cwd = process.cwd();
+  
+  let relativePath;
+  if (absolutePath.startsWith(cwd)) {
+    relativePath = path.relative(cwd, absolutePath);
+  } else {
+    relativePath = absolutePath;
+  }
+  
+  const normalizedPath = relativePath
+    .split(path.sep)
+    .join("/")
+    .replace(/^\.\//, "")
+    .replace(/[^a-zA-Z0-9._\-\/]/g, "_");
+  
+  return normalizedPath;
 }
 
 // Parse XML-style attributes to an object
@@ -223,8 +273,74 @@ async function qualifyFiles({ config }) {
   const cleanup = config.afterAll;
   if (cleanup) sequence = sequence.concat(cleanup);
 
+  if (sequence.length === 0) {
+    log(config, "warning", "No input sources specified.");
+    return [];
+  }
+
+  const ignoredDitaMaps = [];
+  
+  // Track Heretto output paths for sourceIntegration metadata
+  if (!config._herettoPathMapping) {
+    config._herettoPathMapping = {};
+  }
+
   for (let source of sequence) {
     log(config, "debug", `source: ${source}`);
+    
+    // Check if source is a heretto:<name> reference
+    if (source.startsWith("heretto:")) {
+      const herettoName = source.substring(8); // Remove "heretto:" prefix
+      const herettoConfig = config?.integrations?.heretto?.find(
+        (h) => h.name === herettoName
+      );
+      
+      if (!herettoConfig) {
+        log(
+          config,
+          "warning",
+          `Heretto integration "${herettoName}" not found in config. Skipping.`
+        );
+        continue;
+      }
+      
+      // Load Heretto content if not already loaded
+      if (!herettoConfig.outputPath) {
+        try {
+          const outputPath = await loadHerettoContent(herettoConfig, log, config);
+          if (outputPath) {
+            herettoConfig.outputPath = outputPath;
+            // Store mapping from output path to Heretto integration name
+            config._herettoPathMapping[outputPath] = herettoName;
+            log(config, "debug", `Adding Heretto output path: ${outputPath}`);
+            // Insert the output path into the sequence for processing
+            const currentIndex = sequence.indexOf(source);
+            sequence.splice(currentIndex + 1, 0, outputPath);
+            ignoredDitaMaps.push(outputPath); // DITA maps are already processed in Heretto
+          } else {
+            log(
+              config,
+              "warning",
+              `Failed to load Heretto content for "${herettoName}". Skipping.`
+            );
+          }
+        } catch (error) {
+          log(
+            config,
+            "warning",
+            `Failed to load Heretto content from "${herettoName}": ${error.message}`
+          );
+        }
+      } else {
+        // Already loaded, add to sequence if not already there
+        if (!sequence.includes(herettoConfig.outputPath)) {
+          const currentIndex = sequence.indexOf(source);
+          sequence.splice(currentIndex + 1, 0, herettoConfig.outputPath);
+        }
+      }
+      continue;
+    }
+    
     // Check if source is a URL
     let isURL = source.startsWith("http://") || source.startsWith("https://");
     // If URL, fetch file and place in temp directory
@@ -244,13 +360,15 @@ async function qualifyFiles({ config }) {
     if (
       isFile &&
       path.extname(source) === ".ditamap" &&
-      config.processDitaMap
+      !ignoredDitaMaps.some((ignored) => source.includes(ignored)) &&
+      config.processDitaMaps
     ) {
       const ditaOutput = await processDitaMap({ config, source });
       if (ditaOutput) {
         // Add output directory to to sequence right after the ditamap file
         const currentIndex = sequence.indexOf(source);
         sequence.splice(currentIndex + 1, 0, ditaOutput);
+        ignoredDitaMaps.push(ditaOutput); // DITA maps are already processed locally
       }
       continue;
     }
@@ -666,10 +784,47 @@ async function parseContent({ config, content, filePath, fileType }) {
               ) {
                 step[action].origin = config.origin;
               }
+              // Attach sourceIntegration metadata for screenshot steps from Heretto
+              if (action === "screenshot" && config._herettoPathMapping) {
+                const herettoIntegration = findHerettoIntegration(config, filePath);
+                if (herettoIntegration) {
+                  // Convert simple screenshot value to object with sourceIntegration
+                  const screenshotPath = step[action];
+                  step[action] = {
+                    path: screenshotPath,
+                    sourceIntegration: {
+                      type: "heretto",
+                      integrationName: herettoIntegration,
+                      filePath: screenshotPath,
+                      contentPath: filePath,
+                    },
+                  };
+                }
+              }
             } else {
               // Substitute variables $n with match[n]
               // TODO: Make key substitution recursive
               step = replaceNumericVariables(action, statement);
+              
+              // Attach sourceIntegration metadata for screenshot steps from Heretto
+              if (step.screenshot && config._herettoPathMapping) {
+                const herettoIntegration = findHerettoIntegration(config, filePath);
+                if (herettoIntegration) {
+                  // Ensure screenshot is an object
+                  if (typeof step.screenshot === "string") {
+                    step.screenshot = { path: step.screenshot };
+                  } else if (typeof step.screenshot === "boolean") {
+                    step.screenshot = {};
+                  }
+                  // Attach sourceIntegration
+                  step.screenshot.sourceIntegration = {
+                    type: "heretto",
+                    integrationName: herettoIntegration,
+                    filePath: step.screenshot.path || "",
+                    contentPath: filePath,
+                  };
+                }
+              }
             }
 
             // Normalize step field formats
@@ -850,7 +1005,9 @@ async function parseTests({ config, files }) {
       specs.push(content);
     } else {
       // Process non-object
-      let id = `${crypto.randomUUID()}`;
+      // Generate a specId that includes more of the file path to avoid collisions
+      // when different files share the same basename
+      let id = generateSpecId(file);
       let spec = { specId: id, contentPath: file, tests: [] };
       const fileType = config.fileTypes.find((fileType) =>
         fileType.extensions.includes(extension)

@@ -1,0 +1,14 @@
+{
+  "tests": [
+    {
+      "steps": [
+        {
+          "runShell": "exit 1"
+        },
+        {
+          "runShell": "echo 'This step should be skipped if the previous fails'"
+        }
+      ]
+    }
+  ]
+}
