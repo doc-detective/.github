@@ -6142,6 +6142,56 @@
                                                               }
                                                             }
                                                           ]
+                                                        },
+                                                        "sourceIntegration": {
+                                                          "description": "Information about the source integration for this screenshot, enabling upload of changed files back to the source CMS. Set automatically during test resolution for files from integrations.",
+                                                          "$schema": "http://json-schema.org/draft-07/schema#",
+                                                          "title": "sourceIntegration",
+                                                          "type": "object",
+                                                          "additionalProperties": false,
+                                                          "required": [
+                                                            "type",
+                                                            "integrationName"
+                                                          ],
+                                                          "properties": {
+                                                            "type": {
+                                                              "type": "string",
+                                                              "description": "The type of integration. Currently supported: 'heretto'. Additional types may be added in the future.",
+                                                              "enum": [
+                                                                "heretto"
+                                                              ]
+                                                            },
+                                                            "integrationName": {
+                                                              "type": "string",
+                                                              "description": "The name of the integration configuration in the config file. Used to look up authentication credentials."
+                                                            },
+                                                            "fileId": {
+                                                              "type": "string",
+                                                              "description": "The unique identifier (UUID) of the file in the source CMS. If not provided, the file will be looked up by path."
+                                                            },
+                                                            "filePath": {
+                                                              "type": "string",
+                                                              "description": "The path of the file in the source CMS. Used for lookup if fileId is not available."
+                                                            },
+                                                            "contentPath": {
+                                                              "type": "string",
+                                                              "description": "The local path to the file that references this source. Used for resolving relative paths."
+                                                            }
+                                                          },
+                                                          "examples": [
+                                                            {
+                                                              "type": "heretto",
+                                                              "integrationName": "my-heretto",
+                                                              "fileId": "8f3ed200-cbba-11e1-ac51-c82a1446d15c",
+                                                              "filePath": "/db/organizations/example/repositories/docs/images/screenshot.png"
+                                                            },
+                                                            {
+                                                              "type": "heretto",
+                                                              "integrationName": "my-heretto",
+                                                              "filePath": "images/screenshot.png",
+                                                              "contentPath": "/tmp/doc-detective/heretto_abc123/topic.dita"
+                                                            }
+                                                          ]
                                                         }
                                                       },
                                                       "title": "Capture screenshot (detailed)"
@@ -6336,6 +6386,56 @@
                                                                     ]
                                                                   }
                                                                 }
+                                                              }
+                                                            ]
+                                                          },
+                                                          "sourceIntegration": {
+                                                            "description": "Information about the source integration for this screenshot, enabling upload of changed files back to the source CMS. Set automatically during test resolution for files from integrations.",
+                                                            "$schema": "http://json-schema.org/draft-07/schema#",
+                                                            "title": "sourceIntegration",
+                                                            "type": "object",
+                                                            "additionalProperties": false,
+                                                            "required": [
+                                                              "type",
+                                                              "integrationName"
+                                                            ],
+                                                            "properties": {
+                                                              "type": {
+                                                                "type": "string",
+                                                                "description": "The type of integration. Currently supported: 'heretto'. Additional types may be added in the future.",
+                                                                "enum": [
+                                                                  "heretto"
+                                                                ]
+                                                              },
+                                                              "integrationName": {
+                                                                "type": "string",
+                                                                "description": "The name of the integration configuration in the config file. Used to look up authentication credentials."
+                                                              },
+                                                              "fileId": {
+                                                                "type": "string",
+                                                                "description": "The unique identifier (UUID) of the file in the source CMS. If not provided, the file will be looked up by path."
+                                                              },
+                                                              "filePath": {
+                                                                "type": "string",
+                                                                "description": "The path of the file in the source CMS. Used for lookup if fileId is not available."
+                                                              },
+                                                              "contentPath": {
+                                                                "type": "string",
+                                                                "description": "The local path to the file that references this source. Used for resolving relative paths."
+                                                              }
+                                                            },
+                                                            "examples": [
+                                                              {
+                                                                "type": "heretto",
+                                                                "integrationName": "my-heretto",
+                                                                "fileId": "8f3ed200-cbba-11e1-ac51-c82a1446d15c",
+                                                                "filePath": "/db/organizations/example/repositories/docs/images/screenshot.png"
+                                                              },
+                                                              {
+                                                                "type": "heretto",
+                                                                "integrationName": "my-heretto",
+                                                                "filePath": "images/screenshot.png",
+                                                                "contentPath": "/tmp/doc-detective/heretto_abc123/topic.dita"
                                                               }
                                                             ]
                                                           }
@@ -9201,6 +9301,101 @@
               }
             },
             "title": "Doc Detective Orchestration API"
+          },
+          "heretto": {
+            "type": "array",
+            "description": "Configuration for Heretto CMS integrations. Each entry specifies a Heretto instance and a scenario to build and test.",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "name",
+                "organizationId",
+                "username",
+                "apiToken"
+              ],
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "Unique identifier for this Heretto integration. Used in logs and results."
+                },
+                "organizationId": {
+                  "type": "string",
+                  "description": "The organization subdomain used to access Heretto CCMS (e.g., 'thunderbird' for thunderbird.heretto.com)."
+                },
+                "username": {
+                  "type": "string",
+                  "description": "Heretto CCMS username (email address) for API authentication."
+                },
+                "apiToken": {
+                  "format": "password",
+                  "minLength": 1,
+                  "type": "string",
+                  "description": "API token generated in Heretto CCMS for authentication. See https://help.heretto.com/en/heretto-ccms/api/ccms-api-authentication/basic-authentication#ariaid-title3"
+                },
+                "scenarioName": {
+                  "type": "string",
+                  "description": "Name of the scenario to build and test.",
+                  "default": "Doc Detective"
+                },
+                "outputPath": {
+                  "type": "string",
+                  "description": "Local path where Heretto content was downloaded. Set automatically during processing.",
+                  "readOnly": true
+                },
+                "fileMapping": {
+                  "type": "object",
+                  "description": "Mapping of local file paths to Heretto file metadata. Set automatically during content loading.",
+                  "readOnly": true,
+                  "additionalProperties": {
+                    "type": "object",
+                    "properties": {
+                      "fileId": {
+                        "type": "string",
+                        "description": "The UUID of the file in Heretto."
+                      },
+                      "filePath": {
+                        "type": "string",
+                        "description": "The path of the file in Heretto."
+                      }
+                    }
+                  }
+                },
+                "uploadOnChange": {
+                  "type": "boolean",
+                  "description": "If `true`, uploads changed screenshots and other media files back to Heretto CMS after test execution.",
+                  "default": false
+                },
+                "resourceDependencies": {
+                  "type": "object",
+                  "description": "Mapping of Heretto file paths to their UUIDs and metadata. Set automatically during content loading by fetching ditamap resource dependencies.",
+                  "readOnly": true,
+                  "additionalProperties": {
+                    "type": "object",
+                    "properties": {
+                      "uuid": {
+                        "type": "string",
+                        "description": "The UUID of the file in Heretto."
+                      },
+                      "fullPath": {
+                        "type": "string",
+                        "description": "The full xmldb path of the file in Heretto."
+                      },
+                      "name": {
+                        "type": "string",
+                        "description": "The file name."
+                      },
+                      "parentFolderId": {
+                        "type": "string",
+                        "description": "The UUID of the parent folder in Heretto."
+                      }
+                    }
+                  }
+                }
+              },
+              "title": "Heretto CMS integration"
+            },
+            "title": "Heretto CMS integrations"
           }
         },
         "title": "Integrations options"
@@ -14367,6 +14562,56 @@
                                                 }
                                               }
                                             ]
+                                          },
+                                          "sourceIntegration": {
+                                            "description": "Information about the source integration for this screenshot, enabling upload of changed files back to the source CMS. Set automatically during test resolution for files from integrations.",
+                                            "$schema": "http://json-schema.org/draft-07/schema#",
+                                            "title": "sourceIntegration",
+                                            "type": "object",
+                                            "additionalProperties": false,
+                                            "required": [
+                                              "type",
+                                              "integrationName"
+                                            ],
+                                            "properties": {
+                                              "type": {
+                                                "type": "string",
+                                                "description": "The type of integration. Currently supported: 'heretto'. Additional types may be added in the future.",
+                                                "enum": [
+                                                  "heretto"
+                                                ]
+                                              },
+                                              "integrationName": {
+                                                "type": "string",
+                                                "description": "The name of the integration configuration in the config file. Used to look up authentication credentials."
+                                              },
+                                              "fileId": {
+                                                "type": "string",
+                                                "description": "The unique identifier (UUID) of the file in the source CMS. If not provided, the file will be looked up by path."
+                                              },
+                                              "filePath": {
+                                                "type": "string",
+                                                "description": "The path of the file in the source CMS. Used for lookup if fileId is not available."
+                                              },
+                                              "contentPath": {
+                                                "type": "string",
+                                                "description": "The local path to the file that references this source. Used for resolving relative paths."
+                                              }
+                                            },
+                                            "examples": [
+                                              {
+                                                "type": "heretto",
+                                                "integrationName": "my-heretto",
+                                                "fileId": "8f3ed200-cbba-11e1-ac51-c82a1446d15c",
+                                                "filePath": "/db/organizations/example/repositories/docs/images/screenshot.png"
+                                              },
+                                              {
+                                                "type": "heretto",
+                                                "integrationName": "my-heretto",
+                                                "filePath": "images/screenshot.png",
+                                                "contentPath": "/tmp/doc-detective/heretto_abc123/topic.dita"
+                                              }
+                                            ]
                                           }
                                         },
                                         "title": "Capture screenshot (detailed)"
@@ -14561,6 +14806,56 @@
                                                       ]
                                                     }
                                                   }
+                                                }
+                                              ]
+                                            },
+                                            "sourceIntegration": {
+                                              "description": "Information about the source integration for this screenshot, enabling upload of changed files back to the source CMS. Set automatically during test resolution for files from integrations.",
+                                              "$schema": "http://json-schema.org/draft-07/schema#",
+                                              "title": "sourceIntegration",
+                                              "type": "object",
+                                              "additionalProperties": false,
+                                              "required": [
+                                                "type",
+                                                "integrationName"
+                                              ],
+                                              "properties": {
+                                                "type": {
+                                                  "type": "string",
+                                                  "description": "The type of integration. Currently supported: 'heretto'. Additional types may be added in the future.",
+                                                  "enum": [
+                                                    "heretto"
+                                                  ]
+                                                },
+                                                "integrationName": {
+                                                  "type": "string",
+                                                  "description": "The name of the integration configuration in the config file. Used to look up authentication credentials."
+                                                },
+                                                "fileId": {
+                                                  "type": "string",
+                                                  "description": "The unique identifier (UUID) of the file in the source CMS. If not provided, the file will be looked up by path."
+                                                },
+                                                "filePath": {
+                                                  "type": "string",
+                                                  "description": "The path of the file in the source CMS. Used for lookup if fileId is not available."
+                                                },
+                                                "contentPath": {
+                                                  "type": "string",
+                                                  "description": "The local path to the file that references this source. Used for resolving relative paths."
+                                                }
+                                              },
+                                              "examples": [
+                                                {
+                                                  "type": "heretto",
+                                                  "integrationName": "my-heretto",
+                                                  "fileId": "8f3ed200-cbba-11e1-ac51-c82a1446d15c",
+                                                  "filePath": "/db/organizations/example/repositories/docs/images/screenshot.png"
+                                                },
+                                                {
+                                                  "type": "heretto",
+                                                  "integrationName": "my-heretto",
+                                                  "filePath": "images/screenshot.png",
+                                                  "contentPath": "/tmp/doc-detective/heretto_abc123/topic.dita"
                                                 }
                                               ]
                                             }
@@ -17123,6 +17418,21 @@
       },
       {
         "crawl": true
+      },
+      {
+        "processDitaMaps": true
+      },
+      {
+        "integrations": {
+          "heretto": [
+            {
+              "name": "example",
+              "organizationId": "your-organization-id",
+              "username": "your-username",
+              "apiToken": "your-api-token"
+            }
+          ]
+        }
       }
     ]
   },
@@ -27045,6 +27355,56 @@
                                                                   }
                                                                 }
                                                               ]
+                                                            },
+                                                            "sourceIntegration": {
+                                                              "description": "Information about the source integration for this screenshot, enabling upload of changed files back to the source CMS. Set automatically during test resolution for files from integrations.",
+                                                              "$schema": "http://json-schema.org/draft-07/schema#",
+                                                              "title": "sourceIntegration",
+                                                              "type": "object",
+                                                              "additionalProperties": false,
+                                                              "required": [
+                                                                "type",
+                                                                "integrationName"
+                                                              ],
+                                                              "properties": {
+                                                                "type": {
+                                                                  "type": "string",
+                                                                  "description": "The type of integration. Currently supported: 'heretto'. Additional types may be added in the future.",
+                                                                  "enum": [
+                                                                    "heretto"
+                                                                  ]
+                                                                },
+                                                                "integrationName": {
+                                                                  "type": "string",
+                                                                  "description": "The name of the integration configuration in the config file. Used to look up authentication credentials."
+                                                                },
+                                                                "fileId": {
+                                                                  "type": "string",
+                                                                  "description": "The unique identifier (UUID) of the file in the source CMS. If not provided, the file will be looked up by path."
+                                                                },
+                                                                "filePath": {
+                                                                  "type": "string",
+                                                                  "description": "The path of the file in the source CMS. Used for lookup if fileId is not available."
+                                                                },
+                                                                "contentPath": {
+                                                                  "type": "string",
+                                                                  "description": "The local path to the file that references this source. Used for resolving relative paths."
+                                                                }
+                                                              },
+                                                              "examples": [
+                                                                {
+                                                                  "type": "heretto",
+                                                                  "integrationName": "my-heretto",
+                                                                  "fileId": "8f3ed200-cbba-11e1-ac51-c82a1446d15c",
+                                                                  "filePath": "/db/organizations/example/repositories/docs/images/screenshot.png"
+                                                                },
+                                                                {
+                                                                  "type": "heretto",
+                                                                  "integrationName": "my-heretto",
+                                                                  "filePath": "images/screenshot.png",
+                                                                  "contentPath": "/tmp/doc-detective/heretto_abc123/topic.dita"
+                                                                }
+                                                              ]
                                                             }
                                                           },
                                                           "title": "Capture screenshot (detailed)"
@@ -27239,6 +27599,56 @@
                                                                         ]
                                                                       }
                                                                     }
+                                                                  }
+                                                                ]
+                                                              },
+                                                              "sourceIntegration": {
+                                                                "description": "Information about the source integration for this screenshot, enabling upload of changed files back to the source CMS. Set automatically during test resolution for files from integrations.",
+                                                                "$schema": "http://json-schema.org/draft-07/schema#",
+                                                                "title": "sourceIntegration",
+                                                                "type": "object",
+                                                                "additionalProperties": false,
+                                                                "required": [
+                                                                  "type",
+                                                                  "integrationName"
+                                                                ],
+                                                                "properties": {
+                                                                  "type": {
+                                                                    "type": "string",
+                                                                    "description": "The type of integration. Currently supported: 'heretto'. Additional types may be added in the future.",
+                                                                    "enum": [
+                                                                      "heretto"
+                                                                    ]
+                                                                  },
+                                                                  "integrationName": {
+                                                                    "type": "string",
+                                                                    "description": "The name of the integration configuration in the config file. Used to look up authentication credentials."
+                                                                  },
+                                                                  "fileId": {
+                                                                    "type": "string",
+                                                                    "description": "The unique identifier (UUID) of the file in the source CMS. If not provided, the file will be looked up by path."
+                                                                  },
+                                                                  "filePath": {
+                                                                    "type": "string",
+                                                                    "description": "The path of the file in the source CMS. Used for lookup if fileId is not available."
+                                                                  },
+                                                                  "contentPath": {
+                                                                    "type": "string",
+                                                                    "description": "The local path to the file that references this source. Used for resolving relative paths."
+                                                                  }
+                                                                },
+                                                                "examples": [
+                                                                  {
+                                                                    "type": "heretto",
+                                                                    "integrationName": "my-heretto",
+                                                                    "fileId": "8f3ed200-cbba-11e1-ac51-c82a1446d15c",
+                                                                    "filePath": "/db/organizations/example/repositories/docs/images/screenshot.png"
+                                                                  },
+                                                                  {
+                                                                    "type": "heretto",
+                                                                    "integrationName": "my-heretto",
+                                                                    "filePath": "images/screenshot.png",
+                                                                    "contentPath": "/tmp/doc-detective/heretto_abc123/topic.dita"
                                                                   }
                                                                 ]
                                                               }
@@ -30104,6 +30514,101 @@
                   }
                 },
                 "title": "Doc Detective Orchestration API"
+              },
+              "heretto": {
+                "type": "array",
+                "description": "Configuration for Heretto CMS integrations. Each entry specifies a Heretto instance and a scenario to build and test.",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "name",
+                    "organizationId",
+                    "username",
+                    "apiToken"
+                  ],
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "description": "Unique identifier for this Heretto integration. Used in logs and results."
+                    },
+                    "organizationId": {
+                      "type": "string",
+                      "description": "The organization subdomain used to access Heretto CCMS (e.g., 'thunderbird' for thunderbird.heretto.com)."
+                    },
+                    "username": {
+                      "type": "string",
+                      "description": "Heretto CCMS username (email address) for API authentication."
+                    },
+                    "apiToken": {
+                      "format": "password",
+                      "minLength": 1,
+                      "type": "string",
+                      "description": "API token generated in Heretto CCMS for authentication. See https://help.heretto.com/en/heretto-ccms/api/ccms-api-authentication/basic-authentication#ariaid-title3"
+                    },
+                    "scenarioName": {
+                      "type": "string",
+                      "description": "Name of the scenario to build and test.",
+                      "default": "Doc Detective"
+                    },
+                    "outputPath": {
+                      "type": "string",
+                      "description": "Local path where Heretto content was downloaded. Set automatically during processing.",
+                      "readOnly": true
+                    },
+                    "fileMapping": {
+                      "type": "object",
+                      "description": "Mapping of local file paths to Heretto file metadata. Set automatically during content loading.",
+                      "readOnly": true,
+                      "additionalProperties": {
+                        "type": "object",
+                        "properties": {
+                          "fileId": {
+                            "type": "string",
+                            "description": "The UUID of the file in Heretto."
+                          },
+                          "filePath": {
+                            "type": "string",
+                            "description": "The path of the file in Heretto."
+                          }
+                        }
+                      }
+                    },
+                    "uploadOnChange": {
+                      "type": "boolean",
+                      "description": "If `true`, uploads changed screenshots and other media files back to Heretto CMS after test execution.",
+                      "default": false
+                    },
+                    "resourceDependencies": {
+                      "type": "object",
+                      "description": "Mapping of Heretto file paths to their UUIDs and metadata. Set automatically during content loading by fetching ditamap resource dependencies.",
+                      "readOnly": true,
+                      "additionalProperties": {
+                        "type": "object",
+                        "properties": {
+                          "uuid": {
+                            "type": "string",
+                            "description": "The UUID of the file in Heretto."
+                          },
+                          "fullPath": {
+                            "type": "string",
+                            "description": "The full xmldb path of the file in Heretto."
+                          },
+                          "name": {
+                            "type": "string",
+                            "description": "The file name."
+                          },
+                          "parentFolderId": {
+                            "type": "string",
+                            "description": "The UUID of the parent folder in Heretto."
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "title": "Heretto CMS integration"
+                },
+                "title": "Heretto CMS integrations"
               }
             },
             "title": "Integrations options"
@@ -35270,6 +35775,56 @@
                                                     }
                                                   }
                                                 ]
+                                              },
+                                              "sourceIntegration": {
+                                                "description": "Information about the source integration for this screenshot, enabling upload of changed files back to the source CMS. Set automatically during test resolution for files from integrations.",
+                                                "$schema": "http://json-schema.org/draft-07/schema#",
+                                                "title": "sourceIntegration",
+                                                "type": "object",
+                                                "additionalProperties": false,
+                                                "required": [
+                                                  "type",
+                                                  "integrationName"
+                                                ],
+                                                "properties": {
+                                                  "type": {
+                                                    "type": "string",
+                                                    "description": "The type of integration. Currently supported: 'heretto'. Additional types may be added in the future.",
+                                                    "enum": [
+                                                      "heretto"
+                                                    ]
+                                                  },
+                                                  "integrationName": {
+                                                    "type": "string",
+                                                    "description": "The name of the integration configuration in the config file. Used to look up authentication credentials."
+                                                  },
+                                                  "fileId": {
+                                                    "type": "string",
+                                                    "description": "The unique identifier (UUID) of the file in the source CMS. If not provided, the file will be looked up by path."
+                                                  },
+                                                  "filePath": {
+                                                    "type": "string",
+                                                    "description": "The path of the file in the source CMS. Used for lookup if fileId is not available."
+                                                  },
+                                                  "contentPath": {
+                                                    "type": "string",
+                                                    "description": "The local path to the file that references this source. Used for resolving relative paths."
+                                                  }
+                                                },
+                                                "examples": [
+                                                  {
+                                                    "type": "heretto",
+                                                    "integrationName": "my-heretto",
+                                                    "fileId": "8f3ed200-cbba-11e1-ac51-c82a1446d15c",
+                                                    "filePath": "/db/organizations/example/repositories/docs/images/screenshot.png"
+                                                  },
+                                                  {
+                                                    "type": "heretto",
+                                                    "integrationName": "my-heretto",
+                                                    "filePath": "images/screenshot.png",
+                                                    "contentPath": "/tmp/doc-detective/heretto_abc123/topic.dita"
+                                                  }
+                                                ]
                                               }
                                             },
                                             "title": "Capture screenshot (detailed)"
@@ -35464,6 +36019,56 @@
                                                           ]
                                                         }
                                                       }
+                                                    }
+                                                  ]
+                                                },
+                                                "sourceIntegration": {
+                                                  "description": "Information about the source integration for this screenshot, enabling upload of changed files back to the source CMS. Set automatically during test resolution for files from integrations.",
+                                                  "$schema": "http://json-schema.org/draft-07/schema#",
+                                                  "title": "sourceIntegration",
+                                                  "type": "object",
+                                                  "additionalProperties": false,
+                                                  "required": [
+                                                    "type",
+                                                    "integrationName"
+                                                  ],
+                                                  "properties": {
+                                                    "type": {
+                                                      "type": "string",
+                                                      "description": "The type of integration. Currently supported: 'heretto'. Additional types may be added in the future.",
+                                                      "enum": [
+                                                        "heretto"
+                                                      ]
+                                                    },
+                                                    "integrationName": {
+                                                      "type": "string",
+                                                      "description": "The name of the integration configuration in the config file. Used to look up authentication credentials."
+                                                    },
+                                                    "fileId": {
+                                                      "type": "string",
+                                                      "description": "The unique identifier (UUID) of the file in the source CMS. If not provided, the file will be looked up by path."
+                                                    },
+                                                    "filePath": {
+                                                      "type": "string",
+                                                      "description": "The path of the file in the source CMS. Used for lookup if fileId is not available."
+                                                    },
+                                                    "contentPath": {
+                                                      "type": "string",
+                                                      "description": "The local path to the file that references this source. Used for resolving relative paths."
+                                                    }
+                                                  },
+                                                  "examples": [
+                                                    {
+                                                      "type": "heretto",
+                                                      "integrationName": "my-heretto",
+                                                      "fileId": "8f3ed200-cbba-11e1-ac51-c82a1446d15c",
+                                                      "filePath": "/db/organizations/example/repositories/docs/images/screenshot.png"
+                                                    },
+                                                    {
+                                                      "type": "heretto",
+                                                      "integrationName": "my-heretto",
+                                                      "filePath": "images/screenshot.png",
+                                                      "contentPath": "/tmp/doc-detective/heretto_abc123/topic.dita"
                                                     }
                                                   ]
                                                 }
@@ -38026,6 +38631,21 @@
           },
           {
             "crawl": true
+          },
+          {
+            "processDitaMaps": true
+          },
+          {
+            "integrations": {
+              "heretto": [
+                {
+                  "name": "example",
+                  "organizationId": "your-organization-id",
+                  "username": "your-username",
+                  "apiToken": "your-api-token"
+                }
+              ]
+            }
           }
         ]
       },
@@ -44196,6 +44816,56 @@
                                                       }
                                                     }
                                                   ]
+                                                },
+                                                "sourceIntegration": {
+                                                  "description": "Information about the source integration for this screenshot, enabling upload of changed files back to the source CMS. Set automatically during test resolution for files from integrations.",
+                                                  "$schema": "http://json-schema.org/draft-07/schema#",
+                                                  "title": "sourceIntegration",
+                                                  "type": "object",
+                                                  "additionalProperties": false,
+                                                  "required": [
+                                                    "type",
+                                                    "integrationName"
+                                                  ],
+                                                  "properties": {
+                                                    "type": {
+                                                      "type": "string",
+                                                      "description": "The type of integration. Currently supported: 'heretto'. Additional types may be added in the future.",
+                                                      "enum": [
+                                                        "heretto"
+                                                      ]
+                                                    },
+                                                    "integrationName": {
+                                                      "type": "string",
+                                                      "description": "The name of the integration configuration in the config file. Used to look up authentication credentials."
+                                                    },
+                                                    "fileId": {
+                                                      "type": "string",
+                                                      "description": "The unique identifier (UUID) of the file in the source CMS. If not provided, the file will be looked up by path."
+                                                    },
+                                                    "filePath": {
+                                                      "type": "string",
+                                                      "description": "The path of the file in the source CMS. Used for lookup if fileId is not available."
+                                                    },
+                                                    "contentPath": {
+                                                      "type": "string",
+                                                      "description": "The local path to the file that references this source. Used for resolving relative paths."
+                                                    }
+                                                  },
+                                                  "examples": [
+                                                    {
+                                                      "type": "heretto",
+                                                      "integrationName": "my-heretto",
+                                                      "fileId": "8f3ed200-cbba-11e1-ac51-c82a1446d15c",
+                                                      "filePath": "/db/organizations/example/repositories/docs/images/screenshot.png"
+                                                    },
+                                                    {
+                                                      "type": "heretto",
+                                                      "integrationName": "my-heretto",
+                                                      "filePath": "images/screenshot.png",
+                                                      "contentPath": "/tmp/doc-detective/heretto_abc123/topic.dita"
+                                                    }
+                                                  ]
                                                 }
                                               },
                                               "title": "Capture screenshot (detailed)"
@@ -44390,6 +45060,56 @@
                                                             ]
                                                           }
                                                         }
+                                                      }
+                                                    ]
+                                                  },
+                                                  "sourceIntegration": {
+                                                    "description": "Information about the source integration for this screenshot, enabling upload of changed files back to the source CMS. Set automatically during test resolution for files from integrations.",
+                                                    "$schema": "http://json-schema.org/draft-07/schema#",
+                                                    "title": "sourceIntegration",
+                                                    "type": "object",
+                                                    "additionalProperties": false,
+                                                    "required": [
+                                                      "type",
+                                                      "integrationName"
+                                                    ],
+                                                    "properties": {
+                                                      "type": {
+                                                        "type": "string",
+                                                        "description": "The type of integration. Currently supported: 'heretto'. Additional types may be added in the future.",
+                                                        "enum": [
+                                                          "heretto"
+                                                        ]
+                                                      },
+                                                      "integrationName": {
+                                                        "type": "string",
+                                                        "description": "The name of the integration configuration in the config file. Used to look up authentication credentials."
+                                                      },
+                                                      "fileId": {
+                                                        "type": "string",
+                                                        "description": "The unique identifier (UUID) of the file in the source CMS. If not provided, the file will be looked up by path."
+                                                      },
+                                                      "filePath": {
+                                                        "type": "string",
+                                                        "description": "The path of the file in the source CMS. Used for lookup if fileId is not available."
+                                                      },
+                                                      "contentPath": {
+                                                        "type": "string",
+                                                        "description": "The local path to the file that references this source. Used for resolving relative paths."
+                                                      }
+                                                    },
+                                                    "examples": [
+                                                      {
+                                                        "type": "heretto",
+                                                        "integrationName": "my-heretto",
+                                                        "fileId": "8f3ed200-cbba-11e1-ac51-c82a1446d15c",
+                                                        "filePath": "/db/organizations/example/repositories/docs/images/screenshot.png"
+                                                      },
+                                                      {
+                                                        "type": "heretto",
+                                                        "integrationName": "my-heretto",
+                                                        "filePath": "images/screenshot.png",
+                                                        "contentPath": "/tmp/doc-detective/heretto_abc123/topic.dita"
                                                       }
                                                     ]
                                                   }
@@ -51922,6 +52642,56 @@
                                                             }
                                                           }
                                                         ]
+                                                      },
+                                                      "sourceIntegration": {
+                                                        "description": "Information about the source integration for this screenshot, enabling upload of changed files back to the source CMS. Set automatically during test resolution for files from integrations.",
+                                                        "$schema": "http://json-schema.org/draft-07/schema#",
+                                                        "title": "sourceIntegration",
+                                                        "type": "object",
+                                                        "additionalProperties": false,
+                                                        "required": [
+                                                          "type",
+                                                          "integrationName"
+                                                        ],
+                                                        "properties": {
+                                                          "type": {
+                                                            "type": "string",
+                                                            "description": "The type of integration. Currently supported: 'heretto'. Additional types may be added in the future.",
+                                                            "enum": [
+                                                              "heretto"
+                                                            ]
+                                                          },
+                                                          "integrationName": {
+                                                            "type": "string",
+                                                            "description": "The name of the integration configuration in the config file. Used to look up authentication credentials."
+                                                          },
+                                                          "fileId": {
+                                                            "type": "string",
+                                                            "description": "The unique identifier (UUID) of the file in the source CMS. If not provided, the file will be looked up by path."
+                                                          },
+                                                          "filePath": {
+                                                            "type": "string",
+                                                            "description": "The path of the file in the source CMS. Used for lookup if fileId is not available."
+                                                          },
+                                                          "contentPath": {
+                                                            "type": "string",
+                                                            "description": "The local path to the file that references this source. Used for resolving relative paths."
+                                                          }
+                                                        },
+                                                        "examples": [
+                                                          {
+                                                            "type": "heretto",
+                                                            "integrationName": "my-heretto",
+                                                            "fileId": "8f3ed200-cbba-11e1-ac51-c82a1446d15c",
+                                                            "filePath": "/db/organizations/example/repositories/docs/images/screenshot.png"
+                                                          },
+                                                          {
+                                                            "type": "heretto",
+                                                            "integrationName": "my-heretto",
+                                                            "filePath": "images/screenshot.png",
+                                                            "contentPath": "/tmp/doc-detective/heretto_abc123/topic.dita"
+                                                          }
+                                                        ]
                                                       }
                                                     },
                                                     "title": "Capture screenshot (detailed)"
@@ -52116,6 +52886,56 @@
                                                                   ]
                                                                 }
                                                               }
+                                                            }
+                                                          ]
+                                                        },
+                                                        "sourceIntegration": {
+                                                          "description": "Information about the source integration for this screenshot, enabling upload of changed files back to the source CMS. Set automatically during test resolution for files from integrations.",
+                                                          "$schema": "http://json-schema.org/draft-07/schema#",
+                                                          "title": "sourceIntegration",
+                                                          "type": "object",
+                                                          "additionalProperties": false,
+                                                          "required": [
+                                                            "type",
+                                                            "integrationName"
+                                                          ],
+                                                          "properties": {
+                                                            "type": {
+                                                              "type": "string",
+                                                              "description": "The type of integration. Currently supported: 'heretto'. Additional types may be added in the future.",
+                                                              "enum": [
+                                                                "heretto"
+                                                              ]
+                                                            },
+                                                            "integrationName": {
+                                                              "type": "string",
+                                                              "description": "The name of the integration configuration in the config file. Used to look up authentication credentials."
+                                                            },
+                                                            "fileId": {
+                                                              "type": "string",
+                                                              "description": "The unique identifier (UUID) of the file in the source CMS. If not provided, the file will be looked up by path."
+                                                            },
+                                                            "filePath": {
+                                                              "type": "string",
+                                                              "description": "The path of the file in the source CMS. Used for lookup if fileId is not available."
+                                                            },
+                                                            "contentPath": {
+                                                              "type": "string",
+                                                              "description": "The local path to the file that references this source. Used for resolving relative paths."
+                                                            }
+                                                          },
+                                                          "examples": [
+                                                            {
+                                                              "type": "heretto",
+                                                              "integrationName": "my-heretto",
+                                                              "fileId": "8f3ed200-cbba-11e1-ac51-c82a1446d15c",
+                                                              "filePath": "/db/organizations/example/repositories/docs/images/screenshot.png"
+                                                            },
+                                                            {
+                                                              "type": "heretto",
+                                                              "integrationName": "my-heretto",
+                                                              "filePath": "images/screenshot.png",
+                                                              "contentPath": "/tmp/doc-detective/heretto_abc123/topic.dita"
                                                             }
                                                           ]
                                                         }
@@ -61358,6 +62178,56 @@
                                                       }
                                                     }
                                                   ]
+                                                },
+                                                "sourceIntegration": {
+                                                  "description": "Information about the source integration for this screenshot, enabling upload of changed files back to the source CMS. Set automatically during test resolution for files from integrations.",
+                                                  "$schema": "http://json-schema.org/draft-07/schema#",
+                                                  "title": "sourceIntegration",
+                                                  "type": "object",
+                                                  "additionalProperties": false,
+                                                  "required": [
+                                                    "type",
+                                                    "integrationName"
+                                                  ],
+                                                  "properties": {
+                                                    "type": {
+                                                      "type": "string",
+                                                      "description": "The type of integration. Currently supported: 'heretto'. Additional types may be added in the future.",
+                                                      "enum": [
+                                                        "heretto"
+                                                      ]
+                                                    },
+                                                    "integrationName": {
+                                                      "type": "string",
+                                                      "description": "The name of the integration configuration in the config file. Used to look up authentication credentials."
+                                                    },
+                                                    "fileId": {
+                                                      "type": "string",
+                                                      "description": "The unique identifier (UUID) of the file in the source CMS. If not provided, the file will be looked up by path."
+                                                    },
+                                                    "filePath": {
+                                                      "type": "string",
+                                                      "description": "The path of the file in the source CMS. Used for lookup if fileId is not available."
+                                                    },
+                                                    "contentPath": {
+                                                      "type": "string",
+                                                      "description": "The local path to the file that references this source. Used for resolving relative paths."
+                                                    }
+                                                  },
+                                                  "examples": [
+                                                    {
+                                                      "type": "heretto",
+                                                      "integrationName": "my-heretto",
+                                                      "fileId": "8f3ed200-cbba-11e1-ac51-c82a1446d15c",
+                                                      "filePath": "/db/organizations/example/repositories/docs/images/screenshot.png"
+                                                    },
+                                                    {
+                                                      "type": "heretto",
+                                                      "integrationName": "my-heretto",
+                                                      "filePath": "images/screenshot.png",
+                                                      "contentPath": "/tmp/doc-detective/heretto_abc123/topic.dita"
+                                                    }
+                                                  ]
                                                 }
                                               },
                                               "title": "Capture screenshot (detailed)"
@@ -61552,6 +62422,56 @@
                                                             ]
                                                           }
                                                         }
+                                                      }
+                                                    ]
+                                                  },
+                                                  "sourceIntegration": {
+                                                    "description": "Information about the source integration for this screenshot, enabling upload of changed files back to the source CMS. Set automatically during test resolution for files from integrations.",
+                                                    "$schema": "http://json-schema.org/draft-07/schema#",
+                                                    "title": "sourceIntegration",
+                                                    "type": "object",
+                                                    "additionalProperties": false,
+                                                    "required": [
+                                                      "type",
+                                                      "integrationName"
+                                                    ],
+                                                    "properties": {
+                                                      "type": {
+                                                        "type": "string",
+                                                        "description": "The type of integration. Currently supported: 'heretto'. Additional types may be added in the future.",
+                                                        "enum": [
+                                                          "heretto"
+                                                        ]
+                                                      },
+                                                      "integrationName": {
+                                                        "type": "string",
+                                                        "description": "The name of the integration configuration in the config file. Used to look up authentication credentials."
+                                                      },
+                                                      "fileId": {
+                                                        "type": "string",
+                                                        "description": "The unique identifier (UUID) of the file in the source CMS. If not provided, the file will be looked up by path."
+                                                      },
+                                                      "filePath": {
+                                                        "type": "string",
+                                                        "description": "The path of the file in the source CMS. Used for lookup if fileId is not available."
+                                                      },
+                                                      "contentPath": {
+                                                        "type": "string",
+                                                        "description": "The local path to the file that references this source. Used for resolving relative paths."
+                                                      }
+                                                    },
+                                                    "examples": [
+                                                      {
+                                                        "type": "heretto",
+                                                        "integrationName": "my-heretto",
+                                                        "fileId": "8f3ed200-cbba-11e1-ac51-c82a1446d15c",
+                                                        "filePath": "/db/organizations/example/repositories/docs/images/screenshot.png"
+                                                      },
+                                                      {
+                                                        "type": "heretto",
+                                                        "integrationName": "my-heretto",
+                                                        "filePath": "images/screenshot.png",
+                                                        "contentPath": "/tmp/doc-detective/heretto_abc123/topic.dita"
                                                       }
                                                     ]
                                                   }
@@ -69084,6 +70004,56 @@
                                                             }
                                                           }
                                                         ]
+                                                      },
+                                                      "sourceIntegration": {
+                                                        "description": "Information about the source integration for this screenshot, enabling upload of changed files back to the source CMS. Set automatically during test resolution for files from integrations.",
+                                                        "$schema": "http://json-schema.org/draft-07/schema#",
+                                                        "title": "sourceIntegration",
+                                                        "type": "object",
+                                                        "additionalProperties": false,
+                                                        "required": [
+                                                          "type",
+                                                          "integrationName"
+                                                        ],
+                                                        "properties": {
+                                                          "type": {
+                                                            "type": "string",
+                                                            "description": "The type of integration. Currently supported: 'heretto'. Additional types may be added in the future.",
+                                                            "enum": [
+                                                              "heretto"
+                                                            ]
+                                                          },
+                                                          "integrationName": {
+                                                            "type": "string",
+                                                            "description": "The name of the integration configuration in the config file. Used to look up authentication credentials."
+                                                          },
+                                                          "fileId": {
+                                                            "type": "string",
+                                                            "description": "The unique identifier (UUID) of the file in the source CMS. If not provided, the file will be looked up by path."
+                                                          },
+                                                          "filePath": {
+                                                            "type": "string",
+                                                            "description": "The path of the file in the source CMS. Used for lookup if fileId is not available."
+                                                          },
+                                                          "contentPath": {
+                                                            "type": "string",
+                                                            "description": "The local path to the file that references this source. Used for resolving relative paths."
+                                                          }
+                                                        },
+                                                        "examples": [
+                                                          {
+                                                            "type": "heretto",
+                                                            "integrationName": "my-heretto",
+                                                            "fileId": "8f3ed200-cbba-11e1-ac51-c82a1446d15c",
+                                                            "filePath": "/db/organizations/example/repositories/docs/images/screenshot.png"
+                                                          },
+                                                          {
+                                                            "type": "heretto",
+                                                            "integrationName": "my-heretto",
+                                                            "filePath": "images/screenshot.png",
+                                                            "contentPath": "/tmp/doc-detective/heretto_abc123/topic.dita"
+                                                          }
+                                                        ]
                                                       }
                                                     },
                                                     "title": "Capture screenshot (detailed)"
@@ -69278,6 +70248,56 @@
                                                                   ]
                                                                 }
                                                               }
+                                                            }
+                                                          ]
+                                                        },
+                                                        "sourceIntegration": {
+                                                          "description": "Information about the source integration for this screenshot, enabling upload of changed files back to the source CMS. Set automatically during test resolution for files from integrations.",
+                                                          "$schema": "http://json-schema.org/draft-07/schema#",
+                                                          "title": "sourceIntegration",
+                                                          "type": "object",
+                                                          "additionalProperties": false,
+                                                          "required": [
+                                                            "type",
+                                                            "integrationName"
+                                                          ],
+                                                          "properties": {
+                                                            "type": {
+                                                              "type": "string",
+                                                              "description": "The type of integration. Currently supported: 'heretto'. Additional types may be added in the future.",
+                                                              "enum": [
+                                                                "heretto"
+                                                              ]
+                                                            },
+                                                            "integrationName": {
+                                                              "type": "string",
+                                                              "description": "The name of the integration configuration in the config file. Used to look up authentication credentials."
+                                                            },
+                                                            "fileId": {
+                                                              "type": "string",
+                                                              "description": "The unique identifier (UUID) of the file in the source CMS. If not provided, the file will be looked up by path."
+                                                            },
+                                                            "filePath": {
+                                                              "type": "string",
+                                                              "description": "The path of the file in the source CMS. Used for lookup if fileId is not available."
+                                                            },
+                                                            "contentPath": {
+                                                              "type": "string",
+                                                              "description": "The local path to the file that references this source. Used for resolving relative paths."
+                                                            }
+                                                          },
+                                                          "examples": [
+                                                            {
+                                                              "type": "heretto",
+                                                              "integrationName": "my-heretto",
+                                                              "fileId": "8f3ed200-cbba-11e1-ac51-c82a1446d15c",
+                                                              "filePath": "/db/organizations/example/repositories/docs/images/screenshot.png"
+                                                            },
+                                                            {
+                                                              "type": "heretto",
+                                                              "integrationName": "my-heretto",
+                                                              "filePath": "images/screenshot.png",
+                                                              "contentPath": "/tmp/doc-detective/heretto_abc123/topic.dita"
                                                             }
                                                           ]
                                                         }
@@ -73317,6 +74337,56 @@
                 }
               }
             ]
+          },
+          "sourceIntegration": {
+            "description": "Information about the source integration for this screenshot, enabling upload of changed files back to the source CMS. Set automatically during test resolution for files from integrations.",
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "title": "sourceIntegration",
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "type",
+              "integrationName"
+            ],
+            "properties": {
+              "type": {
+                "type": "string",
+                "description": "The type of integration. Currently supported: 'heretto'. Additional types may be added in the future.",
+                "enum": [
+                  "heretto"
+                ]
+              },
+              "integrationName": {
+                "type": "string",
+                "description": "The name of the integration configuration in the config file. Used to look up authentication credentials."
+              },
+              "fileId": {
+                "type": "string",
+                "description": "The unique identifier (UUID) of the file in the source CMS. If not provided, the file will be looked up by path."
+              },
+              "filePath": {
+                "type": "string",
+                "description": "The path of the file in the source CMS. Used for lookup if fileId is not available."
+              },
+              "contentPath": {
+                "type": "string",
+                "description": "The local path to the file that references this source. Used for resolving relative paths."
+              }
+            },
+            "examples": [
+              {
+                "type": "heretto",
+                "integrationName": "my-heretto",
+                "fileId": "8f3ed200-cbba-11e1-ac51-c82a1446d15c",
+                "filePath": "/db/organizations/example/repositories/docs/images/screenshot.png"
+              },
+              {
+                "type": "heretto",
+                "integrationName": "my-heretto",
+                "filePath": "images/screenshot.png",
+                "contentPath": "/tmp/doc-detective/heretto_abc123/topic.dita"
+              }
+            ]
           }
         },
         "title": "Capture screenshot (detailed)"
@@ -73513,6 +74583,56 @@
                   }
                 }
               ]
+            },
+            "sourceIntegration": {
+              "description": "Information about the source integration for this screenshot, enabling upload of changed files back to the source CMS. Set automatically during test resolution for files from integrations.",
+              "$schema": "http://json-schema.org/draft-07/schema#",
+              "title": "sourceIntegration",
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "type",
+                "integrationName"
+              ],
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "description": "The type of integration. Currently supported: 'heretto'. Additional types may be added in the future.",
+                  "enum": [
+                    "heretto"
+                  ]
+                },
+                "integrationName": {
+                  "type": "string",
+                  "description": "The name of the integration configuration in the config file. Used to look up authentication credentials."
+                },
+                "fileId": {
+                  "type": "string",
+                  "description": "The unique identifier (UUID) of the file in the source CMS. If not provided, the file will be looked up by path."
+                },
+                "filePath": {
+                  "type": "string",
+                  "description": "The path of the file in the source CMS. Used for lookup if fileId is not available."
+                },
+                "contentPath": {
+                  "type": "string",
+                  "description": "The local path to the file that references this source. Used for resolving relative paths."
+                }
+              },
+              "examples": [
+                {
+                  "type": "heretto",
+                  "integrationName": "my-heretto",
+                  "fileId": "8f3ed200-cbba-11e1-ac51-c82a1446d15c",
+                  "filePath": "/db/organizations/example/repositories/docs/images/screenshot.png"
+                },
+                {
+                  "type": "heretto",
+                  "integrationName": "my-heretto",
+                  "filePath": "images/screenshot.png",
+                  "contentPath": "/tmp/doc-detective/heretto_abc123/topic.dita"
+                }
+              ]
             }
           },
           "title": "Capture screenshot (detailed)"
@@ -73706,6 +74826,56 @@
             "left": 0
           }
         }
+      }
+    ]
+  },
+  "sourceIntegration_v3": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "sourceIntegration",
+    "description": "Information about the source integration for a file, enabling upload of changed files back to the source CMS.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "type",
+      "integrationName"
+    ],
+    "properties": {
+      "type": {
+        "type": "string",
+        "description": "The type of integration. Currently supported: 'heretto'. Additional types may be added in the future.",
+        "enum": [
+          "heretto"
+        ]
+      },
+      "integrationName": {
+        "type": "string",
+        "description": "The name of the integration configuration in the config file. Used to look up authentication credentials."
+      },
+      "fileId": {
+        "type": "string",
+        "description": "The unique identifier (UUID) of the file in the source CMS. If not provided, the file will be looked up by path."
+      },
+      "filePath": {
+        "type": "string",
+        "description": "The path of the file in the source CMS. Used for lookup if fileId is not available."
+      },
+      "contentPath": {
+        "type": "string",
+        "description": "The local path to the file that references this source. Used for resolving relative paths."
+      }
+    },
+    "examples": [
+      {
+        "type": "heretto",
+        "integrationName": "my-heretto",
+        "fileId": "8f3ed200-cbba-11e1-ac51-c82a1446d15c",
+        "filePath": "/db/organizations/example/repositories/docs/images/screenshot.png"
+      },
+      {
+        "type": "heretto",
+        "integrationName": "my-heretto",
+        "filePath": "images/screenshot.png",
+        "contentPath": "/tmp/doc-detective/heretto_abc123/topic.dita"
       }
     ]
   },
@@ -79870,6 +81040,56 @@
                                             }
                                           }
                                         ]
+                                      },
+                                      "sourceIntegration": {
+                                        "description": "Information about the source integration for this screenshot, enabling upload of changed files back to the source CMS. Set automatically during test resolution for files from integrations.",
+                                        "$schema": "http://json-schema.org/draft-07/schema#",
+                                        "title": "sourceIntegration",
+                                        "type": "object",
+                                        "additionalProperties": false,
+                                        "required": [
+                                          "type",
+                                          "integrationName"
+                                        ],
+                                        "properties": {
+                                          "type": {
+                                            "type": "string",
+                                            "description": "The type of integration. Currently supported: 'heretto'. Additional types may be added in the future.",
+                                            "enum": [
+                                              "heretto"
+                                            ]
+                                          },
+                                          "integrationName": {
+                                            "type": "string",
+                                            "description": "The name of the integration configuration in the config file. Used to look up authentication credentials."
+                                          },
+                                          "fileId": {
+                                            "type": "string",
+                                            "description": "The unique identifier (UUID) of the file in the source CMS. If not provided, the file will be looked up by path."
+                                          },
+                                          "filePath": {
+                                            "type": "string",
+                                            "description": "The path of the file in the source CMS. Used for lookup if fileId is not available."
+                                          },
+                                          "contentPath": {
+                                            "type": "string",
+                                            "description": "The local path to the file that references this source. Used for resolving relative paths."
+                                          }
+                                        },
+                                        "examples": [
+                                          {
+                                            "type": "heretto",
+                                            "integrationName": "my-heretto",
+                                            "fileId": "8f3ed200-cbba-11e1-ac51-c82a1446d15c",
+                                            "filePath": "/db/organizations/example/repositories/docs/images/screenshot.png"
+                                          },
+                                          {
+                                            "type": "heretto",
+                                            "integrationName": "my-heretto",
+                                            "filePath": "images/screenshot.png",
+                                            "contentPath": "/tmp/doc-detective/heretto_abc123/topic.dita"
+                                          }
+                                        ]
                                       }
                                     },
                                     "title": "Capture screenshot (detailed)"
@@ -80064,6 +81284,56 @@
                                                   ]
                                                 }
                                               }
+                                            }
+                                          ]
+                                        },
+                                        "sourceIntegration": {
+                                          "description": "Information about the source integration for this screenshot, enabling upload of changed files back to the source CMS. Set automatically during test resolution for files from integrations.",
+                                          "$schema": "http://json-schema.org/draft-07/schema#",
+                                          "title": "sourceIntegration",
+                                          "type": "object",
+                                          "additionalProperties": false,
+                                          "required": [
+                                            "type",
+                                            "integrationName"
+                                          ],
+                                          "properties": {
+                                            "type": {
+                                              "type": "string",
+                                              "description": "The type of integration. Currently supported: 'heretto'. Additional types may be added in the future.",
+                                              "enum": [
+                                                "heretto"
+                                              ]
+                                            },
+                                            "integrationName": {
+                                              "type": "string",
+                                              "description": "The name of the integration configuration in the config file. Used to look up authentication credentials."
+                                            },
+                                            "fileId": {
+                                              "type": "string",
+                                              "description": "The unique identifier (UUID) of the file in the source CMS. If not provided, the file will be looked up by path."
+                                            },
+                                            "filePath": {
+                                              "type": "string",
+                                              "description": "The path of the file in the source CMS. Used for lookup if fileId is not available."
+                                            },
+                                            "contentPath": {
+                                              "type": "string",
+                                              "description": "The local path to the file that references this source. Used for resolving relative paths."
+                                            }
+                                          },
+                                          "examples": [
+                                            {
+                                              "type": "heretto",
+                                              "integrationName": "my-heretto",
+                                              "fileId": "8f3ed200-cbba-11e1-ac51-c82a1446d15c",
+                                              "filePath": "/db/organizations/example/repositories/docs/images/screenshot.png"
+                                            },
+                                            {
+                                              "type": "heretto",
+                                              "integrationName": "my-heretto",
+                                              "filePath": "images/screenshot.png",
+                                              "contentPath": "/tmp/doc-detective/heretto_abc123/topic.dita"
                                             }
                                           ]
                                         }
@@ -87596,6 +88866,56 @@
                                                   }
                                                 }
                                               ]
+                                            },
+                                            "sourceIntegration": {
+                                              "description": "Information about the source integration for this screenshot, enabling upload of changed files back to the source CMS. Set automatically during test resolution for files from integrations.",
+                                              "$schema": "http://json-schema.org/draft-07/schema#",
+                                              "title": "sourceIntegration",
+                                              "type": "object",
+                                              "additionalProperties": false,
+                                              "required": [
+                                                "type",
+                                                "integrationName"
+                                              ],
+                                              "properties": {
+                                                "type": {
+                                                  "type": "string",
+                                                  "description": "The type of integration. Currently supported: 'heretto'. Additional types may be added in the future.",
+                                                  "enum": [
+                                                    "heretto"
+                                                  ]
+                                                },
+                                                "integrationName": {
+                                                  "type": "string",
+                                                  "description": "The name of the integration configuration in the config file. Used to look up authentication credentials."
+                                                },
+                                                "fileId": {
+                                                  "type": "string",
+                                                  "description": "The unique identifier (UUID) of the file in the source CMS. If not provided, the file will be looked up by path."
+                                                },
+                                                "filePath": {
+                                                  "type": "string",
+                                                  "description": "The path of the file in the source CMS. Used for lookup if fileId is not available."
+                                                },
+                                                "contentPath": {
+                                                  "type": "string",
+                                                  "description": "The local path to the file that references this source. Used for resolving relative paths."
+                                                }
+                                              },
+                                              "examples": [
+                                                {
+                                                  "type": "heretto",
+                                                  "integrationName": "my-heretto",
+                                                  "fileId": "8f3ed200-cbba-11e1-ac51-c82a1446d15c",
+                                                  "filePath": "/db/organizations/example/repositories/docs/images/screenshot.png"
+                                                },
+                                                {
+                                                  "type": "heretto",
+                                                  "integrationName": "my-heretto",
+                                                  "filePath": "images/screenshot.png",
+                                                  "contentPath": "/tmp/doc-detective/heretto_abc123/topic.dita"
+                                                }
+                                              ]
                                             }
                                           },
                                           "title": "Capture screenshot (detailed)"
@@ -87790,6 +89110,56 @@
                                                         ]
                                                       }
                                                     }
+                                                  }
+                                                ]
+                                              },
+                                              "sourceIntegration": {
+                                                "description": "Information about the source integration for this screenshot, enabling upload of changed files back to the source CMS. Set automatically during test resolution for files from integrations.",
+                                                "$schema": "http://json-schema.org/draft-07/schema#",
+                                                "title": "sourceIntegration",
+                                                "type": "object",
+                                                "additionalProperties": false,
+                                                "required": [
+                                                  "type",
+                                                  "integrationName"
+                                                ],
+                                                "properties": {
+                                                  "type": {
+                                                    "type": "string",
+                                                    "description": "The type of integration. Currently supported: 'heretto'. Additional types may be added in the future.",
+                                                    "enum": [
+                                                      "heretto"
+                                                    ]
+                                                  },
+                                                  "integrationName": {
+                                                    "type": "string",
+                                                    "description": "The name of the integration configuration in the config file. Used to look up authentication credentials."
+                                                  },
+                                                  "fileId": {
+                                                    "type": "string",
+                                                    "description": "The unique identifier (UUID) of the file in the source CMS. If not provided, the file will be looked up by path."
+                                                  },
+                                                  "filePath": {
+                                                    "type": "string",
+                                                    "description": "The path of the file in the source CMS. Used for lookup if fileId is not available."
+                                                  },
+                                                  "contentPath": {
+                                                    "type": "string",
+                                                    "description": "The local path to the file that references this source. Used for resolving relative paths."
+                                                  }
+                                                },
+                                                "examples": [
+                                                  {
+                                                    "type": "heretto",
+                                                    "integrationName": "my-heretto",
+                                                    "fileId": "8f3ed200-cbba-11e1-ac51-c82a1446d15c",
+                                                    "filePath": "/db/organizations/example/repositories/docs/images/screenshot.png"
+                                                  },
+                                                  {
+                                                    "type": "heretto",
+                                                    "integrationName": "my-heretto",
+                                                    "filePath": "images/screenshot.png",
+                                                    "contentPath": "/tmp/doc-detective/heretto_abc123/topic.dita"
                                                   }
                                                 ]
                                               }
@@ -95602,6 +96972,56 @@
                             }
                           }
                         ]
+                      },
+                      "sourceIntegration": {
+                        "description": "Information about the source integration for this screenshot, enabling upload of changed files back to the source CMS. Set automatically during test resolution for files from integrations.",
+                        "$schema": "http://json-schema.org/draft-07/schema#",
+                        "title": "sourceIntegration",
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                          "type",
+                          "integrationName"
+                        ],
+                        "properties": {
+                          "type": {
+                            "type": "string",
+                            "description": "The type of integration. Currently supported: 'heretto'. Additional types may be added in the future.",
+                            "enum": [
+                              "heretto"
+                            ]
+                          },
+                          "integrationName": {
+                            "type": "string",
+                            "description": "The name of the integration configuration in the config file. Used to look up authentication credentials."
+                          },
+                          "fileId": {
+                            "type": "string",
+                            "description": "The unique identifier (UUID) of the file in the source CMS. If not provided, the file will be looked up by path."
+                          },
+                          "filePath": {
+                            "type": "string",
+                            "description": "The path of the file in the source CMS. Used for lookup if fileId is not available."
+                          },
+                          "contentPath": {
+                            "type": "string",
+                            "description": "The local path to the file that references this source. Used for resolving relative paths."
+                          }
+                        },
+                        "examples": [
+                          {
+                            "type": "heretto",
+                            "integrationName": "my-heretto",
+                            "fileId": "8f3ed200-cbba-11e1-ac51-c82a1446d15c",
+                            "filePath": "/db/organizations/example/repositories/docs/images/screenshot.png"
+                          },
+                          {
+                            "type": "heretto",
+                            "integrationName": "my-heretto",
+                            "filePath": "images/screenshot.png",
+                            "contentPath": "/tmp/doc-detective/heretto_abc123/topic.dita"
+                          }
+                        ]
                       }
                     },
                     "title": "Capture screenshot (detailed)"
@@ -95796,6 +97216,56 @@
                                   ]
                                 }
                               }
+                            }
+                          ]
+                        },
+                        "sourceIntegration": {
+                          "description": "Information about the source integration for this screenshot, enabling upload of changed files back to the source CMS. Set automatically during test resolution for files from integrations.",
+                          "$schema": "http://json-schema.org/draft-07/schema#",
+                          "title": "sourceIntegration",
+                          "type": "object",
+                          "additionalProperties": false,
+                          "required": [
+                            "type",
+                            "integrationName"
+                          ],
+                          "properties": {
+                            "type": {
+                              "type": "string",
+                              "description": "The type of integration. Currently supported: 'heretto'. Additional types may be added in the future.",
+                              "enum": [
+                                "heretto"
+                              ]
+                            },
+                            "integrationName": {
+                              "type": "string",
+                              "description": "The name of the integration configuration in the config file. Used to look up authentication credentials."
+                            },
+                            "fileId": {
+                              "type": "string",
+                              "description": "The unique identifier (UUID) of the file in the source CMS. If not provided, the file will be looked up by path."
+                            },
+                            "filePath": {
+                              "type": "string",
+                              "description": "The path of the file in the source CMS. Used for lookup if fileId is not available."
+                            },
+                            "contentPath": {
+                              "type": "string",
+                              "description": "The local path to the file that references this source. Used for resolving relative paths."
+                            }
+                          },
+                          "examples": [
+                            {
+                              "type": "heretto",
+                              "integrationName": "my-heretto",
+                              "fileId": "8f3ed200-cbba-11e1-ac51-c82a1446d15c",
+                              "filePath": "/db/organizations/example/repositories/docs/images/screenshot.png"
+                            },
+                            {
+                              "type": "heretto",
+                              "integrationName": "my-heretto",
+                              "filePath": "images/screenshot.png",
+                              "contentPath": "/tmp/doc-detective/heretto_abc123/topic.dita"
                             }
                           ]
                         }
@@ -103683,6 +105153,56 @@
                                   }
                                 }
                               ]
+                            },
+                            "sourceIntegration": {
+                              "description": "Information about the source integration for this screenshot, enabling upload of changed files back to the source CMS. Set automatically during test resolution for files from integrations.",
+                              "$schema": "http://json-schema.org/draft-07/schema#",
+                              "title": "sourceIntegration",
+                              "type": "object",
+                              "additionalProperties": false,
+                              "required": [
+                                "type",
+                                "integrationName"
+                              ],
+                              "properties": {
+                                "type": {
+                                  "type": "string",
+                                  "description": "The type of integration. Currently supported: 'heretto'. Additional types may be added in the future.",
+                                  "enum": [
+                                    "heretto"
+                                  ]
+                                },
+                                "integrationName": {
+                                  "type": "string",
+                                  "description": "The name of the integration configuration in the config file. Used to look up authentication credentials."
+                                },
+                                "fileId": {
+                                  "type": "string",
+                                  "description": "The unique identifier (UUID) of the file in the source CMS. If not provided, the file will be looked up by path."
+                                },
+                                "filePath": {
+                                  "type": "string",
+                                  "description": "The path of the file in the source CMS. Used for lookup if fileId is not available."
+                                },
+                                "contentPath": {
+                                  "type": "string",
+                                  "description": "The local path to the file that references this source. Used for resolving relative paths."
+                                }
+                              },
+                              "examples": [
+                                {
+                                  "type": "heretto",
+                                  "integrationName": "my-heretto",
+                                  "fileId": "8f3ed200-cbba-11e1-ac51-c82a1446d15c",
+                                  "filePath": "/db/organizations/example/repositories/docs/images/screenshot.png"
+                                },
+                                {
+                                  "type": "heretto",
+                                  "integrationName": "my-heretto",
+                                  "filePath": "images/screenshot.png",
+                                  "contentPath": "/tmp/doc-detective/heretto_abc123/topic.dita"
+                                }
+                              ]
                             }
                           },
                           "title": "Capture screenshot (detailed)"
@@ -103877,6 +105397,56 @@
                                         ]
                                       }
                                     }
+                                  }
+                                ]
+                              },
+                              "sourceIntegration": {
+                                "description": "Information about the source integration for this screenshot, enabling upload of changed files back to the source CMS. Set automatically during test resolution for files from integrations.",
+                                "$schema": "http://json-schema.org/draft-07/schema#",
+                                "title": "sourceIntegration",
+                                "type": "object",
+                                "additionalProperties": false,
+                                "required": [
+                                  "type",
+                                  "integrationName"
+                                ],
+                                "properties": {
+                                  "type": {
+                                    "type": "string",
+                                    "description": "The type of integration. Currently supported: 'heretto'. Additional types may be added in the future.",
+                                    "enum": [
+                                      "heretto"
+                                    ]
+                                  },
+                                  "integrationName": {
+                                    "type": "string",
+                                    "description": "The name of the integration configuration in the config file. Used to look up authentication credentials."
+                                  },
+                                  "fileId": {
+                                    "type": "string",
+                                    "description": "The unique identifier (UUID) of the file in the source CMS. If not provided, the file will be looked up by path."
+                                  },
+                                  "filePath": {
+                                    "type": "string",
+                                    "description": "The path of the file in the source CMS. Used for lookup if fileId is not available."
+                                  },
+                                  "contentPath": {
+                                    "type": "string",
+                                    "description": "The local path to the file that references this source. Used for resolving relative paths."
+                                  }
+                                },
+                                "examples": [
+                                  {
+                                    "type": "heretto",
+                                    "integrationName": "my-heretto",
+                                    "fileId": "8f3ed200-cbba-11e1-ac51-c82a1446d15c",
+                                    "filePath": "/db/organizations/example/repositories/docs/images/screenshot.png"
+                                  },
+                                  {
+                                    "type": "heretto",
+                                    "integrationName": "my-heretto",
+                                    "filePath": "images/screenshot.png",
+                                    "contentPath": "/tmp/doc-detective/heretto_abc123/topic.dita"
                                   }
                                 ]
                               }
@@ -111409,6 +112979,56 @@
                                         }
                                       }
                                     ]
+                                  },
+                                  "sourceIntegration": {
+                                    "description": "Information about the source integration for this screenshot, enabling upload of changed files back to the source CMS. Set automatically during test resolution for files from integrations.",
+                                    "$schema": "http://json-schema.org/draft-07/schema#",
+                                    "title": "sourceIntegration",
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                      "type",
+                                      "integrationName"
+                                    ],
+                                    "properties": {
+                                      "type": {
+                                        "type": "string",
+                                        "description": "The type of integration. Currently supported: 'heretto'. Additional types may be added in the future.",
+                                        "enum": [
+                                          "heretto"
+                                        ]
+                                      },
+                                      "integrationName": {
+                                        "type": "string",
+                                        "description": "The name of the integration configuration in the config file. Used to look up authentication credentials."
+                                      },
+                                      "fileId": {
+                                        "type": "string",
+                                        "description": "The unique identifier (UUID) of the file in the source CMS. If not provided, the file will be looked up by path."
+                                      },
+                                      "filePath": {
+                                        "type": "string",
+                                        "description": "The path of the file in the source CMS. Used for lookup if fileId is not available."
+                                      },
+                                      "contentPath": {
+                                        "type": "string",
+                                        "description": "The local path to the file that references this source. Used for resolving relative paths."
+                                      }
+                                    },
+                                    "examples": [
+                                      {
+                                        "type": "heretto",
+                                        "integrationName": "my-heretto",
+                                        "fileId": "8f3ed200-cbba-11e1-ac51-c82a1446d15c",
+                                        "filePath": "/db/organizations/example/repositories/docs/images/screenshot.png"
+                                      },
+                                      {
+                                        "type": "heretto",
+                                        "integrationName": "my-heretto",
+                                        "filePath": "images/screenshot.png",
+                                        "contentPath": "/tmp/doc-detective/heretto_abc123/topic.dita"
+                                      }
+                                    ]
                                   }
                                 },
                                 "title": "Capture screenshot (detailed)"
@@ -111603,6 +113223,56 @@
                                               ]
                                             }
                                           }
+                                        }
+                                      ]
+                                    },
+                                    "sourceIntegration": {
+                                      "description": "Information about the source integration for this screenshot, enabling upload of changed files back to the source CMS. Set automatically during test resolution for files from integrations.",
+                                      "$schema": "http://json-schema.org/draft-07/schema#",
+                                      "title": "sourceIntegration",
+                                      "type": "object",
+                                      "additionalProperties": false,
+                                      "required": [
+                                        "type",
+                                        "integrationName"
+                                      ],
+                                      "properties": {
+                                        "type": {
+                                          "type": "string",
+                                          "description": "The type of integration. Currently supported: 'heretto'. Additional types may be added in the future.",
+                                          "enum": [
+                                            "heretto"
+                                          ]
+                                        },
+                                        "integrationName": {
+                                          "type": "string",
+                                          "description": "The name of the integration configuration in the config file. Used to look up authentication credentials."
+                                        },
+                                        "fileId": {
+                                          "type": "string",
+                                          "description": "The unique identifier (UUID) of the file in the source CMS. If not provided, the file will be looked up by path."
+                                        },
+                                        "filePath": {
+                                          "type": "string",
+                                          "description": "The path of the file in the source CMS. Used for lookup if fileId is not available."
+                                        },
+                                        "contentPath": {
+                                          "type": "string",
+                                          "description": "The local path to the file that references this source. Used for resolving relative paths."
+                                        }
+                                      },
+                                      "examples": [
+                                        {
+                                          "type": "heretto",
+                                          "integrationName": "my-heretto",
+                                          "fileId": "8f3ed200-cbba-11e1-ac51-c82a1446d15c",
+                                          "filePath": "/db/organizations/example/repositories/docs/images/screenshot.png"
+                                        },
+                                        {
+                                          "type": "heretto",
+                                          "integrationName": "my-heretto",
+                                          "filePath": "images/screenshot.png",
+                                          "contentPath": "/tmp/doc-detective/heretto_abc123/topic.dita"
                                         }
                                       ]
                                     }

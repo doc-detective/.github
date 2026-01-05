@@ -88,6 +88,7 @@ let defaultFileTypes = {
       step: [
         "<\\?doc-detective\\s+step\\s+([\\s\\S]*?)\\s*\\?>",
         "<!--\\s*step([\\s\\S]+?)-->",
+        '<data\\s+name="step"\\s*>([\\s\\S]*?)<\\/data>',
       ],
     },
     markup: [
@@ -124,7 +125,7 @@ let defaultFileTypes = {
       {
         name: "runShellCmdWithCodeblock",
         regex: [
-          "(?:[Rr]un|[Ee]xecute)\\s+(?:the\\s+)?(?:following\\s+)?(?:command)[^<]*<\\/cmd>\\s*<info>\\s*<codeblock[^>]*outputclass=\"(?:shell|bash)\"[^>]*>([\\s\\S]*?)<\\/codeblock>",
+          '(?:[Rr]un|[Ee]xecute)\\s+(?:the\\s+)?(?:following\\s+)?(?:command)[^<]*<\\/cmd>\\s*<info>\\s*<codeblock[^>]*outputclass="(?:shell|bash)"[^>]*>([\\s\\S]*?)<\\/codeblock>',
         ],
         actions: [
           {
@@ -133,27 +134,21 @@ let defaultFileTypes = {
             },
           },
         ],
-      },      
+      },
       // Inline Elements - for finding UI elements and text
       {
         name: "findUiControl",
-        regex: [
-          "<uicontrol>([^<]+)<\\/uicontrol>",
-        ],
+        regex: ["<uicontrol>([^<]+)<\\/uicontrol>"],
         actions: ["find"],
       },
       {
         name: "verifyWindowTitle",
-        regex: [
-          "<wintitle>([^<]+)<\\/wintitle>",
-        ],
+        regex: ["<wintitle>([^<]+)<\\/wintitle>"],
         actions: ["find"],
       },
       {
         name: "EnterKey",
-        regex: [
-          "(?:[Pp]ress)\\s+<shortcut>Enter<\\/shortcut>",
-        ],
+        regex: ["(?:[Pp]ress)\\s+<shortcut>Enter<\\/shortcut>"],
         actions: [
           {
             type: {
@@ -164,9 +159,7 @@ let defaultFileTypes = {
       },
       {
         name: "executeCmdName",
-        regex: [
-          "(?:[Ee]xecute|[Rr]un)\\s+<cmdname>([^<]+)<\\/cmdname>",
-        ],
+        regex: ["(?:[Ee]xecute|[Rr]un)\\s+<cmdname>([^<]+)<\\/cmdname>"],
         actions: [
           {
             runShell: {
@@ -175,7 +168,7 @@ let defaultFileTypes = {
           },
         ],
       },
-      
+
       // Links and References - for link validation
       {
         name: "checkExternalXref",
@@ -187,24 +180,20 @@ let defaultFileTypes = {
       },
       {
         name: "checkHyperlink",
-        regex: [
-          '<xref\\s+href="(https?:\\/\\/[^"]+)"[^>]*>',
-        ],
+        regex: ['<xref\\s+href="(https?:\\/\\/[^"]+)"[^>]*>'],
         actions: ["checkLink"],
       },
       {
         name: "checkLinkElement",
-        regex: [
-          '<link\\s+href="(https?:\\/\\/[^"]+)"[^>]*>',
-        ],
+        regex: ['<link\\s+href="(https?:\\/\\/[^"]+)"[^>]*>'],
         actions: ["checkLink"],
       },
-      
+
       // Code Execution
       {
         name: "runShellCodeblock",
         regex: [
-          "<codeblock[^>]*outputclass=\"(?:shell|bash)\"[^>]*>([\\s\\S]*?)<\\/codeblock>",
+          '<codeblock[^>]*outputclass="(?:shell|bash)"[^>]*>([\\s\\S]*?)<\\/codeblock>',
         ],
         actions: [
           {
@@ -217,7 +206,7 @@ let defaultFileTypes = {
       {
         name: "runCode",
         regex: [
-          "<codeblock[^>]*outputclass=\"(python|py|javascript|js)\"[^>]*>([\\s\\S]*?)<\\/codeblock>",
+          '<codeblock[^>]*outputclass="(python|py|javascript|js)"[^>]*>([\\s\\S]*?)<\\/codeblock>',
         ],
         actions: [
           {
@@ -231,7 +220,7 @@ let defaultFileTypes = {
           },
         ],
       },
-      
+
       // Legacy patterns for compatibility with existing tests
       {
         name: "clickOnscreenText",
@@ -255,7 +244,10 @@ let defaultFileTypes = {
       {
         name: "screenshotImage",
         regex: [
+          '<image\\s+[^>]*outputclass="[^"]*screenshot[^"]*"[^>]*href="([^"]+)"[^>]*\\/>',
           '<image\\s+[^>]*href="([^"]+)"[^>]*outputclass="[^"]*screenshot[^"]*"[^>]*\\/>',
+          '<image\\s+[^>]*outputclass="[^"]*screenshot[^"]*"[^>]*href="([^"]+)"[\\s\\S]*?<\\/image>',
+          '<image\\s+[^>]*href="([^"]+)"[^>]*outputclass="[^"]*screenshot[^"]*"[\\s\\S]*?<\\/image>',
         ],
         actions: ["screenshot"],
       },
@@ -267,7 +259,7 @@ let defaultFileTypes = {
       {
         name: "httpRequestFormat",
         regex: [
-          "<codeblock[^>]*outputclass=\"http\"[^>]*>\\s*([A-Z]+)\\s+([^\\s]+)(?:\\s+HTTP\\/[\\d.]+)?\\s*(?:\\r?\\n|&#xA;)((?:[^\\s<]+:\\s+[^\\r\\n<]+(?:\\r?\\n|&#xA;))*)(?:\\s*(?:\\r?\\n|&#xA;)([\\s\\S]*?))?\\s*<\\/codeblock>",
+          '<codeblock[^>]*outputclass="http"[^>]*>\\s*([A-Z]+)\\s+([^\\s]+)(?:\\s+HTTP\\/[\\d.]+)?\\s*(?:\\r?\\n|&#xA;)((?:[^\\s<]+:\\s+[^\\r\\n<]+(?:\\r?\\n|&#xA;))*)(?:\\s*(?:\\r?\\n|&#xA;)([\\s\\S]*?))?\\s*<\\/codeblock>',
         ],
         actions: [
           {
@@ -285,7 +277,7 @@ let defaultFileTypes = {
       {
         name: "runCode",
         regex: [
-          "<codeblock[^>]*outputclass=\"(bash|python|py|javascript|js)\"[^>]*>([\\s\\S]*?)<\\/codeblock>",
+          '<codeblock[^>]*outputclass="(bash|python|py|javascript|js)"[^>]*>([\\s\\S]*?)<\\/codeblock>',
         ],
         actions: [
           {
@@ -462,7 +454,7 @@ defaultFileTypes = {
 /**
  * Resolves the concurrentRunners configuration value from various input formats
  * to a concrete integer for the core execution engine.
- * 
+ *
  * @param {Object} config - The configuration object
  * @returns {number} The resolved concurrent runners value
  */
@@ -665,10 +657,10 @@ async function setConfig({ config }) {
 
   // Detect current environment.
   config.environment = getEnvironment();
-  
+
   // Resolve concurrent runners configuration
   config.concurrentRunners = resolveConcurrentRunners(config);
-  
+
   // TODO: Revise loadDescriptions() so it doesn't mutate the input but instead returns an updated object
   await loadDescriptions(config);
 
