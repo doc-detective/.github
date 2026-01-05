@@ -30,10 +30,83 @@ const { resolveExpression } = require("./expressions");
 const { getEnvironment, getAvailableApps } = require("./config");
 const { uploadChangedFiles } = require("./integrations");
 
+class ScopeRegistry {
+  constructor() {
+    this.scopes = new Map();
+  }
+
+  has(name) {
+    return this.scopes.has(name);
+  }
+
+  get(name) {
+    return this.scopes.get(name);
+  }
+
+  create(name, process) {
+    if (this.scopes.has(name)) {
+      return this.scopes.get(name);
+    }
+    const scope = {
+      name,
+      process,
+      stdout: "",
+      stderr: "",
+      exitCode: null,
+      closed: false,
+    };
+
+    if (process) {
+      process.stdout?.on("data", (data) => {
+        scope.stdout += data.toString();
+      });
+      process.stderr?.on("data", (data) => {
+        scope.stderr += data.toString();
+      });
+      process.on("close", (code) => {
+        scope.exitCode = code;
+        scope.closed = true;
+      });
+      process.on("error", (err) => {
+        scope.stderr += err.message;
+        scope.closed = true;
+      });
+    }
+
+    this.scopes.set(name, scope);
+    return scope;
+  }
+
+  writeToScope(name, data) {
+    const scope = this.scopes.get(name);
+    if (!scope || !scope.process || scope.closed) {
+      return false;
+    }
+    try {
+      scope.process.stdin.write(data);
+      return true;
+    } catch (err) {
+      return false;
+    }
+  }
+
+  async cleanup() {
+    for (const [name, scope] of this.scopes) {
+      if (scope.process && !scope.closed) {
+        try {
+          scope.process.kill("SIGTERM");
+        } catch (err) {
+        }
+      }
+    }
+    this.scopes.clear();
+  }
+}
+
 exports.runSpecs = runSpecs;
 exports.runViaApi = runViaApi;
 exports.getRunner = getRunner;
-// exports.appiumStart = appiumStart;
+exports.ScopeRegistry = ScopeRegistry;
 // exports.appiumIsReady = appiumIsReady;
 // exports.driverStart = driverStart;
 
@@ -524,6 +597,7 @@ async function runSpecs({ resolvedTests }) {
         log(config, "debug", `CONTEXT:\n${JSON.stringify(context, null, 2)}`);
 
         let driver;
+        const scopeRegistry = new ScopeRegistry();
         // Ensure context contains a 'steps' property
         if (!context.steps) {
           context.steps = [];
@@ -652,6 +726,7 @@ async function runSpecs({ resolvedTests }) {
             step: step,
             driver: driver,
             metaValues: metaValues,
+            scopeRegistry: scopeRegistry,
             options: {
               openApiDefinitions: context.openApi || [],
               test: test,
@@ -736,6 +811,9 @@ async function runSpecs({ resolvedTests }) {
         contextReport = { result: contextResult, ...contextReport };
         testReport.contexts.push(contextReport);
         report.summary.contexts[contextResult.toLowerCase()]++;
+
+        // Clean up scopes for this context
+        await scopeRegistry.cleanup();
 
         if (driverRequired) {
           // Close driver
@@ -840,13 +918,13 @@ async function runSpecs({ resolvedTests }) {
   return report;
 }
 
-// Run a specific step
 async function runStep({
   config = {},
   context = {},
   step,
   driver,
   metaValues = {},
+  scopeRegistry = null,
   options = {},
 }) {
   let actionResult;
@@ -901,9 +979,9 @@ async function runStep({
     });
     config.recording = actionResult.recording;
   } else if (typeof step.runCode !== "undefined") {
-    actionResult = await runCode({ config: config, step: step, test: options?.test });
+    actionResult = await runCode({ config: config, step: step, test: options?.test, scopeRegistry: scopeRegistry });
   } else if (typeof step.runShell !== "undefined") {
-    actionResult = await runShell({ config: config, step: step, test: options?.test });
+    actionResult = await runShell({ config: config, step: step, test: options?.test, scopeRegistry: scopeRegistry });
   } else if (typeof step.screenshot !== "undefined") {
     actionResult = await saveScreenshot({
       config: config,
@@ -915,6 +993,7 @@ async function runStep({
       config: config,
       step: step,
       driver: driver,
+      scopeRegistry: scopeRegistry,
     });
   } else if (typeof step.terminateScope !== "undefined") {
     actionResult = await terminateScope({

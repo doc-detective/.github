@@ -8,6 +8,16 @@ const { writeToTerminal } = require("../scopes/terminal");
 
 exports.typeKeys = typeKeys;
 
+const terminalSpecialKeyMap = {
+  "$ENTER$": "\n",
+  "$RETURN$": "\n",
+  "$TAB$": "\t",
+  "$ESCAPE$": "\x1b",
+  "$BACKSPACE$": "\x7f",
+  "$CTRL$": "",
+  "$SPACE$": " ",
+};
+
 const specialKeyMap = {
   $CTRL$: Key.Ctrl,
   $NULL$: Key.NULL,
@@ -68,132 +78,73 @@ const specialKeyMap = {
   $ZANKAKU_HANDKAKU$: Key.ZenkakuHankaku,
 };
 
-// Mapping of special keys to terminal control sequences for terminal scopes
-const specialKeyTerminalMap = {
-  // Basic control characters
-  $ENTER$: '\r',
-  $RETURN$: '\r',
-  $TAB$: '\t',
-  $BACKSPACE$: '\x7f',
-  $ESCAPE$: '\x1b',
-  $SPACE$: ' ',
-  // Arrow keys
-  $ARROW_UP$: '\x1b[A',
-  $ARROW_DOWN$: '\x1b[B',
-  $ARROW_RIGHT$: '\x1b[C',
-  $ARROW_LEFT$: '\x1b[D',
-  // Modifier keys (standalone escape sequences)
-  $CTRL$: '\x1b[17~',
-  $CONTROL$: '\x1b[17~',
-  $ALT$: '\x1b',
-  $SHIFT$: '\x1b[16~',
-  // Navigation keys
-  $HOME$: '\x1b[H',
-  $END$: '\x1b[F',
-  $PAGE_UP$: '\x1b[5~',
-  $PAGE_DOWN$: '\x1b[6~',
-  $INSERT$: '\x1b[2~',
-  $DELETE$: '\x1b[3~',
-  // Function keys (F1-F12)
-  $F1$: '\x1bOP',
-  $F2$: '\x1bOQ',
-  $F3$: '\x1bOR',
-  $F4$: '\x1bOS',
-  $F5$: '\x1b[15~',
-  $F6$: '\x1b[17~',
-  $F7$: '\x1b[18~',
-  $F8$: '\x1b[19~',
-  $F9$: '\x1b[20~',
-  $F10$: '\x1b[21~',
-  $F11$: '\x1b[23~',
-  $F12$: '\x1b[24~',
-};
-
-// Type a sequence of keys in the active element.
-async function typeKeys({ config, step, driver }) {
+async function typeKeys({ config, step, driver, scopeRegistry = null }) {
   let result = { status: "PASS", description: "Typed keys." };
 
-  // Validate step payload
   const isValidStep = validate({ schemaKey: "step_v3", object: step });
   if (!isValidStep.valid) {
     result.status = "FAIL";
     result.description = `Invalid step definition: ${isValidStep.errors}`;
     return result;
   }
-  // Accept coerced and defaulted values
   step = isValidStep.object;
 
-  // Convert to array
   if (typeof step.type === "string") {
     step.type = [step.type];
   }
-  // Convert to object
   if (Array.isArray(step.type)) {
     step.type = { keys: step.type };
   }
-  // Convert keys property to object
   if (typeof step.type.keys === "string") {
     step.type.keys = [step.type.keys];
   }
-  // Set default values
   step.type = {
     ...step.type,
     keys: step.type.keys || [],
     inputDelay: step.type.inputDelay || 100,
   };
 
-  // Skip if no keys to type
   if (!step.type.keys.length) {
     result.status = "SKIPPED";
     result.description = "No keys to type.";
     return result;
   }
 
-  // If scope is specified, write to terminal scope instead of UI
-  if (step.type.scope) {
-    const scopeName = step.type.scope;
-    
-    // Check if scope exists
-    if (!hasScope(scopeName)) {
+  const scopeName = step.type.scope;
+  if (scopeName) {
+    if (!scopeRegistry || !scopeRegistry.has(scopeName)) {
       result.status = "FAIL";
-      result.description = `Scope '${scopeName}' not found`;
+      result.description = `Scope '${scopeName}' does not exist. Create it with a runShell or runCode step first.`;
       return result;
     }
     
-    // Get the scope
-    const scope = getScope(scopeName);
-    
-    if (scope.type !== 'terminal') {
+    const scope = scopeRegistry.get(scopeName);
+    if (scope.closed) {
       result.status = "FAIL";
-      result.description = `Scope '${scopeName}' is not a terminal scope`;
+      result.description = `Scope '${scopeName}' has already closed.`;
       return result;
     }
     
-    try {
-      // Build text for terminal by expanding special keys and splitting normal text
-      let keysToWrite = [];
-
-      step.type.keys.forEach((key) => {
-        if (key.startsWith("$") && key.endsWith("$") && specialKeyTerminalMap[key]) {
-          keysToWrite.push(specialKeyTerminalMap[key]);
-        } else {
-          // Split into individual characters
-          keysToWrite = keysToWrite.concat(key.split(""));
-        }
-      });
-
-      const text = keysToWrite.join("");
-
-      // Write to terminal
-      await writeToTerminal(scopeName, text, config);
-
-      result.description = `Typed keys to scope '${scopeName}'`;
-      return result;
-    } catch (error) {
+    let inputData = "";
+    for (const key of step.type.keys) {
+      if (terminalSpecialKeyMap[key]) {
+        inputData += terminalSpecialKeyMap[key];
+      } else if (key.startsWith("$") && key.endsWith("$")) {
+        inputData += key;
+      } else {
+        inputData += key;
+      }
+    }
+    
+    const success = scopeRegistry.writeToScope(scopeName, inputData);
+    if (!success) {
       result.status = "FAIL";
-      result.description = `Failed to type to scope '${scopeName}': ${error.message}`;
+      result.description = `Failed to write to scope '${scopeName}'.`;
       return result;
     }
+    
+    result.description = `Typed keys to scope '${scopeName}'.`;
+    return result;
   }
 
   // Find element to type into if any criteria are specified
