@@ -37,6 +37,17 @@ function validateScopeName(name) {
 }
 
 /**
+ * Normalizes line endings for cross-platform support.
+ * Handles both \r\n (Windows) and \n (Unix) line endings.
+ * 
+ * @param {string} text - Text to normalize
+ * @returns {string[]} Array of lines
+ */
+function splitLines(text) {
+  return text.toString().replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n');
+}
+
+/**
  * Registers a new scope in the global registry.
  * 
  * @param {string} name - The scope name
@@ -50,6 +61,7 @@ function validateScopeName(name) {
  * @param {string} scopeData.workingDir - Working directory
  * @param {string} scopeData.testId - Test identifier
  * @param {object} config - Config for logging
+ * @throws {Error} If scope name is invalid or scope already exists
  */
 function registerScope(name, scopeData, config) {
   const validation = validateScopeName(name);
@@ -57,35 +69,51 @@ function registerScope(name, scopeData, config) {
     throw new Error(validation.error);
   }
   
-  // Initialize buffers
+  // Prevent silent overwriting of existing scopes
+  if (scopes.has(name)) {
+    throw new Error(`Scope '${name}' already exists. Use a different name or terminate the existing scope first.`);
+  }
+  
+  // Initialize buffers and listener references for cleanup
   scopeData.stdoutBuffer = [];
   scopeData.stderrBuffer = [];
   scopeData.createdAt = Date.now();
+  scopeData._listeners = { stdout: null, stderr: null, stdoutError: null, stderrError: null };
   
   // Set up buffer management for stdout
   if (scopeData.stdout) {
-    scopeData.stdout.on('data', (data) => {
-      const lines = data.toString().split('\n');
+    scopeData._listeners.stdout = (data) => {
+      const lines = splitLines(data);
       scopeData.stdoutBuffer.push(...lines);
       
       // Trim buffer if needed
       if (scopeData.stdoutBuffer.length > MAX_BUFFER_SIZE) {
         scopeData.stdoutBuffer = scopeData.stdoutBuffer.slice(-MAX_BUFFER_SIZE);
       }
-    });
+    };
+    scopeData._listeners.stdoutError = (err) => {
+      log(config, "warn", `Stdout stream error for scope '${name}': ${err.message}`);
+    };
+    scopeData.stdout.on('data', scopeData._listeners.stdout);
+    scopeData.stdout.on('error', scopeData._listeners.stdoutError);
   }
   
   // Set up buffer management for stderr
   if (scopeData.stderr) {
-    scopeData.stderr.on('data', (data) => {
-      const lines = data.toString().split('\n');
+    scopeData._listeners.stderr = (data) => {
+      const lines = splitLines(data);
       scopeData.stderrBuffer.push(...lines);
       
       // Trim buffer if needed
       if (scopeData.stderrBuffer.length > MAX_BUFFER_SIZE) {
         scopeData.stderrBuffer = scopeData.stderrBuffer.slice(-MAX_BUFFER_SIZE);
       }
-    });
+    };
+    scopeData._listeners.stderrError = (err) => {
+      log(config, "warn", `Stderr stream error for scope '${name}': ${err.message}`);
+    };
+    scopeData.stderr.on('data', scopeData._listeners.stderr);
+    scopeData.stderr.on('error', scopeData._listeners.stderrError);
   }
   
   scopes.set(name, scopeData);
@@ -114,23 +142,42 @@ function hasScope(name) {
 
 /**
  * Removes a scope from the registry.
+ * Cleans up stream listeners to prevent memory leaks.
  * 
  * @param {string} name - The scope name
  * @param {object} config - Config for logging
  */
 function removeScope(name, config) {
-  if (scopes.delete(name)) {
+  const scopeData = scopes.get(name);
+  if (scopeData) {
+    // Clean up listeners to prevent memory leaks
+    if (scopeData._listeners) {
+      if (scopeData.stdout && scopeData._listeners.stdout) {
+        scopeData.stdout.removeListener('data', scopeData._listeners.stdout);
+      }
+      if (scopeData.stdout && scopeData._listeners.stdoutError) {
+        scopeData.stdout.removeListener('error', scopeData._listeners.stdoutError);
+      }
+      if (scopeData.stderr && scopeData._listeners.stderr) {
+        scopeData.stderr.removeListener('data', scopeData._listeners.stderr);
+      }
+      if (scopeData.stderr && scopeData._listeners.stderrError) {
+        scopeData.stderr.removeListener('error', scopeData._listeners.stderrError);
+      }
+    }
+    scopes.delete(name);
     log(config, "debug", `Removed scope from registry: ${name}`);
   }
 }
 
 /**
  * Gets all scopes in the registry.
+ * Returns a defensive copy to prevent external modification of internal state.
  * 
- * @returns {Map} The scopes map
+ * @returns {Map} Copy of the scopes map
  */
 function getAllScopes() {
-  return scopes;
+  return new Map(scopes);
 }
 
 /**

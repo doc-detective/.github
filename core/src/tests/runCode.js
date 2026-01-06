@@ -109,17 +109,12 @@ async function runCode({ config, step }) {
             ? "node"
             : "bash",
         args: [scriptPath, ...step.runCode.args],
-        scope: step.runCode.scope, // Pass through scope
-        waitUntil: step.runCode.waitUntil, // Pass through waitUntil
+        scope: step.runCode.scope,
+        waitUntil: step.runCode.waitUntil,
         workingDirectory: step.runCode.workingDirectory,
         timeout: step.runCode.timeout,
       },
     };
-    
-    if (step.runCode.scope) {
-      shellStep.runShell.scope = step.runCode.scope;
-    }
-    delete shellStep.runCode;
 
     // Execute script using runShell
     const shellResult = await runShell({ config: config, step: shellStep });

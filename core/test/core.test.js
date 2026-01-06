@@ -1166,7 +1166,7 @@ describe("Scope property for terminal management", function () {
   });
 
   describe("Scope edge cases", function () {
-    it("should handle empty scope name gracefully", async () => {
+    it("should reject empty scope name with validation error", async () => {
       const emptyScopeTest = {
         tests: [
           {
@@ -1191,20 +1191,22 @@ describe("Scope property for terminal management", function () {
       try {
         result = await runTests(config);
         assert.notEqual(result, null, "Result should not be null");
+        // Empty scope name should fail schema validation
+        assert.equal(result.summary.tests.fail, 1, "Test with empty scope should fail");
       } finally {
         fs.unlinkSync(tempFilePath);
       }
     });
 
-    it("should handle special characters in scope name", async () => {
-      const specialCharScopeTest = {
+    it("should handle valid scope names with hyphens and underscores", async () => {
+      const validScopeTest = {
         tests: [
           {
             steps: [
               {
                 runShell: {
-                  command: "echo 'special chars'",
-                  scope: "my-scope_123.test",
+                  command: "echo 'valid scope'",
+                  scope: "my-scope_123-test",
                   exitCodes: [0]
                 }
               }
@@ -1213,8 +1215,8 @@ describe("Scope property for terminal management", function () {
         ]
       };
       
-      const tempFilePath = path.resolve("./test/temp-scope-special-chars.json");
-      fs.writeFileSync(tempFilePath, JSON.stringify(specialCharScopeTest, null, 2));
+      const tempFilePath = path.resolve("./test/temp-scope-valid-chars.json");
+      fs.writeFileSync(tempFilePath, JSON.stringify(validScopeTest, null, 2));
       const config = { input: tempFilePath, logLevel: "silent" };
       
       let result;

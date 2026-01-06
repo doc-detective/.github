@@ -6,7 +6,9 @@ module.exports = {
   // Terminal scopes
   ...require('./terminal'),
   
-  // Code scopes (future)
+  // Code scopes - PLACEHOLDER: These functions throw "not implemented" errors.
+  // They are exported for API completeness and future implementation.
+  // See code.js for details.
   ...require('./code'),
   
   // WaitUntil utilities

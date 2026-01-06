@@ -10,7 +10,9 @@ const path = require("path");
 exports.runShell = runShell;
 
 // Run a shell command.
-async function runShell({ config, step }) {
+// Note: scopeRegistry and test are passed from tests.js but currently unused.
+// For scope-based commands with persistent sessions, use createTerminalScope from scopes/terminal.js
+async function runShell({ config, step, test = null, scopeRegistry = null }) {
   // Promisify and execute command
   const result = {
     status: "PASS",
