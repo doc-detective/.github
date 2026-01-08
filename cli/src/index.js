@@ -335,19 +335,29 @@ async function main(argv) {
       } catch (err) {
         console.error(`\x1b[31mError detecting specs: ${err.message}\x1b[0m`);
       }
-      
-      // If input paths were specified but no specs were detected, exit with error
+
+      // If input paths were specified but no specs were detected
       if (specs.length === 0) {
-        console.error('\x1b[31mError: No valid spec files could be detected from the provided inputs.\x1b[0m');
-        process.exit(1);
+        // If single file provided, allow it (might be documentation file to analyze)
+        const isSingleFile = inputPaths.length === 1 && fs.existsSync(inputPaths[0]);
+        if (!isSingleFile) {
+          // Multiple files or missing file - this is an error
+          console.error('\x1b[31mError: No valid spec files could be detected from the provided inputs.\x1b[0m');
+          process.exit(1);
+        }
+        // Otherwise, proceed - single file will be auto-analyzed as documentation
       }
     }
-    
+
     // Dynamically import the builder to avoid ESM issues at startup
     const { runBuilder } = require("./cli/builder");
-    
-    // Run the interactive builder with loaded specs
-    await runBuilder({ outputDir, specs });
+
+    // Determine if we should auto-analyze
+    // Auto-analyze when: single input file provided with --editor
+    const autoAnalyzeFile = inputPaths.length === 1 ? inputPaths[0] : null;
+
+    // Run the interactive builder with loaded specs (may be empty for auto-analyze)
+    await runBuilder({ outputDir, specs, autoAnalyzeFile });
     return;
   }
 

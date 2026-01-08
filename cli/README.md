@@ -63,6 +63,80 @@ You can override config options with command-line arguments. For example, to run
 npx doc-detective --config .doc-detective.json --input tests.spec.json
 ```
 
+## CLI Test Builder
+
+Doc Detective includes an interactive CLI test builder that helps you create, edit, and debug tests in your terminal. The builder features AI-powered documentation analysis (via Deputy, Doc Detective's AI assistant) that can automatically generate tests from your markdown or DITA documentation files.
+
+### Launch the test builder
+
+To start the interactive test builder:
+
+```bash
+npx doc-detective --editor
+```
+
+Or use the shorthand:
+
+```bash
+npm run editor
+```
+
+To auto-analyze a single documentation file:
+
+```bash
+npx doc-detective --editor --input docs/getting-started.md
+```
+
+This will automatically start analyzing the file without showing the file browser.
+
+### Analyze documentation
+
+The test builder can analyze documentation and generate tests automatically using Deputy (Doc Detective's AI assistant):
+
+**Manual workflow:**
+1. Start the builder: `npx doc-detective --editor`
+2. Select "Analyze documentation" from the menu
+3. Browse and select a markdown or DITA file
+4. Review the generated tests with confidence scores
+5. Accept/reject/regenerate individual tests
+6. Edit and refine the analyzed tests as needed
+
+**Auto-analyze workflow:**
+```bash
+npx doc-detective --editor --input docs/api-guide.md
+```
+When you specify a single file with `--input`, the builder automatically starts analyzing it.
+
+**Requirements**: Set one of these environment variables:
+- `ANTHROPIC_API_KEY` - For Claude models (recommended)
+- `OPENAI_API_KEY` - For GPT models
+- `GOOGLE_API_KEY` - For Gemini models
+
+**How it works**:
+- Your documentation is parsed into logical chunks (by headings for markdown, by topics for DITA)
+- Each chunk is analyzed by Deputy to generate appropriate test steps
+- Deputy assigns a confidence score (0-100%) to each generated test
+- Tests with confidence ≥ 80% (configurable) are automatically accepted
+- Tests with lower confidence require manual review
+- Existing inline tests in the documentation are preserved and merged
+- Generated tests include source location metadata linking back to the original documentation
+
+**Confidence-based autonomy**:
+- High-confidence tests (≥80% by default) are auto-accepted ✓✓
+- Low-confidence tests require your review ○
+- Configure the threshold in your `.doc-detective.json`:
+  ```json
+  {
+    "deputy": {
+      "confidenceThreshold": 75
+    }
+  }
+  ```
+
+**Supported formats**:
+- Markdown (`.md`, `.markdown`) - parsed by headings
+- DITA (`.dita`, `.xml`) - coming soon
+
 ### Check out some samples
 
 You can find test and config samples in the [samples](https://github.com/doc-detective/doc-detective/tree/main/samples) directory.

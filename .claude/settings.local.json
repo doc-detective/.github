@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:github.com)",
+      "Bash(ls:*)",
+      "Bash(grep:*)",
+      "Bash(npm test:*)",
+      "Bash(npx mocha:*)",
+      "Bash(node --input-type=module -e:*)",
+      "Bash(node -e:*)",
+      "Bash(node --check:*)"
+    ]
+  }
+}

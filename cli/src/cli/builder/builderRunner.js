@@ -9,10 +9,11 @@
  * @param {string} options.outputDir - Output directory for the spec file
  * @param {Object} options.initialSpec - Initial spec to edit (optional, deprecated - use specs instead)
  * @param {Array} options.specs - Array of spec objects to choose from: { spec, filePath, extension, isValid, validationErrors }
+ * @param {string} options.autoAnalyzeFile - File path to auto-analyze (optional)
  * @returns {Promise<void>}
  */
 async function runBuilder(options = {}) {
-  const { outputDir = process.cwd(), initialSpec = null, specs = [] } = options;
+  const { outputDir = process.cwd(), initialSpec = null, specs = [], autoAnalyzeFile = null } = options;
 
   // Clear terminal and move cursor to top-left
   process.stdout.write('\x1b[2J\x1b[H');
@@ -48,17 +49,20 @@ async function runBuilder(options = {}) {
           isValid,
           validationErrors,
           outputDir,
+          autoAnalyzeFile,
         });
       } else if (initialSpec) {
         // Legacy: initialSpec provided directly
         component = React.createElement(TestBuilder, {
           initialSpec,
           outputDir,
+          autoAnalyzeFile,
         });
       } else {
         // No specs - create new
         component = React.createElement(TestBuilder, {
           outputDir,
+          autoAnalyzeFile,
         });
       }
 

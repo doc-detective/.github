@@ -21,6 +21,10 @@ import TestEditor from './TestEditor.mjs';
 import FieldEditor from './FieldEditor.mjs';
 import DebugRunner from './DebugRunner.mjs';
 import { StatusBar, JsonPreview, SimpleTextInput, LabeledTextInput, ConfirmPrompt, DescriptiveItem, NoIndicator, ScrollableSelect } from './components.mjs';
+import DocumentImporter from './DocumentImporter.mjs';
+import GenerationProgress from './GenerationProgress.mjs';
+import ChunkReviewer from './ChunkReviewer.mjs';
+import { parseDocument, generateTestsForChunk } from './DocAnalyzer.mjs';
 
 // Import source file utilities for inline test handling
 const {
@@ -111,15 +115,17 @@ function serializeSpec(spec, format) {
  * @param {string|null} props.validationErrors - Validation error message if invalid
  * @param {string} props.outputDir - Output directory for new specs
  * @param {Function|null} props.onBack - Callback to navigate back to spec selector (optional)
+ * @param {string|null} props.autoAnalyzeFile - File path to auto-analyze (optional)
  */
-const TestBuilder = ({ 
-  initialSpec = null, 
-  inputFilePath = null, 
+const TestBuilder = ({
+  initialSpec = null,
+  inputFilePath = null,
   inputFileExtension = null,
   isValid = true,
   validationErrors = null,
   outputDir = process.cwd(),
   onBack = null,
+  autoAnalyzeFile = null,
 }) => {
   const { exit } = useApp();
 
@@ -169,6 +175,18 @@ const TestBuilder = ({
   // Track original spec for detecting which steps were modified
   const [originalSpec] = useState(() => initialSpec ? JSON.parse(JSON.stringify(initialSpec)) : null);
 
+  // Analyze workflow state
+  const [analyzeFilePath, setAnalyzeFilePath] = useState(null);
+  const [analyzeFormat, setAnalyzeFormat] = useState(null);
+  const [parsedChunks, setParsedChunks] = useState([]);
+  const [reviewItems, setReviewItems] = useState([]);
+  const [generationProgress, setGenerationProgress] = useState({
+    current: 0,
+    total: 0,
+    currentHeading: null,
+    errors: [],
+  });
+
   // Track if there are unsaved changes
   const hasUnsavedChanges = useMemo(() => {
     const currentJson = JSON.stringify(spec);
@@ -184,6 +202,19 @@ const TestBuilder = ({
   
   // Check if spec has auto-detected steps
   const hasAutoDetected = useMemo(() => hasAutoDetectedSteps(spec), [spec]);
+
+  // Check if API key is available for doc import
+  const hasApiKey = useMemo(() => {
+    // Check environment variables
+    if (process.env.ANTHROPIC_API_KEY || process.env.OPENAI_API_KEY) {
+      return true;
+    }
+    // Check config (if spec has config with integrations)
+    if (spec?.integrations?.anthropic?.apiKey || spec?.integrations?.openai?.apiKey) {
+      return true;
+    }
+    return false;
+  }, [spec]);
 
   // Get spec fields
   const { fields: specFields } = useMemo(() => getSpecFields(), []);
@@ -295,6 +326,187 @@ const TestBuilder = ({
       cancelled = true;
     };
   }, [phase, spec, originalSpec, sourceFileHashes]);
+
+  // Effect to parse documentation when phase changes to 'parseDoc'
+  useEffect(() => {
+    if (phase !== 'parseDoc') return;
+
+    let cancelled = false;
+
+    const doParse = async () => {
+      try {
+        const content = fs.readFileSync(analyzeFilePath, 'utf8');
+        const result = await parseDocument({
+          filePath: analyzeFilePath,
+          content,
+          config: spec,
+          applyHybridRules: true,
+        });
+
+        if (cancelled) return;
+
+        if (!result.chunks || result.chunks.length === 0) {
+          setPhase('noContent');
+          return;
+        }
+
+        setParsedChunks(result.chunks);
+        setGenerationProgress({
+          current: 0,
+          total: result.chunks.length,
+          currentHeading: null,
+          errors: [],
+        });
+        setPhase('generateTests');
+      } catch (err) {
+        if (cancelled) return;
+        console.error('Parse error:', err);
+        setPhase('parseError');
+      }
+    };
+
+    doParse();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [phase, analyzeFilePath, spec]);
+
+  // Effect to generate tests when phase changes to 'generateTests'
+  useEffect(() => {
+    if (phase !== 'generateTests') return;
+
+    let cancelled = false;
+
+    const doGenerate = async () => {
+      const items = [];
+      const errors = [];
+
+      // Get confidence threshold from Deputy config (default 80%)
+      const confidenceThreshold = spec?.deputy?.confidenceThreshold || 80;
+
+      for (let i = 0; i < parsedChunks.length; i++) {
+        if (cancelled) return;
+
+        const chunk = parsedChunks[i];
+
+        // Update progress - current chunk
+        setGenerationProgress({
+          current: i,
+          total: parsedChunks.length,
+          currentHeading: chunk.heading,
+          errors,
+        });
+
+        try {
+          const generated = await generateTestsForChunk({
+            chunk,
+            existingTests: [],
+            config: spec,
+            attemptNumber: 0,
+          });
+
+          // Auto-accept if confidence meets threshold
+          const shouldAutoAccept = generated.confidence >= confidenceThreshold && !generated.hasErrors;
+
+          items.push({
+            id: `chunk_${i}`,
+            generated,
+            status: shouldAutoAccept ? 'auto-accepted' : 'pending',
+            regenerationAttempts: 0,
+          });
+        } catch (err) {
+          console.error(`Error generating tests for chunk ${i}:`, err);
+          errors.push(`${chunk.heading}: ${err.message}`);
+
+          // Add item with error
+          items.push({
+            id: `chunk_${i}`,
+            generated: {
+              tests: [],
+              preservedTests: [],
+              chunk,
+              hasErrors: true,
+              errorMessage: err.message,
+              confidence: 0,
+            },
+            status: 'pending',
+            regenerationAttempts: 0,
+          });
+        }
+      }
+
+      if (cancelled) return;
+
+      // Update progress - complete
+      setGenerationProgress({
+        current: parsedChunks.length,
+        total: parsedChunks.length,
+        currentHeading: null,
+        errors,
+      });
+
+      // Check if all items were auto-accepted
+      const allAutoAccepted = items.every(item => item.status === 'auto-accepted');
+      const autoAcceptedCount = items.filter(item => item.status === 'auto-accepted').length;
+
+      if (allAutoAccepted && items.length > 0) {
+        // All tests were auto-accepted - merge them automatically and return to menu
+        const newTests = [];
+        items.forEach((item) => {
+          // Add preserved tests first
+          newTests.push(...item.generated.preservedTests);
+          // Then add generated tests
+          newTests.push(...item.generated.tests);
+        });
+
+        setSpec({ ...spec, tests: [...(spec.tests || []), ...newTests] });
+
+        // Clear analyze state
+        setAnalyzeFilePath(null);
+        setAnalyzeFormat(null);
+        setParsedChunks([]);
+        setReviewItems([]);
+        setGenerationProgress({ current: 0, total: 0, currentHeading: null, errors: [] });
+
+        // Show success message phase
+        setPhase('autoAcceptedAll');
+      } else {
+        // Some tests need review
+        setReviewItems(items);
+        setPhase('reviewGenerated');
+      }
+    };
+
+    doGenerate();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [phase, parsedChunks, spec]);
+
+  // Effect to auto-analyze file when provided via CLI
+  useEffect(() => {
+    // Only auto-analyze if:
+    // 1. autoAnalyzeFile is provided
+    // 2. We have an API key
+    // 3. We're not already editing a spec
+    // 4. We haven't already started analyzing
+    if (autoAnalyzeFile && hasApiKey && !initialSpec && !analyzeFilePath) {
+      const format = detectFormat(autoAnalyzeFile);
+      setAnalyzeFilePath(autoAnalyzeFile);
+      setAnalyzeFormat(format);
+      setPhase('parseDoc');
+    }
+  }, [autoAnalyzeFile, hasApiKey, initialSpec, analyzeFilePath]);
+
+  // Helper function to detect format from filename
+  function detectFormat(filename) {
+    const ext = path.extname(filename).toLowerCase();
+    if (ext === '.md' || ext === '.markdown') return 'markdown';
+    if (ext === '.dita' || ext === '.xml') return 'dita';
+    return 'unknown';
+  }
 
   // Show validation warning for invalid loaded specs
   if (showValidationWarning) {
@@ -959,6 +1171,264 @@ const TestBuilder = ({
     );
   }
 
+  // Analyze Setup - API key instructions
+  if (phase === 'analyzeSetup') {
+    return React.createElement(
+      Box,
+      { flexDirection: 'column', padding: 1 },
+      React.createElement(
+        Box,
+        { marginBottom: 1 },
+        React.createElement(Text, { bold: true, color: 'cyan' }, '🔑 API Key Required')
+      ),
+      React.createElement(
+        Box,
+        { marginBottom: 1 },
+        React.createElement(Text, null, 'To analyze documentation, you need an API key from Anthropic, OpenAI, or Google.')
+      ),
+      React.createElement(
+        Box,
+        { flexDirection: 'column', marginBottom: 1, marginLeft: 2 },
+        React.createElement(Text, { color: 'gray' }, '1. Get an API key:'),
+        React.createElement(Text, { color: 'gray', marginLeft: 2 }, '• Anthropic: https://console.anthropic.com/'),
+        React.createElement(Text, { color: 'gray', marginLeft: 2 }, '• OpenAI: https://platform.openai.com/'),
+        React.createElement(Text, { color: 'gray', marginLeft: 2 }, '• Google: https://makersuite.google.com/'),
+        React.createElement(Text, { color: 'gray', marginTop: 1 }, '2. Set as environment variable or in config:'),
+        React.createElement(Text, { color: 'gray', marginLeft: 2 }, 'export ANTHROPIC_API_KEY=your_key'),
+        React.createElement(Text, { color: 'gray', marginLeft: 2 }, 'export OPENAI_API_KEY=your_key'),
+        React.createElement(Text, { color: 'gray', marginLeft: 2 }, 'export GOOGLE_API_KEY=your_key')
+      ),
+      React.createElement(SelectInput, {
+        items: [{ label: '← Back to menu', value: 'back' }],
+        onSelect: () => setPhase('menu'),
+      })
+    );
+  }
+
+  // Analyze Doc - File selection
+  if (phase === 'analyzeDoc') {
+    return React.createElement(DocumentImporter, {
+      initialDir: process.cwd(),
+      onSelect: async (filePath, format) => {
+        setAnalyzeFilePath(filePath);
+        setAnalyzeFormat(format);
+        setPhase('parseDoc');
+      },
+      onCancel: () => setPhase('menu'),
+    });
+  }
+
+  // Parse Doc - Parsing progress
+  if (phase === 'parseDoc') {
+    return React.createElement(
+      Box,
+      { flexDirection: 'column', padding: 1 },
+      React.createElement(Text, { color: 'cyan' }, 'Parsing documentation...')
+    );
+  }
+
+  // Generate Tests - AI generation with progress
+  if (phase === 'generateTests') {
+    return React.createElement(GenerationProgress, generationProgress);
+  }
+
+  // Review Generated - Review/accept/reject UI
+  if (phase === 'reviewGenerated') {
+    return React.createElement(ChunkReviewer, {
+      items: reviewItems,
+      onAccept: (acceptedItems) => {
+        // Merge accepted tests into spec
+        const newTests = [];
+        acceptedItems.forEach((item) => {
+          if (item.status === 'accepted') {
+            // Add preserved tests first
+            newTests.push(...item.generated.preservedTests);
+            // Then add generated tests
+            newTests.push(...item.generated.tests);
+          }
+        });
+
+        setSpec({ ...spec, tests: [...(spec.tests || []), ...newTests] });
+
+        // Clear analyze state
+        setAnalyzeFilePath(null);
+        setAnalyzeFormat(null);
+        setParsedChunks([]);
+        setReviewItems([]);
+        setGenerationProgress({ current: 0, total: 0, currentHeading: null, errors: [] });
+
+        setPhase('menu');
+      },
+      onRegenerate: async (itemId) => {
+        // Find the item
+        const itemIndex = reviewItems.findIndex((item) => item.id === itemId);
+        if (itemIndex === -1) return;
+
+        const item = reviewItems[itemIndex];
+        const newAttempt = item.regenerationAttempts + 1;
+
+        // Update status to regenerating
+        const updatedItems = [...reviewItems];
+        updatedItems[itemIndex] = {
+          ...item,
+          status: 'regenerating',
+        };
+        setReviewItems(updatedItems);
+
+        try {
+          const generated = await generateTestsForChunk({
+            chunk: item.generated.chunk,
+            existingTests: [],
+            config: spec,
+            attemptNumber: newAttempt,
+          });
+
+          updatedItems[itemIndex] = {
+            ...item,
+            generated,
+            status: 'pending',
+            regenerationAttempts: newAttempt,
+          };
+        } catch (err) {
+          updatedItems[itemIndex] = {
+            ...item,
+            generated: {
+              tests: [],
+              preservedTests: item.generated.preservedTests,
+              chunk: item.generated.chunk,
+              hasErrors: true,
+              errorMessage: err.message,
+            },
+            status: 'pending',
+            regenerationAttempts: newAttempt,
+          };
+        }
+
+        setReviewItems(updatedItems);
+      },
+      onCancel: () => {
+        // Clear analyze state
+        setAnalyzeFilePath(null);
+        setAnalyzeFormat(null);
+        setParsedChunks([]);
+        setReviewItems([]);
+        setGenerationProgress({ current: 0, total: 0, currentHeading: null, errors: [] });
+
+        setPhase('menu');
+      },
+    });
+  }
+
+  // No Content - No testable content found
+  if (phase === 'noContent') {
+    return React.createElement(
+      Box,
+      { flexDirection: 'column', padding: 1 },
+      React.createElement(
+        Box,
+        { marginBottom: 1 },
+        React.createElement(Text, { bold: true, color: 'yellow' }, '⚠️  No Testable Content')
+      ),
+      React.createElement(
+        Box,
+        { marginBottom: 1 },
+        React.createElement(Text, null, 'The selected document contains no testable content.')
+      ),
+      React.createElement(
+        Box,
+        { marginBottom: 1 },
+        React.createElement(Text, { color: 'gray' }, 'Make sure the document has proper headings or sections.')
+      ),
+      React.createElement(SelectInput, {
+        items: [
+          { label: '← Try another file', value: 'back' },
+          { label: '← Back to menu', value: 'menu' },
+        ],
+        onSelect: (item) => {
+          if (item.value === 'back') {
+            setPhase('analyzeDoc');
+          } else {
+            setAnalyzeFilePath(null);
+            setAnalyzeFormat(null);
+            setPhase('menu');
+          }
+        },
+      })
+    );
+  }
+
+  // Auto Accepted All - All tests were auto-accepted
+  if (phase === 'autoAcceptedAll') {
+    // Count how many tests were added
+    const testCount = reviewItems.reduce((sum, item) => {
+      return sum + (item.generated.tests || []).length + (item.generated.preservedTests || []).length;
+    }, 0);
+
+    return React.createElement(
+      Box,
+      { flexDirection: 'column', padding: 1 },
+      React.createElement(
+        Box,
+        { marginBottom: 1 },
+        React.createElement(Text, { bold: true, color: 'green' }, '✓ Analysis Complete')
+      ),
+      React.createElement(
+        Box,
+        { marginBottom: 1 },
+        React.createElement(Text, null, `All ${testCount} generated tests met the confidence threshold and were automatically accepted.`)
+      ),
+      React.createElement(
+        Box,
+        { marginBottom: 1 },
+        React.createElement(Text, { color: 'gray' }, `Tests have been added to your spec. You can now edit, debug, or save them.`)
+      ),
+      React.createElement(SelectInput, {
+        items: [
+          { label: '← Back to menu', value: 'menu' },
+        ],
+        onSelect: () => setPhase('menu'),
+      })
+    );
+  }
+
+  // Parse Error - Parse failure handling
+  if (phase === 'parseError') {
+    return React.createElement(
+      Box,
+      { flexDirection: 'column', padding: 1 },
+      React.createElement(
+        Box,
+        { marginBottom: 1 },
+        React.createElement(Text, { bold: true, color: 'red' }, '❌ Parse Error')
+      ),
+      React.createElement(
+        Box,
+        { marginBottom: 1 },
+        React.createElement(Text, null, 'Failed to parse the selected document.')
+      ),
+      React.createElement(
+        Box,
+        { marginBottom: 1 },
+        React.createElement(Text, { color: 'gray' }, 'The file may be corrupted or in an unsupported format.')
+      ),
+      React.createElement(SelectInput, {
+        items: [
+          { label: '← Try another file', value: 'back' },
+          { label: '← Back to menu', value: 'menu' },
+        ],
+        onSelect: (item) => {
+          if (item.value === 'back') {
+            setPhase('analyzeDoc');
+          } else {
+            setAnalyzeFilePath(null);
+            setAnalyzeFormat(null);
+            setPhase('menu');
+          }
+        },
+      })
+    );
+  }
+
   // Main menu view
   const menuItems = [];
   let menuIndex = 0;
@@ -1019,6 +1489,20 @@ const TestBuilder = ({
     menuItems.push({
       label: '🚀 Run and debug test',
       value: 'debugTest',
+    });
+  }
+
+  // Analyze documentation
+  menuItems.push({ label: '─────── Analyze ────────', value: `none_${menuIndex++}` });
+  if (hasApiKey) {
+    menuItems.push({
+      label: '📄 Analyze documentation',
+      value: 'analyzeDoc',
+    });
+  } else {
+    menuItems.push({
+      label: '⚠️  Analyze documentation (requires API key)',
+      value: 'analyzeSetup',
     });
   }
 
@@ -1131,6 +1615,12 @@ const TestBuilder = ({
             } else {
               setPhase('selectDebugTest');
             }
+            break;
+          case 'analyzeDoc':
+            setPhase('analyzeDoc');
+            break;
+          case 'analyzeSetup':
+            setPhase('analyzeSetup');
             break;
           case 'preview':
             setPhase('preview');
