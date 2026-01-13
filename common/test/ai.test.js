@@ -63,8 +63,8 @@ describe("AI Module", function () {
       });
 
       it("should contain Ollama model mappings", function () {
-        expect(modelMap["ollama/qwen3-vl:2b"]).to.equal("qwen3-vl:2b-instruct-q4_K_M");
-        expect(modelMap["ollama/qwen3-vl:8b"]).to.equal("qwen3-vl:8b-instruct-q4_K_M");
+        expect(modelMap["ollama/qwen3:4b"]).to.equal("qwen3:4b");
+        expect(modelMap["ollama/qwen3:8b"]).to.equal("qwen3:8b");
       });
 
       it("should contain Google Gemini model mappings", function () {
@@ -111,16 +111,16 @@ describe("AI Module", function () {
 
       it("should detect Ollama provider for known Ollama models", async function () {
         const config = {};
-        const result = await detectProvider(config, "ollama/qwen3-vl:8b");
+        const result = await detectProvider(config, "ollama/qwen3:4b");
         expect(result.provider).to.equal("ollama");
-        expect(result.model).to.equal("qwen3-vl:8b-instruct-q4_K_M");
+        expect(result.model).to.equal("qwen3:4b");
         expect(result.apiKey).to.be.null;
         expect(result.baseURL).to.equal("http://localhost:11434/api");
       });
 
       it("should use custom baseUrl from config for Ollama", async function () {
         const config = { integrations: { ollama: { baseUrl: "http://custom:11434/api" } } };
-        const result = await detectProvider(config, "ollama/qwen3-vl:8b");
+        const result = await detectProvider(config, "ollama/qwen3:4b");
         expect(result.provider).to.equal("ollama");
         expect(result.baseURL).to.equal("http://custom:11434/api");
       });
@@ -229,7 +229,7 @@ describe("AI Module", function () {
         const result = await detectProvider(config, "unknown-model");
         // Ollama should be preferred when available
         expect(result.provider).to.equal("ollama");
-        expect(result.model).to.equal("qwen3-vl:8b-instruct-q4_K_M");
+        expect(result.model).to.equal("qwen3:4b");
       });
 
       it("should return null values when model is known but no API key for that provider", async function () {
@@ -243,8 +243,8 @@ describe("AI Module", function () {
     });
 
     describe("DEFAULT_MODEL", function () {
-      it("should be ollama/qwen3-vl:8b", function () {
-        expect(DEFAULT_MODEL).to.equal("ollama/qwen3-vl:8b");
+      it("should be ollama/qwen3:4b", function () {
+        expect(DEFAULT_MODEL).to.equal("ollama/qwen3:4b");
       });
     });
 
@@ -329,7 +329,7 @@ describe("AI Module", function () {
           try {
             const result = await generate({
               prompt: "Reply with exactly one word: Yes",
-              model: "ollama/qwen3-vl:8b",
+              model: "ollama/qwen3:4b",
               maxTokens: 20,
             });
 

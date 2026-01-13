@@ -2,7 +2,7 @@ const { schemas } = require("./schemas");
 const { validate, transformToSchemaKey } = require("./validate");
 const { resolvePaths } = require("./resolvePaths");
 const { readFile } = require("./files");
-const { generate, detectProvider, getApiKey, isOllamaAvailable, DEFAULT_MODEL, MAX_SCHEMA_VALIDATION_RETRIES } = require("./ai");
+const { generate, detectProvider, getApiKey, DEFAULT_MODEL, MAX_SCHEMA_VALIDATION_RETRIES } = require("./ai");
 const { refineStep } = require("./refineStep");
 const {
   DEFAULT_OLLAMA_MODEL,
@@ -11,9 +11,10 @@ const {
   detectGpuType,
   startOllamaContainer,
   waitForOllama,
-  pullOllamaModel,
   stopOllamaContainer,
   ensureOllamaRunning,
+  isOllamaAvailable,
+  ensureModelAvailable,
 } = require("./ollama");
 
 module.exports = {
@@ -35,7 +36,7 @@ module.exports = {
   detectGpuType,
   startOllamaContainer,
   waitForOllama,
-  pullOllamaModel,
+  ensureModelAvailable,
   stopOllamaContainer,
   ensureOllamaRunning,
 };

@@ -8,7 +8,7 @@ const Ajv = require("ajv");
 const addFormats = require("ajv-formats");
 const { ensureModelAvailable, isOllamaAvailable, DEFAULT_OLLAMA_BASE_URL } = require("./ollama");
 
-const DEFAULT_MODEL = "ollama/qwen3-vl:8b";
+const DEFAULT_MODEL = "ollama/qwen3:4b";
 const MAX_SCHEMA_VALIDATION_RETRIES = 3;
 
 /**
@@ -27,10 +27,9 @@ const modelMap = {
   "google/gemini-2.5-flash": "gemini-2.5-flash",
   "google/gemini-2.5-pro": "gemini-2.5-pro",
   "google/gemini-3-pro": "gemini-3-pro-preview",
-  // Ollama models
-  "ollama/qwen3-vl:8b": "qwen3-vl:8b-instruct-q4_K_M",
-  "ollama/qwen3-vl:4b": "qwen3-vl:4b-instruct-q4_K_M",
-  "ollama/qwen3-vl:2b": "qwen3-vl:2b-instruct-q4_K_M",
+  // Ollama models (text models that support standard chat API)
+  "ollama/qwen3:4b": "qwen3:4b",
+  "ollama/qwen3:8b": "qwen3:8b",
   "ollama/gemma3:4bq4": "gemma3:4b-it-q4_K_M",
   "ollama/gemma3:4bq8": "gemma3:4b-it-q8_0",
   "ollama/gemma3:12bq4": "gemma3:12b-it-q4_K_M",
@@ -68,7 +67,7 @@ const getDefaultProvider = async (config = {}) => {
     // Local, no API key needed
     return {
       provider: "ollama",
-      model: modelMap["ollama/qwen3-vl:8b"],
+      model: modelMap["ollama/qwen3:4b"],
       apiKey: null,
       baseURL: ollamaBaseUrl || undefined,
     };

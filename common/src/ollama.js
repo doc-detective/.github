@@ -1,8 +1,8 @@
 const { execSync, spawn } = require("child_process");
 const fs = require("fs");
 
-/** Default Ollama model to use */
-const DEFAULT_OLLAMA_MODEL = "qwen3-vl:8b-instruct-q4_K_M";
+/** Default Ollama model to use (text model that supports standard chat API) */
+const DEFAULT_OLLAMA_MODEL = "qwen3:4b";
 
 /** Timeout for checking Ollama availability */
 const OLLAMA_AVAILABILITY_TIMEOUT_MS = 500;

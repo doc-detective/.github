@@ -1,13 +1,39 @@
 const { setConfig } = require("./config");
 const { qualifyFiles, parseTests, log } = require("./utils");
 const { resolveDetectedTests } = require("./resolve");
-const { analyze } = require("./analyze");
+const { analyze, analyzeDocument, checkActionability } = require("./analyze");
+const {
+  parseDocument,
+  parseMarkdown,
+  parseMdx,
+  parseRst,
+  parseAsciidoc,
+  parseDitaXml,
+  parseHtml,
+  parseNaive,
+  detectFormat,
+  getParser,
+} = require("./parsers");
 // const { telemetryNotice, sendTelemetry } = require("./telem");
 
 exports.detectTests = detectTests;
 exports.resolveTests = resolveTests;
 exports.detectAndResolveTests = detectAndResolveTests;
 exports.analyze = analyze;
+exports.analyzeDocument = analyzeDocument;
+exports.checkActionability = checkActionability;
+
+// Parser exports
+exports.parseDocument = parseDocument;
+exports.parseMarkdown = parseMarkdown;
+exports.parseMdx = parseMdx;
+exports.parseRst = parseRst;
+exports.parseAsciidoc = parseAsciidoc;
+exports.parseDitaXml = parseDitaXml;
+exports.parseHtml = parseHtml;
+exports.parseNaive = parseNaive;
+exports.detectFormat = detectFormat;
+exports.getParser = getParser;
 
 // const supportMessage = `
 // ##########################################################################

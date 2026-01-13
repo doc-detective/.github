@@ -1,7 +1,53 @@
 const { generate, schemas, validate } = require("doc-detective-common");
 const crypto = require("crypto");
+const { parseDocument, detectFormat } = require("./parsers");
 
 const DEFAULT_MAX_CONTENT_LENGTH = 100000;
+
+/**
+ * Schema for actionability classification.
+ * Used to determine if a chunk contains instructions for users to perform testable actions.
+ */
+const ACTIONABILITY_SCHEMA = {
+  type: "object",
+  properties: {
+    isActionable: {
+      type: "boolean",
+      description:
+        "Whether this content instructs the user to perform testable actions",
+    },
+    reason: {
+      type: "string",
+      description:
+        "Brief explanation of why the content is or is not actionable",
+    },
+  },
+  required: ["isActionable", "reason"],
+};
+
+/**
+ * System prompt for classifying content actionability.
+ */
+const ACTIONABILITY_SYSTEM_PROMPT = `You are a documentation analysis expert. Your task is to determine if a piece of documentation content instructs users to perform testable actions.
+
+Content is ACTIONABLE if it contains instructions for users to:
+- Navigate to URLs or web pages
+- Click buttons, links, or UI elements
+- Type or enter text into forms or fields
+- Run shell/terminal commands
+- Make HTTP/API requests
+- Execute code examples
+- Perform specific interactions with a user interface
+- Follow step-by-step procedures that can be automated
+
+Content is NOT ACTIONABLE if it:
+- Only provides conceptual explanations or background information
+- Contains only reference material without procedures
+- Discusses features without showing how to use them
+- Contains only code snippets shown for illustration without execution instructions
+- Is purely descriptive text about architecture or design
+
+Be conservative - only mark content as actionable if there are clear, specific actions a user would perform that can be tested automatically.`;
 
 /**
  * System prompt for analyzing documentation and generating test specifications.
@@ -208,11 +254,239 @@ const analyze = async ({
   return finalTest;
 };
 
+/**
+ * Check if a content chunk is actionable (contains testable instructions).
+ *
+ * @param {Object} options - Options
+ * @param {string} options.content - The chunk content to check
+ * @param {string} [options.heading] - The heading of this chunk for context
+ * @param {Object} [options.config] - Doc Detective configuration object
+ * @returns {Promise<{isActionable: boolean, reason: string}>} Actionability result
+ */
+const checkActionability = async ({ content, heading, config = {} }) => {
+  const prompt = heading
+    ? `Analyze the following documentation section titled "${heading}":\n\n${content}`
+    : `Analyze the following documentation content:\n\n${content}`;
+
+  try {
+    const result = await generate({
+      prompt,
+      system: ACTIONABILITY_SYSTEM_PROMPT,
+      schema: ACTIONABILITY_SCHEMA,
+      schemaName: "actionability",
+      schemaDescription: "Classification of whether content is actionable",
+      config,
+    });
+
+    return result.object;
+  } catch (error) {
+    // On error, assume not actionable to be conservative
+    return {
+      isActionable: false,
+      reason: `Failed to check actionability: ${error.message}`,
+    };
+  }
+};
+
+/**
+ * Analyzes a document by breaking it into semantic chunks, identifying actionable content,
+ * and generating test specifications for each actionable chunk.
+ *
+ * @param {Object} options - Analysis options
+ * @param {string} options.content - Raw document content to analyze (required)
+ * @param {string} options.filePath - Path to the source file (required for format detection)
+ * @param {Object} [options.config] - Doc Detective configuration object
+ * @param {number} [options.chunkLevel=2] - Heading level to chunk at (1-6, default H2)
+ * @param {number} [options.maxContentLength] - Maximum content length per chunk before truncation
+ * @param {Array} [options.files] - Optional images/screenshots to include for multimodal analysis
+ * @returns {Promise<Object>} A promise that resolves to a spec_v3 compatible specification
+ * @throws {Error} If content or filePath is not provided
+ *
+ * @example
+ * const spec = await analyzeDocument({
+ *   content: fs.readFileSync('docs/guide.md', 'utf8'),
+ *   filePath: 'docs/guide.md',
+ *   config: { integrations: { anthropic: { apiKey: "sk-..." } } }
+ * });
+ */
+const analyzeDocument = async ({
+  content,
+  filePath,
+  config = {},
+  chunkLevel = 2,
+  maxContentLength = DEFAULT_MAX_CONTENT_LENGTH,
+  files,
+}) => {
+  // Validate required inputs
+  if (!content || typeof content !== "string") {
+    throw new Error("'content' is required and must be a string.");
+  }
+  if (!filePath || typeof filePath !== "string") {
+    throw new Error("'filePath' is required and must be a string.");
+  }
+
+  // Simple logging helper
+  const log = (level, message) => {
+    const logLevel = config.logLevel || "info";
+    const levels = ["error", "warning", "info", "debug"];
+    const currentLevelIndex = levels.indexOf(logLevel);
+    const messageLevelIndex = levels.indexOf(level);
+    if (messageLevelIndex <= currentLevelIndex) {
+      console.log(`(${level.toUpperCase()}) ${message}`);
+    }
+  };
+
+  // Parse document into semantic chunks
+  log("info", `Parsing document: ${filePath}`);
+  const format = detectFormat(filePath);
+  log("debug", `Detected format: ${format}`);
+
+  const chunks = await parseDocument(content, filePath, { chunkLevel });
+  log("info", `Found ${chunks.length} chunk(s) in document`);
+
+  if (chunks.length === 0) {
+    log("info", "No chunks found in document, returning empty spec");
+    const emptySpec = {
+      specId: generateId("spec"),
+      description: `Generated from ${filePath}`,
+      contentPath: filePath,
+      tests: [],
+    };
+
+    const validation = validate({
+      schemaKey: "spec_v3",
+      object: emptySpec,
+      addDefaults: false,
+    });
+
+    // If empty tests array is not valid, we need at least one test
+    // But per spec_v3 schema, tests requires minItems: 1
+    // Return the spec anyway with a warning
+    log("info", "Document produced no actionable chunks");
+    return emptySpec;
+  }
+
+  // Check actionability for all chunks in parallel
+  log("info", "Checking chunk actionability in parallel...");
+  const actionabilityResults = await Promise.all(
+    chunks.map(async (chunk, index) => {
+      try {
+        const result = await checkActionability({
+          content: chunk.content,
+          heading: chunk.heading,
+          config,
+        });
+        return { index, chunk, ...result };
+      } catch (error) {
+        log(
+          "info",
+          `Skipping chunk ${index + 1} (actionability check failed): ${error.message}`
+        );
+        return { index, chunk, isActionable: false, reason: error.message };
+      }
+    })
+  );
+
+  // Filter to actionable chunks
+  const actionableChunks = actionabilityResults.filter((r) => r.isActionable);
+  log(
+    "info",
+    `${actionableChunks.length} of ${chunks.length} chunk(s) are actionable`
+  );
+
+  if (actionableChunks.length === 0) {
+    log("info", "No actionable chunks found, returning spec with empty tests");
+    const emptySpec = {
+      specId: generateId("spec"),
+      description: `Generated from ${filePath}`,
+      contentPath: filePath,
+      tests: [],
+    };
+    return emptySpec;
+  }
+
+  // Analyze actionable chunks in parallel to generate tests
+  log("info", "Generating tests for actionable chunks...");
+  const testResults = await Promise.all(
+    actionableChunks.map(async ({ index, chunk }) => {
+      try {
+        // Build description from heading if available
+        const description = chunk.heading
+          ? `${chunk.heading} - Generated from ${filePath}`
+          : `Chunk ${index + 1} - Generated from ${filePath}`;
+
+        const test = await analyze({
+          content: chunk.content,
+          filePath,
+          config,
+          maxContentLength,
+          files,
+          test: {
+            description,
+            sourceLocation: {
+              file: filePath,
+              ...chunk.sourceLocation,
+              isInline: false,
+              isAutoDetected: true,
+            },
+          },
+        });
+
+        return { success: true, test, index };
+      } catch (error) {
+        log(
+          "info",
+          `Skipping chunk ${index + 1} (test generation failed): ${error.message}`
+        );
+        return { success: false, error: error.message, index };
+      }
+    })
+  );
+
+  // Collect successful tests
+  const tests = testResults
+    .filter((r) => r.success)
+    .map((r) => r.test);
+
+  log("info", `Successfully generated ${tests.length} test(s)`);
+
+  // Build the spec
+  const spec = {
+    specId: generateId("spec"),
+    description: `Generated from ${filePath}`,
+    contentPath: filePath,
+    tests,
+  };
+
+  // Validate if we have tests
+  if (tests.length > 0) {
+    const validation = validate({
+      schemaKey: "spec_v3",
+      object: spec,
+      addDefaults: false,
+    });
+
+    if (!validation.valid) {
+      log(
+        "warning",
+        `Generated spec failed validation: ${JSON.stringify(validation.errors)}`
+      );
+      // Return anyway - caller can decide what to do
+    }
+  }
+
+  return spec;
+};
+
 
 module.exports = {
   analyze,
+  analyzeDocument,
+  checkActionability,
   buildAnalysisPrompt,
   postProcessTest,
   ANALYSIS_SYSTEM_PROMPT,
+  ACTIONABILITY_SCHEMA,
+  ACTIONABILITY_SYSTEM_PROMPT,
   DEFAULT_MAX_CONTENT_LENGTH,
 };
