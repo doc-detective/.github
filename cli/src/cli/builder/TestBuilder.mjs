@@ -11,6 +11,7 @@ import * as path from 'path';
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 const yaml = require('js-yaml');
+const { analyzeDocument } = require('doc-detective-resolver');
 import {
   createDefaultSpec,
   createDefaultTest,
@@ -34,6 +35,46 @@ const {
   prepareSourceUpdates,
   hasAutoDetectedSteps,
 } = require('./sourceFileUtils.js');
+
+/**
+ * Check if AI integrations are available via environment variables or config file.
+ * @returns {boolean} True if at least one AI integration is configured
+ */
+const hasAiIntegration = () => {
+  // Check environment variables
+  if (process.env.ANTHROPIC_API_KEY) return true;
+  if (process.env.OPENAI_API_KEY) return true;
+  if (process.env.GOOGLE_GENERATIVE_AI_API_KEY) return true;
+  
+  // Try to load config file and check for integrations
+  const configPaths = [
+    path.resolve(process.cwd(), '.doc-detective.json'),
+    path.resolve(process.cwd(), '.doc-detective.yaml'),
+    path.resolve(process.cwd(), '.doc-detective.yml'),
+  ];
+  
+  for (const configPath of configPaths) {
+    if (fs.existsSync(configPath)) {
+      try {
+        const content = fs.readFileSync(configPath, 'utf-8');
+        const ext = path.extname(configPath).toLowerCase();
+        const config = ext === '.json' ? JSON.parse(content) : yaml.load(content);
+        
+        if (config?.integrations) {
+          const { anthropic, openAi, google, ollama } = config.integrations;
+          if (anthropic?.apiKey) return true;
+          if (openAi?.apiKey) return true;
+          if (google?.apiKey) return true;
+          if (ollama?.baseUrl || ollama) return true; // Ollama doesn't need API key
+        }
+      } catch {
+        // Ignore config parsing errors
+      }
+    }
+  }
+  
+  return false;
+};
 
 /**
  * Determine the output file path based on input file and extension
@@ -166,6 +207,10 @@ const TestBuilder = ({
   const [changedSourceFiles, setChangedSourceFiles] = useState([]);
   const [inlineUpdateError, setInlineUpdateError] = useState(null);
   
+  // State for analyze feature
+  const [analyzeError, setAnalyzeError] = useState(null);
+  const [analyzedSpec, setAnalyzedSpec] = useState(null);
+  
   // Track original spec for detecting which steps were modified
   const [originalSpec] = useState(() => initialSpec ? JSON.parse(JSON.stringify(initialSpec)) : null);
 
@@ -184,6 +229,19 @@ const TestBuilder = ({
   
   // Check if spec has auto-detected steps
   const hasAutoDetected = useMemo(() => hasAutoDetectedSteps(spec), [spec]);
+
+  // Check if AI integrations are available
+  const hasAiConfig = useMemo(() => hasAiIntegration(), []);
+  
+  // Check if spec has a source file that can be analyzed
+  const hasSourceFile = useMemo(() => {
+    return !!(inputFilePath || spec.contentPath || spec.sourcePath);
+  }, [inputFilePath, spec]);
+  
+  // Get the source file path for analysis
+  const sourceFilePath = useMemo(() => {
+    return inputFilePath || spec.contentPath || spec.sourcePath || null;
+  }, [inputFilePath, spec]);
 
   // Get spec fields
   const { fields: specFields } = useMemo(() => getSpecFields(), []);
@@ -295,6 +353,53 @@ const TestBuilder = ({
       cancelled = true;
     };
   }, [phase, spec, originalSpec, sourceFileHashes]);
+
+  // Effect to handle AI analysis when phase changes to 'analyzing'
+  useEffect(() => {
+    if (phase !== 'analyzing') return;
+
+    let cancelled = false;
+
+    const performAnalysis = async () => {
+      try {
+        if (!sourceFilePath) {
+          throw new Error('No source file found. The spec must have an input file or contentPath to analyze.');
+        }
+
+        // Check if file exists and read content
+        if (!fs.existsSync(sourceFilePath)) {
+          throw new Error(`Source file not found: ${sourceFilePath}`);
+        }
+
+        const content = fs.readFileSync(sourceFilePath, 'utf-8');
+        
+        if (!content || content.trim().length === 0) {
+          throw new Error('Source file is empty.');
+        }
+
+        // Call analyzeDocument with the content
+        const result = await analyzeDocument({
+          content,
+          filePath: sourceFilePath,
+        });
+
+        if (cancelled) return;
+
+        setAnalyzedSpec(result);
+        setPhase('analyzePreview');
+      } catch (error) {
+        if (cancelled) return;
+        setAnalyzeError(error.message);
+        setPhase('analyzeError');
+      }
+    };
+
+    performAnalysis();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [phase, sourceFilePath]);
 
   // Show validation warning for invalid loaded specs
   if (showValidationWarning) {
@@ -855,6 +960,133 @@ const TestBuilder = ({
     );
   }
 
+  // Analyzing view - show loading state during AI analysis
+  if (phase === 'analyzing') {
+    return React.createElement(
+      Box,
+      { flexDirection: 'column', padding: 1 },
+      React.createElement(StatusBar, {
+        location: [specName || path.basename(inputFilePath || 'Spec'), 'Analyze'],
+      }),
+      React.createElement(
+        Box,
+        { marginBottom: 1 },
+        React.createElement(Text, { bold: true, color: 'cyan' }, '✨ Analyzing Documentation...')
+      ),
+      React.createElement(
+        Box,
+        { marginBottom: 1 },
+        React.createElement(Text, { color: 'gray' }, 'Using AI to generate test specifications based on the source documentation.')
+      ),
+      React.createElement(
+        Text,
+        { color: 'yellow' },
+        '⏳ This may take a moment...'
+      )
+    );
+  }
+
+  // Analyze error view
+  if (phase === 'analyzeError') {
+    return React.createElement(
+      Box,
+      { flexDirection: 'column', padding: 1 },
+      React.createElement(StatusBar, {
+        location: [specName || path.basename(inputFilePath || 'Spec'), 'Analyze Error'],
+      }),
+      React.createElement(
+        Box,
+        { marginBottom: 1 },
+        React.createElement(Text, { bold: true, color: 'red' }, '❌ Analysis Failed')
+      ),
+      React.createElement(
+        Box,
+        { marginBottom: 1 },
+        React.createElement(Text, { color: 'red' }, analyzeError)
+      ),
+      React.createElement(
+        Box,
+        { marginBottom: 1 },
+        React.createElement(
+          Text,
+          { color: 'gray' },
+          'Make sure you have configured an AI integration (Anthropic, OpenAI, Google, or Ollama) in your Doc Detective config or via environment variables.'
+        )
+      ),
+      React.createElement(SelectInput, {
+        items: [{ label: '← Back to menu', value: 'back' }],
+        onSelect: () => {
+          setAnalyzeError(null);
+          setPhase('menu');
+        },
+      })
+    );
+  }
+
+  // Analyze preview view - show the generated spec and allow user to apply or discard
+  if (phase === 'analyzePreview') {
+    const newTestsCount = analyzedSpec?.tests?.length || 0;
+    const currentTestsCount = spec.tests?.length || 0;
+
+    return React.createElement(
+      Box,
+      { flexDirection: 'column', padding: 1 },
+      React.createElement(StatusBar, {
+        location: [specName || path.basename(inputFilePath || 'Spec'), 'Analyze Results'],
+      }),
+      React.createElement(
+        Box,
+        { marginBottom: 1 },
+        React.createElement(Text, { bold: true, color: 'green' }, '✨ Analysis Complete!')
+      ),
+      React.createElement(
+        Box,
+        { marginBottom: 1 },
+        React.createElement(
+          Text,
+          null,
+          `Generated ${newTestsCount} test(s) (current spec has ${currentTestsCount} test(s))`
+        )
+      ),
+      React.createElement(JsonPreview, {
+        data: analyzedSpec,
+        title: 'Generated Specification',
+      }),
+      React.createElement(
+        Box,
+        { marginTop: 1 },
+        React.createElement(SelectInput, {
+          items: [
+            { label: '✅ Replace tests with generated tests', value: 'replace' },
+            { label: '🔀 Merge (keep existing + add new tests)', value: 'merge' },
+            { label: '← Discard and go back', value: 'discard' },
+          ],
+          onSelect: (item) => {
+            if (item.value === 'replace') {
+              // Replace tests with analyzed version
+              setSpec({ ...spec, tests: analyzedSpec?.tests || [] });
+              setAnalyzedSpec(null);
+              setPhase('menu');
+            } else if (item.value === 'merge') {
+              // Merge tests: keep existing tests and add new ones
+              const mergedTests = [
+                ...(spec.tests || []),
+                ...(analyzedSpec?.tests || []),
+              ];
+              setSpec({ ...spec, tests: mergedTests });
+              setAnalyzedSpec(null);
+              setPhase('menu');
+            } else {
+              // Discard
+              setAnalyzedSpec(null);
+              setPhase('menu');
+            }
+          },
+        })
+      )
+    );
+  }
+
   // Save confirmation
   if (phase === 'save') {
     const isOverwrite = inputFilePath && (inputFileExtension === '.json' || inputFileExtension === '.yaml' || inputFileExtension === '.yml');
@@ -1027,6 +1259,18 @@ const TestBuilder = ({
   // Actions
   menuItems.push({ label: '🔍 Preview', value: 'preview' });
 
+  // Analyze option - show if spec has a source file
+  if (hasSourceFile) {
+    if (hasAiConfig) {
+      menuItems.push({ label: '✨ Analyze document', value: 'analyze' });
+    } else {
+      menuItems.push({ 
+        label: '✨ Analyze document (requires AI integration)', 
+        value: `none_${menuIndex++}` 
+      });
+    }
+  }
+
   if (validation.valid && tests.length > 0) {
     // Use different label based on whether spec has inline sources
     let saveLabel;
@@ -1134,6 +1378,9 @@ const TestBuilder = ({
             break;
           case 'preview':
             setPhase('preview');
+            break;
+          case 'analyze':
+            setPhase('analyzing');
             break;
           case 'save':
             // Use preSave to check for inline sources before saving
