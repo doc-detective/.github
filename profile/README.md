@@ -6,6 +6,7 @@
 Doc Detective is a doc content testing framework that simplifies the process of keeping your docs accurate and up-to-date. You write tests, and Doc Detective runs them directly against your product to ensure your docs match your user experience. Whether it’s a UI-based process or a series of API calls, Doc Detective can help you find doc bugs before your users do.
 
 - [doc-detective](https://github.com/doc-detective/doc-detective): The `doc-detective` command line interface for creating and running documentation tests.
+- [/samples](https://github.com/doc-detective/doc-detective/tree/main/samples): Sample docs and tests for getting started.
 
 ### Additional tools
 
