@@ -3,7 +3,7 @@
   "displayName": "Doc Detective",
   "publisher": "DocDetective",
   "description": "View Doc Detective tests for active files.",
-  "version": "3.6.1",
+  "version": "3.6.2",
   "sponsor": {
     "url": "https://github.com/sponsors/doc-detective"
   },
@@ -90,7 +90,7 @@
   },
   "dependencies": {
     "@vscode/vsce": "^3.4.2",
-    "doc-detective-resolver": "^3.6.1",
+    "doc-detective-resolver": "^3.6.2",
     "js-yaml": "^4.1.0"
   }
 }
