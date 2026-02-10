@@ -1,6 +1,6 @@
 const { replaceEnvs } = require("./utils");
 const { JSONSchemaFaker } = require("json-schema-faker");
-const { readFile } = require("doc-detective-common");
+const { readFile } = require("./files");
 const parser = require("@apidevtools/json-schema-ref-parser");
 
 JSONSchemaFaker.option({ requiredOnly: true });
