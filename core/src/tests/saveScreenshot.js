@@ -249,9 +249,24 @@ async function saveScreenshot({ config, step, driver }) {
     rect.width = Math.round(rect.width);
     rect.height = Math.round(rect.height);
 
-    log(config, "debug", { padded_rect: rect });
+    // Clamp values to stay within image bounds
+    const imgMeta = await sharp(filePath).metadata();
+    if (rect.x < 0) {
+      rect.width += rect.x;
+      rect.x = 0;
+    }
+    if (rect.y < 0) {
+      rect.height += rect.y;
+      rect.y = 0;
+    }
+    if (rect.x + rect.width > imgMeta.width) {
+      rect.width = imgMeta.width - rect.x;
+    }
+    if (rect.y + rect.height > imgMeta.height) {
+      rect.height = imgMeta.height - rect.y;
+    }
 
-    // TODO: Add error handling for out of bounds
+    log(config, "debug", { padded_rect: rect });
 
     // Create a new PNG object with the dimensions of the cropped area
     const croppedPath = path.join(dir, "cropped.png");

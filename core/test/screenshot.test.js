@@ -10,18 +10,27 @@ const server = createServer({
   staticDir: "./test/server/public",
 });
 
+let serverStarted = false;
+
 // Start the server before tests
 before(async () => {
   try {
     await server.start();
+    serverStarted = true;
   } catch (error) {
-    console.error(`Failed to start test server: ${error.message}`);
-    throw error;
+    if (error.code === "EADDRINUSE") {
+      // Server already running from another test file
+      console.log("Test server already running on port 8092");
+    } else {
+      console.error(`Failed to start test server: ${error.message}`);
+      throw error;
+    }
   }
 });
 
 // Stop the server after tests
 after(async () => {
+  if (!serverStarted) return;
   try {
     await server.stop();
   } catch (error) {
@@ -118,7 +127,7 @@ describe("Screenshot sourceIntegration preservation", function () {
             {
               screenshot: {
                 path: screenshotPath,
-                maxVariation: 0.05,
+                maxVariation: 0,
                 overwrite: "false",
               },
             },
@@ -138,7 +147,7 @@ describe("Screenshot sourceIntegration preservation", function () {
             {
               screenshot: {
                 path: screenshotPath,
-                maxVariation: 0.05,
+                maxVariation: 0,
                 overwrite: "aboveVariation",
                 sourceIntegration: {
                   type: "heretto",
@@ -155,7 +164,9 @@ describe("Screenshot sourceIntegration preservation", function () {
 
     try {
       fs.writeFileSync(initialFilePath, JSON.stringify(initialSpec, null, 2));
-      await runTests({ input: initialFilePath, logLevel: "silent" });
+      const initialResult = await runTests({ input: initialFilePath, logLevel: "silent" });
+      assert.ok(initialResult, "Initial screenshot run should produce a result");
+      assert.ok(fs.existsSync(screenshotPath), "Initial screenshot file should have been created");
 
       // Now run with a different page to trigger variation warning
       fs.writeFileSync(variationFilePath, JSON.stringify(variationSpec, null, 2));
