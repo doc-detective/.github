@@ -1,6 +1,6 @@
 {
   "name": "doc-detective-core",
-  "version": "3.6.3",
+  "version": "4.0.0-beta.0",
   "description": "The doc testing framework.",
   "main": "src/index.js",
   "scripts": {
@@ -36,14 +36,14 @@
     "appium-geckodriver": "^2.1.11",
     "appium-safari-driver": "^4.1.8",
     "axios": "^1.13.5",
-    "doc-detective-common": "file:../common",
+    "doc-detective-common": "^4.0.0-beta.0",
     "dotenv": "^17.2.4",
     "geckodriver": "^6.1.0",
     "jq-web": "^0.6.2",
     "json-schema-faker": "^0.5.9",
     "pixelmatch": "^7.1.0",
     "pngjs": "^7.0.0",
-    "posthog-node": "^5.24.14",
+    "posthog-node": "^5.24.15",
     "tree-kill": "^1.2.2",
     "webdriverio": "^9.24.0",
     "yaml": "^2.8.2"
