@@ -9,6 +9,7 @@ Doc Detective is a doc content testing framework that simplifies the process of 
 
 ### Additional tools
 
+- [agent-tools(https://github.com/doc-detective/agent-tools): Claude plugin, Gemini extension, Agent Skills, and other agentic tools to help your AI write, run, and debug Doc Detective tests.
 - [github-action](https://github.com/doc-detective/github-action): Doc Detective as a GitHub Action.
 
 ### Component repositories
