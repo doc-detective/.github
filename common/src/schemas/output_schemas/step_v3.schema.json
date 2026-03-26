@@ -1155,6 +1155,11 @@
                                     }
                                   ]
                                 },
+                                "scope": {
+                                  "type": "string",
+                                  "pattern": "^[a-zA-Z0-9_-]{1,64}$",
+                                  "description": "Named scope to interact with. References a terminal scope created by a previous step. If the specified scope doesn't exist, the step fails. Must be 1-64 characters and contain only letters, numbers, hyphens, and underscores."
+                                },
                                 "inputDelay": {
                                   "type": "number",
                                   "description": "Delay in milliseconds between each key press during a recording",
@@ -1262,6 +1267,11 @@
                                       }
                                     ]
                                   },
+                                  "scope": {
+                                    "type": "string",
+                                    "pattern": "^[a-zA-Z0-9_-]{1,64}$",
+                                    "description": "Named scope to interact with. References a terminal scope created by a previous step. If the specified scope doesn't exist, the step fails. Must be 1-64 characters and contain only letters, numbers, hyphens, and underscores."
+                                  },
                                   "inputDelay": {
                                     "type": "number",
                                     "description": "Delay in milliseconds between each key press during a recording",
@@ -1349,6 +1359,10 @@
                                 "$ENTER$"
                               ],
                               "inputDelay": 500
+                            },
+                            {
+                              "keys": "my-project\n",
+                              "scope": "npm-init"
                             }
                           ]
                         },
@@ -1804,6 +1818,11 @@
                                       }
                                     ]
                                   },
+                                  "scope": {
+                                    "type": "string",
+                                    "pattern": "^[a-zA-Z0-9_-]{1,64}$",
+                                    "description": "Named scope to interact with. References a terminal scope created by a previous step. If the specified scope doesn't exist, the step fails. Must be 1-64 characters and contain only letters, numbers, hyphens, and underscores."
+                                  },
                                   "inputDelay": {
                                     "type": "number",
                                     "description": "Delay in milliseconds between each key press during a recording",
@@ -1911,6 +1930,11 @@
                                         }
                                       ]
                                     },
+                                    "scope": {
+                                      "type": "string",
+                                      "pattern": "^[a-zA-Z0-9_-]{1,64}$",
+                                      "description": "Named scope to interact with. References a terminal scope created by a previous step. If the specified scope doesn't exist, the step fails. Must be 1-64 characters and contain only letters, numbers, hyphens, and underscores."
+                                    },
                                     "inputDelay": {
                                       "type": "number",
                                       "description": "Delay in milliseconds between each key press during a recording",
@@ -1998,6 +2022,10 @@
                                   "$ENTER$"
                                 ],
                                 "inputDelay": 500
+                              },
+                              {
+                                "keys": "my-project\n",
+                                "scope": "npm-init"
                               }
                             ]
                           },
@@ -3719,6 +3747,31 @@
                       "type": "string",
                       "description": "Command to perform in the machine's default shell."
                     },
+                    "scope": {
+                      "type": "string",
+                      "pattern": "^[a-zA-Z0-9_-]{1,64}$",
+                      "description": "Named scope to create or interact with. Creates a new terminal scope for long-running/parallel processes, or references an existing scope. Must be 1-64 characters and contain only letters, numbers, hyphens, and underscores."
+                    },
+                    "waitUntil": {
+                      "type": "object",
+                      "description": "Conditions to wait for in the command's output before considering the step complete. When specified, the process continues running after conditions are met. Times out after 30 seconds.",
+                      "properties": {
+                        "stdio": {
+                          "type": "object",
+                          "description": "Standard I/O conditions to wait for.",
+                          "properties": {
+                            "stdout": {
+                              "type": "string",
+                              "description": "String or regex pattern to wait for in stdout. Use `/pattern/flags` format for regex."
+                            },
+                            "stderr": {
+                              "type": "string",
+                              "description": "String or regex pattern to wait for in stderr. Use `/pattern/flags` format for regex."
+                            }
+                          }
+                        }
+                      }
+                    },
                     "args": {
                       "type": "array",
                       "description": "Arguments for the command.",
@@ -3808,6 +3861,31 @@
                       "command": {
                         "type": "string",
                         "description": "Command to perform in the machine's default shell."
+                      },
+                      "scope": {
+                        "type": "string",
+                        "pattern": "^[a-zA-Z0-9_-]{1,64}$",
+                        "description": "Named scope to create or interact with. Creates a new terminal scope for long-running/parallel processes, or references an existing scope. Must be 1-64 characters and contain only letters, numbers, hyphens, and underscores."
+                      },
+                      "waitUntil": {
+                        "type": "object",
+                        "description": "Conditions to wait for in the command's output before considering the step complete. When specified, the process continues running after conditions are met. Times out after 30 seconds.",
+                        "properties": {
+                          "stdio": {
+                            "type": "object",
+                            "description": "Standard I/O conditions to wait for.",
+                            "properties": {
+                              "stdout": {
+                                "type": "string",
+                                "description": "String or regex pattern to wait for in stdout. Use `/pattern/flags` format for regex."
+                              },
+                              "stderr": {
+                                "type": "string",
+                                "description": "String or regex pattern to wait for in stderr. Use `/pattern/flags` format for regex."
+                              }
+                            }
+                          }
+                        }
                       },
                       "args": {
                         "type": "array",
@@ -3928,6 +4006,24 @@
                   "directory": "output",
                   "maxVariation": 0.1,
                   "overwrite": "aboveVariation"
+                },
+                {
+                  "command": "npm run dev",
+                  "scope": "dev-server",
+                  "waitUntil": {
+                    "stdio": {
+                      "stdout": "Server listening on port"
+                    }
+                  }
+                },
+                {
+                  "command": "npm init",
+                  "scope": "npm-init",
+                  "waitUntil": {
+                    "stdio": {
+                      "stdout": "/package name:/i"
+                    }
+                  }
                 }
               ]
             }
@@ -4027,6 +4123,31 @@
                       "description": "Code to run.",
                       "type": "string"
                     },
+                    "scope": {
+                      "type": "string",
+                      "pattern": "^[a-zA-Z0-9_-]{1,64}$",
+                      "description": "Named scope to create or interact with. Creates a new code execution scope for long-running/parallel processes, or references an existing scope. Must be 1-64 characters and contain only letters, numbers, hyphens, and underscores."
+                    },
+                    "waitUntil": {
+                      "type": "object",
+                      "description": "Conditions to wait for in the code's output before considering the step complete. When specified, the process continues running after conditions are met. Times out after 30 seconds.",
+                      "properties": {
+                        "stdio": {
+                          "type": "object",
+                          "description": "Standard I/O conditions to wait for.",
+                          "properties": {
+                            "stdout": {
+                              "type": "string",
+                              "description": "String or regex pattern to wait for in stdout. Use `/pattern/flags` format for regex."
+                            },
+                            "stderr": {
+                              "type": "string",
+                              "description": "String or regex pattern to wait for in stderr. Use `/pattern/flags` format for regex."
+                            }
+                          }
+                        }
+                      }
+                    },
                     "args": {
                       "type": "array",
                       "description": "Arguments for the command.",
@@ -4117,6 +4238,31 @@
                       "code": {
                         "description": "Code to run.",
                         "type": "string"
+                      },
+                      "scope": {
+                        "type": "string",
+                        "pattern": "^[a-zA-Z0-9_-]{1,64}$",
+                        "description": "Named scope to create or interact with. Creates a new code execution scope for long-running/parallel processes, or references an existing scope. Must be 1-64 characters and contain only letters, numbers, hyphens, and underscores."
+                      },
+                      "waitUntil": {
+                        "type": "object",
+                        "description": "Conditions to wait for in the code's output before considering the step complete. When specified, the process continues running after conditions are met. Times out after 30 seconds.",
+                        "properties": {
+                          "stdio": {
+                            "type": "object",
+                            "description": "Standard I/O conditions to wait for.",
+                            "properties": {
+                              "stdout": {
+                                "type": "string",
+                                "description": "String or regex pattern to wait for in stdout. Use `/pattern/flags` format for regex."
+                              },
+                              "stderr": {
+                                "type": "string",
+                                "description": "String or regex pattern to wait for in stderr. Use `/pattern/flags` format for regex."
+                              }
+                            }
+                          }
+                        }
                       },
                       "args": {
                         "type": "array",
@@ -4342,6 +4488,11 @@
                         }
                       ]
                     },
+                    "scope": {
+                      "type": "string",
+                      "pattern": "^[a-zA-Z0-9_-]{1,64}$",
+                      "description": "Named scope to interact with. References a terminal scope created by a previous step. If the specified scope doesn't exist, the step fails. Must be 1-64 characters and contain only letters, numbers, hyphens, and underscores."
+                    },
                     "inputDelay": {
                       "type": "number",
                       "description": "Delay in milliseconds between each key press during a recording",
@@ -4449,6 +4600,11 @@
                           }
                         ]
                       },
+                      "scope": {
+                        "type": "string",
+                        "pattern": "^[a-zA-Z0-9_-]{1,64}$",
+                        "description": "Named scope to interact with. References a terminal scope created by a previous step. If the specified scope doesn't exist, the step fails. Must be 1-64 characters and contain only letters, numbers, hyphens, and underscores."
+                      },
                       "inputDelay": {
                         "type": "number",
                         "description": "Delay in milliseconds between each key press during a recording",
@@ -4536,6 +4692,10 @@
                     "$ENTER$"
                   ],
                   "inputDelay": 500
+                },
+                {
+                  "keys": "my-project\n",
+                  "scope": "npm-init"
                 }
               ]
             }
@@ -6926,6 +7086,89 @@
           }
         }
       ]
+    },
+    {
+      "allOf": [
+        {
+          "type": "object",
+          "dynamicDefaults": {
+            "stepId": "uuid"
+          },
+          "properties": {
+            "$schema": {
+              "description": "JSON Schema for this object.",
+              "type": "string",
+              "enum": [
+                "https://raw.githubusercontent.com/doc-detective/common/refs/heads/main/dist/schemas/step_v3.schema.json"
+              ]
+            },
+            "stepId": {
+              "type": "string",
+              "description": "ID of the step."
+            },
+            "description": {
+              "type": "string",
+              "description": "Description of the step."
+            },
+            "unsafe": {
+              "type": "boolean",
+              "description": "Whether or not the step may be unsafe. Unsafe steps may perform actions that could modify the system or environment in unexpected ways. Unsafe steps are only performed within Docker containers or if unsafe steps are enabled with the `allowUnsafeSteps` config property or the `--allow-unsafe` flag.",
+              "default": false
+            },
+            "outputs": {
+              "type": "object",
+              "description": "Outputs from step processes and user-defined expressions. Use the `outputs` object to reference outputs in subsequent steps. If a user-defined output matches the key for a step-defined output, the user-defined output takes precedence.",
+              "default": {},
+              "patternProperties": {
+                "^[A-Za-z0-9_]+$": {
+                  "type": "string",
+                  "description": "Runtime expression for a user-defined output value."
+                }
+              },
+              "title": "Outputs (step)"
+            },
+            "variables": {
+              "type": "object",
+              "description": "Environment variables to set from user-defined expressions.",
+              "default": {},
+              "patternProperties": {
+                "^[A-Za-z0-9_]+$": {
+                  "type": "string",
+                  "description": "Runtime expression for a user-defined output value."
+                }
+              },
+              "title": "Variables (step)"
+            },
+            "breakpoint": {
+              "type": "boolean",
+              "description": "Whether or not this step should act as a breakpoint when debugging is enabled. When `true`, execution will pause at this step when debug mode is enabled.",
+              "default": false
+            }
+          },
+          "title": "Common"
+        },
+        {
+          "title": "terminateScope",
+          "type": "object",
+          "required": [
+            "terminateScope"
+          ],
+          "properties": {
+            "terminateScope": {
+              "$schema": "http://json-schema.org/draft-07/schema#",
+              "title": "terminateScope",
+              "description": "Terminate a named scope. Sends SIGTERM to the process, waits up to 5 seconds, then sends SIGKILL if needed.",
+              "type": "string",
+              "pattern": "^[a-zA-Z0-9_-]{1,64}$",
+              "examples": [
+                "dev-server",
+                "npm-init",
+                "test-scope"
+              ]
+            }
+          }
+        }
+      ]
     }
   ],
   "examples": [
@@ -7314,6 +7557,12 @@
           "selector": "#targetElement"
         }
       }
+    },
+    {
+      "terminateScope": "dev-server"
+    },
+    {
+      "terminateScope": "npm-init"
     }
   ]
 }

@@ -3,8 +3,20 @@ const { Key } = require("webdriverio");
 const {
   findElementByCriteria,
 } = require("./findStrategies");
+const { hasScope, getScope } = require("../scopes/registry");
+const { writeToTerminal } = require("../scopes/terminal");
 
 exports.typeKeys = typeKeys;
+
+const terminalSpecialKeyMap = {
+  "$ENTER$": "\n",
+  "$RETURN$": "\n",
+  "$TAB$": "\t",
+  "$ESCAPE$": "\x1b",
+  "$BACKSPACE$": "\x7f",
+  "$CTRL$": "",
+  "$SPACE$": " ",
+};
 
 const specialKeyMap = {
   $CTRL$: Key.Ctrl,
@@ -66,43 +78,72 @@ const specialKeyMap = {
   $ZANKAKU_HANDKAKU$: Key.ZenkakuHankaku,
 };
 
-// Type a sequence of keys in the active element.
-async function typeKeys({ config, step, driver }) {
+async function typeKeys({ config, step, driver, scopeRegistry = null }) {
   let result = { status: "PASS", description: "Typed keys." };
 
-  // Validate step payload
   const isValidStep = validate({ schemaKey: "step_v3", object: step });
   if (!isValidStep.valid) {
     result.status = "FAIL";
     result.description = `Invalid step definition: ${isValidStep.errors}`;
     return result;
   }
-  // Accept coerced and defaulted values
   step = isValidStep.object;
 
-  // Convert to array
   if (typeof step.type === "string") {
     step.type = [step.type];
   }
-  // Convert to object
   if (Array.isArray(step.type)) {
     step.type = { keys: step.type };
   }
-  // Convert keys property to object
   if (typeof step.type.keys === "string") {
     step.type.keys = [step.type.keys];
   }
-  // Set default values
   step.type = {
     ...step.type,
     keys: step.type.keys || [],
     inputDelay: step.type.inputDelay || 100,
   };
 
-  // Skip if no keys to type
   if (!step.type.keys.length) {
     result.status = "SKIPPED";
     result.description = "No keys to type.";
+    return result;
+  }
+
+  const scopeName = step.type.scope;
+  if (scopeName) {
+    if (!scopeRegistry || !scopeRegistry.has(scopeName)) {
+      result.status = "FAIL";
+      result.description = `Scope '${scopeName}' does not exist. Create it with a runShell or runCode step first.`;
+      return result;
+    }
+    
+    const scope = scopeRegistry.get(scopeName);
+    if (scope.closed) {
+      result.status = "FAIL";
+      result.description = `Scope '${scopeName}' has already closed.`;
+      return result;
+    }
+    
+    let inputData = "";
+    for (const key of step.type.keys) {
+      if (terminalSpecialKeyMap[key]) {
+        inputData += terminalSpecialKeyMap[key];
+      } else if (key.startsWith("$") && key.endsWith("$")) {
+        inputData += key;
+      } else {
+        inputData += key;
+      }
+    }
+    
+    const success = scopeRegistry.writeToScope(scopeName, inputData);
+    if (!success) {
+      result.status = "FAIL";
+      result.description = `Failed to write to scope '${scopeName}'.`;
+      return result;
+    }
+    
+    result.description = `Typed keys to scope '${scopeName}'.`;
     return result;
   }
 

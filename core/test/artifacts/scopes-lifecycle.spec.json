@@ -1,0 +1,74 @@
+{
+  "$schema": "https://raw.githubusercontent.com/doc-detective/common/refs/heads/main/dist/schemas/spec_v3.schema.json",
+  "description": "Test basic scope lifecycle: create, use, and terminate",
+  "tests": [
+    {
+      "testId": "scope-basic-lifecycle",
+      "description": "Create a scope with sleep command and terminate it",
+      "contexts": [],
+      "steps": [
+        {
+          "runShell": {
+            "command": "sleep 60",
+            "scope": "test-scope-sleep"
+          }
+        },
+        {
+          "terminateScope": "test-scope-sleep"
+        }
+      ]
+    },
+    {
+      "testId": "scope-waituntil-stdout",
+      "description": "Test waitUntil with stdout condition",
+      "contexts": [],
+      "steps": [
+        {
+          "runShell": {
+            "command": "echo 'Server is ready' && sleep 60",
+            "scope": "test-waituntil",
+            "waitUntil": {
+              "stdio": {
+                "stdout": "Server is ready"
+              }
+            }
+          }
+        },
+        {
+          "terminateScope": "test-waituntil"
+        }
+      ]
+    },
+    {
+      "testId": "scope-waituntil-regex",
+      "description": "Test waitUntil with regex pattern",
+      "contexts": [],
+      "steps": [
+        {
+          "runShell": {
+            "command": "echo 'Server listening on port 3000' && sleep 60",
+            "scope": "test-regex",
+            "waitUntil": {
+              "stdio": {
+                "stdout": "/listening.*port/"
+              }
+            }
+          }
+        },
+        {
+          "terminateScope": "test-regex"
+        }
+      ]
+    },
+    {
+      "testId": "terminate-nonexistent-scope",
+      "description": "Test terminating a scope that doesn't exist (should not fail)",
+      "contexts": [],
+      "steps": [
+        {
+          "terminateScope": "nonexistent-scope"
+        }
+      ]
+    }
+  ]
+}

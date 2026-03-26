@@ -7,7 +7,6 @@ const os = require("os");
 
 exports.runCode = runCode;
 
-// Create a temporary script file
 function createTempScript(code, language) {
   let extension;
   switch (language) {
@@ -101,7 +100,6 @@ async function runCode({ config, step }) {
       return result;
     }
 
-    // Prepare shell command based on language
     const shellStep = {
       runShell: {
         command:
@@ -111,9 +109,12 @@ async function runCode({ config, step }) {
             ? "node"
             : "bash",
         args: [scriptPath, ...step.runCode.args],
+        scope: step.runCode.scope,
+        waitUntil: step.runCode.waitUntil,
+        workingDirectory: step.runCode.workingDirectory,
+        timeout: step.runCode.timeout,
       },
     };
-    delete shellStep.runCode;
 
     // Execute script using runShell
     const shellResult = await runShell({ config: config, step: shellStep });
@@ -149,7 +150,7 @@ if (require.main === module) {
       language: "python",
     },
   };
-  runCode(config, step)
+  runCode({ config, step })
     .then((result) => {
       console.log(result);
     })

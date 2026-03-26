@@ -31,6 +31,31 @@
             "type": "string",
             "description": "Command to perform in the machine's default shell."
           },
+          "scope": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9_-]{1,64}$",
+            "description": "Named scope to create or interact with. Creates a new terminal scope for long-running/parallel processes, or references an existing scope. Must be 1-64 characters and contain only letters, numbers, hyphens, and underscores."
+          },
+          "waitUntil": {
+            "type": "object",
+            "description": "Conditions to wait for in the command's output before considering the step complete. When specified, the process continues running after conditions are met. Times out after 30 seconds.",
+            "properties": {
+              "stdio": {
+                "type": "object",
+                "description": "Standard I/O conditions to wait for.",
+                "properties": {
+                  "stdout": {
+                    "type": "string",
+                    "description": "String or regex pattern to wait for in stdout. Use `/pattern/flags` format for regex."
+                  },
+                  "stderr": {
+                    "type": "string",
+                    "description": "String or regex pattern to wait for in stderr. Use `/pattern/flags` format for regex."
+                  }
+                }
+              }
+            }
+          },
           "args": {
             "type": "array",
             "description": "Arguments for the command.",
@@ -150,6 +175,24 @@
       "directory": "output",
       "maxVariation": 0.1,
       "overwrite": "aboveVariation"
+    },
+    {
+      "command": "npm run dev",
+      "scope": "dev-server",
+      "waitUntil": {
+        "stdio": {
+          "stdout": "Server listening on port"
+        }
+      }
+    },
+    {
+      "command": "npm init",
+      "scope": "npm-init",
+      "waitUntil": {
+        "stdio": {
+          "stdout": "/package name:/i"
+        }
+      }
     }
   ]
 }

@@ -433,6 +433,11 @@
                         }
                       ]
                     },
+                    "scope": {
+                      "type": "string",
+                      "pattern": "^[a-zA-Z0-9_-]{1,64}$",
+                      "description": "Named scope to interact with. References a terminal scope created by a previous step. If the specified scope doesn't exist, the step fails. Must be 1-64 characters and contain only letters, numbers, hyphens, and underscores."
+                    },
                     "inputDelay": {
                       "type": "number",
                       "description": "Delay in milliseconds between each key press during a recording",
@@ -540,6 +545,11 @@
                           }
                         ]
                       },
+                      "scope": {
+                        "type": "string",
+                        "pattern": "^[a-zA-Z0-9_-]{1,64}$",
+                        "description": "Named scope to interact with. References a terminal scope created by a previous step. If the specified scope doesn't exist, the step fails. Must be 1-64 characters and contain only letters, numbers, hyphens, and underscores."
+                      },
                       "inputDelay": {
                         "type": "number",
                         "description": "Delay in milliseconds between each key press during a recording",
@@ -627,6 +637,10 @@
                     "$ENTER$"
                   ],
                   "inputDelay": 500
+                },
+                {
+                  "keys": "my-project\n",
+                  "scope": "npm-init"
                 }
               ]
             },
@@ -1082,6 +1096,11 @@
                           }
                         ]
                       },
+                      "scope": {
+                        "type": "string",
+                        "pattern": "^[a-zA-Z0-9_-]{1,64}$",
+                        "description": "Named scope to interact with. References a terminal scope created by a previous step. If the specified scope doesn't exist, the step fails. Must be 1-64 characters and contain only letters, numbers, hyphens, and underscores."
+                      },
                       "inputDelay": {
                         "type": "number",
                         "description": "Delay in milliseconds between each key press during a recording",
@@ -1189,6 +1208,11 @@
                             }
                           ]
                         },
+                        "scope": {
+                          "type": "string",
+                          "pattern": "^[a-zA-Z0-9_-]{1,64}$",
+                          "description": "Named scope to interact with. References a terminal scope created by a previous step. If the specified scope doesn't exist, the step fails. Must be 1-64 characters and contain only letters, numbers, hyphens, and underscores."
+                        },
                         "inputDelay": {
                           "type": "number",
                           "description": "Delay in milliseconds between each key press during a recording",
@@ -1276,6 +1300,10 @@
                       "$ENTER$"
                     ],
                     "inputDelay": 500
+                  },
+                  {
+                    "keys": "my-project\n",
+                    "scope": "npm-init"
                   }
                 ]
               },

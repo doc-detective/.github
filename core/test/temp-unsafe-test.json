@@ -1,0 +1,12 @@
+{
+  "tests": [
+    {
+      "steps": [
+        {
+          "runShell": "echo 'This step is unsafe'",
+          "unsafe": true
+        }
+      ]
+    }
+  ]
+}
