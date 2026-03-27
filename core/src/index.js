@@ -1,12 +1,18 @@
-const {
-  detectAndResolveTests,
-} = require("doc-detective-resolver");
+const { setConfig } = require("./config");
+const { detectTests } = require("./detectTests");
+const { resolveTests } = require("./resolveTests");
 const { log, cleanTemp } = require("./utils");
 const { runSpecs, runViaApi, getRunner } = require("./tests");
 const { telemetryNotice, sendTelemetry } = require("./telem");
+const { readFile, resolvePaths } = require("./files");
 
 exports.runTests = runTests;
 exports.getRunner = getRunner;
+exports.detectTests = detectTests;
+exports.detectAndResolveTests = detectAndResolveTests;
+exports.resolveTests = resolveTests;
+exports.readFile = readFile;
+exports.resolvePaths = resolvePaths;
 
 const supportMessage = `
 ##########################################################################
@@ -15,6 +21,26 @@ const supportMessage = `
 # - GitHub Sponsors: https://github.com/sponsors/doc-detective           #
 # - Open Collective: https://opencollective.com/doc-detective            #
 ##########################################################################`;
+
+/**
+ * Detects and resolves tests based on the provided configuration.
+ * Chains setConfig -> detectTests -> resolveTests.
+ *
+ * @async
+ * @param {Object} options
+ * @param {Object} options.config - The configuration object
+ * @returns {Promise<Object|null>} Resolved tests object or null if none found
+ */
+async function detectAndResolveTests({ config }) {
+  config = await setConfig({ config });
+  const detectedTests = await detectTests({ config });
+  if (!detectedTests || detectedTests.length === 0) {
+    log(config, "warning", "No tests detected.");
+    return null;
+  }
+  const resolvedTests = await resolveTests({ config, detectedTests });
+  return resolvedTests;
+}
 
 // Run tests defined in specifications and documentation source files.
 async function runTests(config, options = {}) {

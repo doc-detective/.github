@@ -1,35 +1,12 @@
-const { createServer } = require("./server");
-const path = require("path");
-const { spawnCommand } = require("../src/utils");
-const assert = require("assert").strict;
-const fs = require("fs");
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import { spawnCommand } from "../dist/utils.js";
+import assert from "node:assert/strict";
+import fs from "node:fs";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const artifactPath = path.resolve(__dirname, "./artifacts");
 const outputFile = path.resolve(`${artifactPath}/resolvedTestsResults.json`);
-
-// Create a server with custom options
-const server = createServer({
-  port: 8093,
-  staticDir: "./test/server/public",
-});
-
-// Start the server before tests
-before(async () => {
-  try {
-    await server.start();
-  } catch (error) {
-    console.error(`Failed to start test server: ${error.message}`);
-    throw error;
-  }
-});
-
-// Stop the server after tests
-after(async () => {
-  try {
-    await server.stop();
-  } catch (error) {
-    console.error(`Failed to stop test server: ${error.message}`);
-  }
-});
 
 describe("DOC_DETECTIVE_API environment variable", function () {
   // Set indefinite timeout
@@ -60,13 +37,11 @@ describe("DOC_DETECTIVE_API environment variable", function () {
       }
 
       if (fs.existsSync(outputFile)) {
-        const testResult = require(outputFile);
+        const testResult = JSON.parse(fs.readFileSync(outputFile, "utf8"));
         console.log(
           "API Result summary:",
           JSON.stringify(testResult.summary, null, 2)
         );
-        // Clean up the require cache
-        delete require.cache[require.resolve(outputFile)];
         fs.unlinkSync(outputFile);
 
         // Check that tests were run
@@ -167,9 +142,7 @@ describe("DOC_DETECTIVE_API environment variable", function () {
       }
 
       if (fs.existsSync(outputFile)) {
-        const testResult = require(outputFile);
-        // Clean up the require cache
-        delete require.cache[require.resolve(outputFile)];
+        const testResult = JSON.parse(fs.readFileSync(outputFile, "utf8"));
         fs.unlinkSync(outputFile);
 
         // Check that tests were run

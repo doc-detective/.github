@@ -347,7 +347,7 @@ describe("Intelligent goTo behavior", function () {
       assert.equal(result.summary.steps.fail, 1);
       assert.equal(result.summary.tests.fail, 1);
     } finally {
-      fs.unlinkSync(tempFilePath);
+      if (fs.existsSync(tempFilePath)) fs.unlinkSync(tempFilePath);
     }
   });
 
@@ -378,7 +378,7 @@ describe("Intelligent goTo behavior", function () {
       assert.equal(result.summary.steps.fail, 1);
       assert.equal(result.summary.tests.fail, 1);
     } finally {
-      fs.unlinkSync(tempFilePath);
+      if (fs.existsSync(tempFilePath)) fs.unlinkSync(tempFilePath);
     }
   });
 
@@ -411,7 +411,7 @@ describe("Intelligent goTo behavior", function () {
       assert.equal(result.summary.steps.fail, 1);
       assert.equal(result.summary.tests.fail, 1);
     } finally {
-      fs.unlinkSync(tempFilePath);
+      if (fs.existsSync(tempFilePath)) fs.unlinkSync(tempFilePath);
     }
   });
 });
@@ -600,9 +600,12 @@ describe("getRunner() function", function () {
       const result = await getRunner();
       cleanup = result.cleanup;
 
+      // Verify session is ready before navigating
+      await result.runner.getTitle();
+
       // Navigate to test page
       await result.runner.url("http://localhost:8092/index.html");
-      
+
       // Verify we can interact with the page
       const title = await result.runner.getTitle();
       assert.ok(title, "should get page title");

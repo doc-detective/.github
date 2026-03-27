@@ -11,6 +11,41 @@ const { loadDescription } = require("./openapi");
 exports.setConfig = setConfig;
 exports.getAvailableApps = getAvailableApps;
 exports.getEnvironment = getEnvironment;
+exports.resolveConcurrentRunners = resolveConcurrentRunners;
+
+/**
+ * Deep merge two objects, with override properties taking precedence
+ * @param {Object} target - The target object to merge into
+ * @param {Object} override - The override object containing properties to merge
+ * @returns {Object} A new object with merged properties
+ */
+function deepMerge(target, override) {
+  const result = { ...target };
+
+  for (const key in override) {
+    if (override.hasOwnProperty(key)) {
+      if (
+        override[key] != null &&
+        typeof override[key] === "object" &&
+        !Array.isArray(override[key])
+      ) {
+        if (
+          result[key] != null &&
+          typeof result[key] === "object" &&
+          !Array.isArray(result[key])
+        ) {
+          result[key] = deepMerge(result[key], override[key]);
+        } else {
+          result[key] = deepMerge({}, override[key]);
+        }
+      } else {
+        result[key] = override[key];
+      }
+    }
+  }
+
+  return result;
+}
 
 // Map of Node-detected platforms to common-term equivalents
 const platformMap = {
@@ -40,7 +75,6 @@ const defaultAppIDs = {
 };
 
 // List of default file type definitions
-// TODO: Add defaults for all supported files
 let defaultFileTypes = {
   asciidoc_1_0: {
     name: "asciidoc",
@@ -53,6 +87,115 @@ let defaultFileTypes = {
       step: ["\\/\\/\\s+\\(\\s*step\\s+([\\s\\S]*?)\\s*\\)"],
     },
     markup: [],
+  },
+  dita_1_0: {
+    name: "dita",
+    extensions: ["dita", "ditamap", "xml"],
+    inlineStatements: {
+      testStart: [
+        "<\\?doc-detective\\s+test([\\s\\S]*?)\\?>",
+        "<!--\\s*test([\\s\\S]+?)-->",
+      ],
+      testEnd: [
+        "<\\?doc-detective\\s+test\\s+end\\s*\\?>",
+        "<!--\\s*test end([\\s\\S]+?)-->",
+      ],
+      ignoreStart: [
+        "<\\?doc-detective\\s+test\\s+ignore\\s+start\\s*\\?>",
+        "<!--\\s*test ignore\\s+start\\s*-->",
+      ],
+      ignoreEnd: [
+        "<\\?doc-detective\\s+test\\s+ignore\\s+end\\s*\\?>",
+        "<!--\\s*test ignore\\s+end\\s*-->",
+      ],
+      step: [
+        "<\\?doc-detective\\s+step\\s+([\\s\\S]*?)\\s*\\?>",
+        "<!--\\s*step([\\s\\S]+?)-->",
+        '<data\\s+name="step"\\s*>([\\s\\S]*?)<\\/data>',
+      ],
+    },
+    markup: [
+      {
+        name: "clickUiControl",
+        regex: [
+          "(?:[Cc]lick|[Tt]ap|[Ss]elect|[Pp]ress|[Cc]hoose)\\s+(?:the\\s+)?<uicontrol>([^<]+)<\\/uicontrol>",
+        ],
+        actions: ["click"],
+      },
+      {
+        name: "typeIntoUiControl",
+        regex: [
+          "(?:[Tt]ype|[Ee]nter|[Ii]nput)\\s+<userinput>([^<]+)<\\/userinput>\\s+(?:in|into)(?:\\s+the)?\\s+<uicontrol>([^<]+)<\\/uicontrol>",
+        ],
+        actions: [
+          {
+            type: {
+              keys: "$1",
+              selector: "$2",
+            },
+          },
+        ],
+      },
+      {
+        name: "navigateToXref",
+        regex: [
+          '(?:[Nn]avigate\\s+to|[Oo]pen|[Gg]o\\s+to|[Vv]isit|[Bb]rowse\\s+to)\\s+<xref\\s+[^>]*href="(https?:\\/\\/[^"]+)"[^>]*>',
+        ],
+        actions: ["goTo"],
+      },
+      {
+        name: "findUiControl",
+        regex: ["<uicontrol>([^<]+)<\\/uicontrol>"],
+        actions: ["find"],
+      },
+      {
+        name: "verifyWindowTitle",
+        regex: ["<wintitle>([^<]+)<\\/wintitle>"],
+        actions: ["find"],
+      },
+      {
+        name: "checkExternalXref",
+        regex: [
+          '<xref\\s+[^>]*scope="external"[^>]*href="(https?:\\/\\/[^"]+)"[^>]*>',
+          '<xref\\s+[^>]*href="(https?:\\/\\/[^"]+)"[^>]*scope="external"[^>]*>',
+        ],
+        actions: ["checkLink"],
+      },
+      {
+        name: "checkHyperlink",
+        regex: ['<xref\\s+href="(https?:\\/\\/[^"]+)"[^>]*>'],
+        actions: ["checkLink"],
+      },
+      {
+        name: "checkLinkElement",
+        regex: ['<link\\s+href="(https?:\\/\\/[^"]+)"[^>]*>'],
+        actions: ["checkLink"],
+      },
+      {
+        name: "clickOnscreenText",
+        regex: [
+          "\\b(?:[Cc]lick|[Tt]ap|[Ll]eft-click|[Cc]hoose|[Ss]elect|[Cc]heck)\\b\\s+<b>((?:(?!<\\/b>).)+)<\\/b>",
+        ],
+        actions: ["click"],
+      },
+      {
+        name: "findOnscreenText",
+        regex: ["<b>((?:(?!<\\/b>).)+)<\\/b>"],
+        actions: ["find"],
+      },
+      {
+        name: "goToUrl",
+        regex: [
+          '\\b(?:[Gg]o\\s+to|[Oo]pen|[Nn]avigate\\s+to|[Vv]isit|[Aa]ccess|[Pp]roceed\\s+to|[Ll]aunch)\\b\\s+<xref\\s+href="(https?:\\/\\/[^"]+)"[^>]*>',
+        ],
+        actions: ["goTo"],
+      },
+      {
+        name: "typeText",
+        regex: ['\\b(?:[Pp]ress|[Ee]nter|[Tt]ype)\\b\\s+"([^"]+)"'],
+        actions: ["type"],
+      },
+    ],
   },
   html_1_0: {
     name: "html",
@@ -75,24 +218,38 @@ let defaultFileTypes = {
         "<!--\\s*test\\s*([\\s\\S]*?)\\s*-->",
         "\\[comment\\]:\\s+#\\s+\\(test\\s*(.*?)\\s*\\)",
         "\\[comment\\]:\\s+#\\s+\\(test start\\s*(.*?)\\s*\\)",
+        "\\[comment\\]:\\s+#\\s+'test\\s*(.*?)\\s*'",
+        "\\[comment\\]:\\s+#\\s+'test start\\s*(.*?)\\s*'",
+        '\\[comment\\]:\\s+#\\s+"test\\s*((?:[^"\\\\]|\\\\.)*)\\s*"',
+        '\\[comment\\]:\\s+#\\s+"test start\\s*((?:[^"\\\\]|\\\\.)*)\\s*"',
       ],
       testEnd: [
         "{\\/\\*\\s*test end\\s*\\*\\/}",
         "<!--\\s*test end\\s*([\\s\\S]*?)\\s*-->",
         "\\[comment\\]:\\s+#\\s+\\(test end\\)",
+        "\\[comment\\]:\\s+#\\s+'test end'",
+        '\\[comment\\]:\\s+#\\s+"test end"',
       ],
       ignoreStart: [
         "{\\/\\*\\s*test ignore start\\s*\\*\\/}",
         "<!--\\s*test ignore start\\s*-->",
+        "\\[comment\\]:\\s+#\\s+\\(test ignore start\\)",
+        "\\[comment\\]:\\s+#\\s+'test ignore start'",
+        '\\[comment\\]:\\s+#\\s+"test ignore start"',
       ],
       ignoreEnd: [
         "{\\/\\*\\s*test ignore end\\s*\\*\\/}",
         "<!--\\s*test ignore end\\s*-->",
+        "\\[comment\\]:\\s+#\\s+\\(test ignore end\\)",
+        "\\[comment\\]:\\s+#\\s+'test ignore end'",
+        '\\[comment\\]:\\s+#\\s+"test ignore end"',
       ],
       step: [
         "{\\/\\*\\s*step\\s+?([\\s\\S]*?)\\s*\\*\\/}",
         "<!--\\s*step\\s*([\\s\\S]*?)\\s*-->",
         "\\[comment\\]:\\s+#\\s+\\(step\\s*(.*?)\\s*\\)",
+        "\\[comment\\]:\\s+#\\s+'step\\s*(.*?)\\s*'",
+        '\\[comment\\]:\\s+#\\s+"step\\s*((?:[^"\\\\]|\\\\.)*)\\s*"',
       ],
     },
     markup: [
@@ -134,19 +291,39 @@ let defaultFileTypes = {
         regex: ['\\b(?:press|enter|type)\\b\\s+"([^"]+)"'],
         actions: ["type"],
       },
-      // {
-      //   name: "runBash",
-      //   regex: ["```(?:bash)\\b\\s*\\n(?<code>.*?)(?=\\n```)"],
-      //   batchMatches: true,
-      //   actions: [
-      //     {
-      //       runCode: {
-      //         language: "bash",
-      //         code: "$1",
-      //       },
-      //     },
-      //   ],
-      // },
+      {
+        name: "httpRequestFormat",
+        regex: [
+          "```(?:http)?\\r?\\n([A-Z]+)\\s+([^\\s]+)(?:\\s+HTTP\\/[\\d.]+)?\\r?\\n((?:[^\\s]+:\\s+[^\\s]+\\r?\\n)*)?(?:\\s+([\\s\\S]*?)\\r?\\n+)?```",
+        ],
+        actions: [
+          {
+            httpRequest: {
+              method: "$1",
+              url: "$2",
+              request: {
+                headers: "$3",
+                body: "$4",
+              },
+            },
+          },
+        ],
+      },
+      {
+        name: "runCode",
+        regex: [
+          "```(bash|python|py|javascript|js)(?![^\\r\\n]*testIgnore)[^\\r\\n]*\\r?\\n([\\s\\S]*?)\\r?\\n```",
+        ],
+        actions: [
+          {
+            unsafe: true,
+            runCode: {
+              language: "$1",
+              code: "$2",
+            },
+          },
+        ],
+      },
     ],
   },
 };
@@ -156,6 +333,7 @@ defaultFileTypes = {
   markdown: defaultFileTypes.markdown_1_0,
   asciidoc: defaultFileTypes.asciidoc_1_0,
   html: defaultFileTypes.html_1_0,
+  dita: defaultFileTypes.dita_1_0,
 };
 
 /**
@@ -172,6 +350,25 @@ async function setConfig({ config }) {
   // Load environment variables for `config`
   config = replaceEnvs(config);
 
+  // Apply config overrides from DOC_DETECTIVE environment variable
+  if (process.env.DOC_DETECTIVE) {
+    try {
+      const docDetectiveEnv = JSON.parse(process.env.DOC_DETECTIVE);
+      if (
+        docDetectiveEnv.config &&
+        typeof docDetectiveEnv.config === "object"
+      ) {
+        config = deepMerge(config, docDetectiveEnv.config);
+      }
+    } catch (error) {
+      log(
+        config,
+        "warning",
+        `Invalid JSON in DOC_DETECTIVE environment variable: ${error.message}. Ignoring config overrides.`
+      );
+    }
+  }
+
   // Validate inbound `config`.
   const validityCheck = validate({ schemaKey: "config_v3", object: config });
   if (!validityCheck.valid) {
@@ -181,7 +378,7 @@ async function setConfig({ config }) {
       "error",
       `Invalid config object: ${validityCheck.errors}. Exiting.`
     );
-    process.exit(1);
+    throw new Error(`Invalid config object: ${validityCheck.errors}. Exiting.`);
   }
   config = validityCheck.object;
 
@@ -195,10 +392,10 @@ async function setConfig({ config }) {
       "error",
       `Invalid config. "${fileType}" isn't a valid fileType value.`
     );
-    process.exit(1);
+    throw new Error(
+      `Invalid config. "${fileType}" isn't a valid fileType value.`
+    );
   });
-
-  // TODO: Combine extended fileTypes with overrides
 
   // Standardize value formats
   if (typeof config.input === "string") config.input = [config.input];
@@ -240,9 +437,80 @@ async function setConfig({ config }) {
     }
     if (fileType.markup) {
       fileType.markup = fileType.markup.map((markup) => {
-        if (typeof markup.regex === "string") markup.regex = [markup.regex];
+        if (typeof markup?.regex === "string") markup.regex = [markup.regex];
         return markup;
       });
+    }
+    if (fileType.extends) {
+      // If fileType extends another, merge the properties
+      const extendedFileTypeRaw = defaultFileTypes[fileType.extends];
+      if (!extendedFileTypeRaw) {
+        log(
+          config,
+          "error",
+          'Invalid config. fileType.extends references unknown fileType definition: "' +
+            fileType.extends +
+            '".'
+        );
+        throw new Error(
+          'Invalid config. fileType.extends references unknown fileType definition: "' +
+            fileType.extends +
+            '".'
+        );
+      }
+      const extendedFileType = JSON.parse(JSON.stringify(extendedFileTypeRaw));
+      if (extendedFileType) {
+        if (!fileType.name) {
+          fileType.name = extendedFileType.name;
+        }
+        // Merge extensions
+        if (extendedFileType?.extensions) {
+          fileType.extensions = [
+            ...new Set([
+              ...(extendedFileType.extensions || []),
+              ...(fileType.extensions || []),
+            ]),
+          ];
+        }
+        // Merge inlineStatements
+        if (extendedFileType?.inlineStatements) {
+          if (fileType.inlineStatements === undefined) {
+            fileType.inlineStatements = {};
+          }
+          const keys = [
+            "testStart",
+            "testEnd",
+            "ignoreStart",
+            "ignoreEnd",
+            "step",
+          ];
+          for (const key of keys) {
+            if (
+              extendedFileType?.inlineStatements?.[key] ||
+              fileType?.inlineStatements?.[key]
+            ) {
+              fileType.inlineStatements[key] = [
+                ...new Set([
+                  ...(extendedFileType?.inlineStatements?.[key] || []),
+                  ...(fileType?.inlineStatements?.[key] || []),
+                ]),
+              ];
+            }
+          }
+        }
+        // Merge markup array
+        if (extendedFileType?.markup) {
+          fileType.markup = fileType.markup || [];
+          extendedFileType.markup.forEach((extendedMarkup) => {
+            const existingMarkupIndex = fileType.markup.findIndex(
+              (markup) => markup.name === extendedMarkup.name
+            );
+            if (existingMarkupIndex === -1) {
+              fileType.markup.push(extendedMarkup);
+            }
+          });
+        }
+      }
     }
 
     return fileType;
@@ -250,11 +518,31 @@ async function setConfig({ config }) {
 
   // Detect current environment.
   config.environment = getEnvironment();
-  config.environment.apps = await getAvailableApps(config);
+  config.environment.apps = await getAvailableApps({ config });
+
+  // Resolve concurrent runners configuration
+  config.concurrentRunners = resolveConcurrentRunners(config);
+
   // TODO: Revise loadDescriptions() so it doesn't mutate the input but instead returns an updated object
   await loadDescriptions(config);
 
   return config;
+}
+
+/**
+ * Resolves the concurrentRunners configuration value from various input formats
+ * to a concrete integer for the core execution engine.
+ *
+ * @param {Object} config - The configuration object
+ * @returns {number} The resolved concurrent runners value
+ */
+function resolveConcurrentRunners(config) {
+  if (config.concurrentRunners === true) {
+    // Cap at 4 only for the boolean convenience option
+    return Math.min(os.cpus().length, 4);
+  }
+  // Respect explicit numeric values and default
+  return config.concurrentRunners || 1;
 }
 
 /**
